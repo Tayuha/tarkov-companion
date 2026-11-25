@@ -27,9 +27,10 @@ Implemented so far:
   checksum changed, and `npm run compare` reports the per-dataset plan.
 - Idempotent publication to GitHub Releases: one rolling release per mode, content-addressed dataset
   assets, a stable `manifest.json` pointer swapped last, and a dry-run plan with zero mutations.
-
-Not implemented yet: the scheduled sync workflow (`data-sync.yml`). It is tracked in
-`openspec/changes/bootstrap-tarkov-companion/tasks.md`.
+- Production sync orchestration (`npm run sync`) and the scheduled `.github/workflows/data-sync.yml`:
+  live fetch with the conditional cache, schema validation, normalization, normalized-JSONL cache,
+  bundling, publication, per-mode failure isolation, and a single `Data sync failing` issue lifecycle.
+  Operational guide: [`../docs/data-sync.md`](../docs/data-sync.md).
 
 Bundle writing uses zstd from `node:zlib`, so the pipeline requires **Node 24 or newer** (declared in
 `engines`); no native module or WASM dependency is involved.
@@ -63,6 +64,15 @@ npm run publish -- --mode regular                # create/update data-regular-la
 npm run publish -- --mode regular --prune        # also delete unreferenced assets
 npm run publish -- --mode regular --json
 npm run publish -- --mode regular --tag data-test-regular-latest
+
+# Production sync: fetch -> validate -> normalize -> bundle -> publish (network)
+npm run sync -- --all                            # every mode, rolling releases
+npm run sync -- --mode regular --dry-run         # read the release, mutate nothing
+npm run sync -- --all --force                    # bypass conditional-request validators
+npm run sync -- --all --fixtures ../test/fixtures/upstream --dry-run   # offline plan
+
+# CI failure-issue reporter (used by .github/workflows/data-sync.yml)
+npm run report:status -- --status success --run-url https://github.com/Tayuha/tarkov-companion/actions/runs/0
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -285,6 +295,42 @@ local manifest, and a local dataset that does not match its checksum are typed
 errors with exit code 1. `GH_TOKEN` and `GITHUB_TOKEN` are honored through gh;
 otherwise the existing gh login is used. Full contract, examples and the client
 resolution rule: [`../docs/data-bundles.md`](../docs/data-bundles.md#publication-to-github-releases).
+
+## Scheduled sync
+
+`npm run sync` is the production entry point the workflow calls. It composes the
+stages above instead of reimplementing them:
+
+```
+pipeline/src/sync/
+  types.ts            provider, report and cache interfaces
+  provider.ts         UpstreamDatasetProvider (fetchDataset adapter)
+  fixture-provider.ts FixtureDatasetProvider (offline `--fixtures`)
+  normalized-cache.ts content-addressed normalized JSONL cache
+  run.ts              per-mode fetch -> validate -> normalize -> bundle -> publish
+  report.ts           human summary (`fetched` / `304` / `reused`, bytes, uploads)
+pipeline/src/cli/sync.ts     npm run sync
+pipeline/src/ci/report-status.ts  failure/success issue lifecycle
+```
+
+- Every dataset is fetched with the conditional cache. On `200` it is validated
+  with the schema registry, normalized and its JSONL is stored under the upstream
+  content checksum. On `304` the stored normalized JSONL is reused; when that
+  entry is missing the dataset is re-fetched unconditionally and the decision is
+  logged.
+- A validation or normalization failure blocks that dataset's whole mode:
+  publishing the rest would mark the dataset `removed` and make clients delete
+  their rows. Other modes still run.
+- All modes are processed before exiting. `exitCode` is 1 when any mode failed,
+  and a JSON report is written for the CI issue reporter.
+- A mode with no changes still builds locally, but `publishBundle` makes zero
+  API mutations. A dry run writes any temporary bundle outside the repository and
+  never mutates a release.
+- `--fixtures <dir>` reads committed (or synthesized) fixtures and requires
+  `--dry-run`; fixture bundles are never published.
+
+Schedule, cache key, release tags, issue lifecycle, forced refresh and rollback
+are documented in [`../docs/data-sync.md`](../docs/data-sync.md).
 
 ## Localization contract
 

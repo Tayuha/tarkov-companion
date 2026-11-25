@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
 
 /**
  * Filesystem helpers for the committed upstream fixtures.
@@ -46,13 +47,13 @@ async function walk(dir: string): Promise<string[]> {
 }
 
 /** Every JSON file under the fixtures root, sorted by relative path. */
-export async function listFixtureFiles(): Promise<FixtureFile[]> {
-  const files = await walk(FIXTURES_ROOT);
+export async function listFixtureFiles(root: string = FIXTURES_ROOT): Promise<FixtureFile[]> {
+  const files = await walk(root);
 
   return files
     .filter((path) => path.endsWith(".json"))
     .map((path) => {
-      const relativePath = relative(FIXTURES_ROOT, path).split(sep).join("/");
+      const relativePath = relative(root, path).split(sep).join("/");
       const segments = relativePath.split("/");
       const fixtureSet = segments[0] ?? "";
       const fileName = segments[segments.length - 1] ?? "";
@@ -67,7 +68,43 @@ export function dictionaryPathFor(baseRelativePath: string): string {
   return `${baseRelativePath.replace(/\.json$/, "")}_en.json`;
 }
 
-export async function readFixtureJson(relativePath: string): Promise<unknown> {
-  const text = await readFile(join(FIXTURES_ROOT, relativePath), "utf8");
+export async function readFixtureJson(
+  relativePath: string,
+  root: string = FIXTURES_ROOT,
+): Promise<unknown> {
+  const text = await readFile(join(root, relativePath), "utf8");
   return JSON.parse(text) as unknown;
+}
+
+/**
+ * The capture manifest of one fixture set. It records the upstream source URL,
+ * validators and fetch time per fixture, which the offline sync provider copies
+ * into the bundle manifest.
+ */
+const fixtureFileSchema = z.looseObject({
+  source: z.string().nullish(),
+  lastModified: z.string().nullish(),
+  etag: z.string().nullish(),
+  fetchedAt: z.string().nullish(),
+});
+
+export const fixtureManifestSchema = z.looseObject({
+  sourceBaseUrl: z.string().nullish(),
+  capturedAt: z.string().nullish(),
+  files: z.record(z.string(), fixtureFileSchema),
+});
+
+export type FixtureManifest = z.infer<typeof fixtureManifestSchema>;
+export type FixtureManifestFile = z.infer<typeof fixtureFileSchema>;
+
+export async function readFixtureManifest(
+  mode: string,
+  root: string = FIXTURES_ROOT,
+): Promise<FixtureManifest> {
+  const relativePath = `${mode}/manifest.json`;
+  const parsed = fixtureManifestSchema.safeParse(await readFixtureJson(relativePath, root));
+  if (!parsed.success) {
+    throw new Error(`${relativePath} is not a usable fixture manifest`);
+  }
+  return parsed.data;
 }

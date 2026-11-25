@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { BUNDLE_MODES, type BundleMode } from "../bundle/manifest.js";
 import type { BundleInput, BundleDatasetSource, BundleSourceMeta } from "../bundle/writer.js";
 import {
@@ -9,7 +8,8 @@ import {
 } from "../normalize/index.js";
 import {
   listFixtureFiles,
-  readFixtureJson,
+  readFixtureManifest,
+  type FixtureManifest,
 } from "../schemas/fixtures.js";
 import { datasetForFixturePath } from "../schemas/registry.js";
 import { loadLocalizedFixture } from "./load.js";
@@ -23,30 +23,6 @@ import { loadLocalizedFixture } from "./load.js";
  * fixture but no registered normalizer (for example `pvp-season/season`) are
  * intentionally not part of the bundle.
  */
-
-const fixtureFileSchema = z.looseObject({
-  source: z.string().nullish(),
-  lastModified: z.string().nullish(),
-  etag: z.string().nullish(),
-  fetchedAt: z.string().nullish(),
-});
-
-const fixtureManifestSchema = z.looseObject({
-  sourceBaseUrl: z.string().nullish(),
-  capturedAt: z.string().nullish(),
-  files: z.record(z.string(), fixtureFileSchema),
-});
-
-type FixtureManifest = z.infer<typeof fixtureManifestSchema>;
-
-async function readFixtureManifest(mode: BundleMode): Promise<FixtureManifest> {
-  const relativePath = `${mode}/manifest.json`;
-  const parsed = fixtureManifestSchema.safeParse(await readFixtureJson(relativePath));
-  if (!parsed.success) {
-    throw new Error(`${relativePath} is not a usable fixture manifest`);
-  }
-  return parsed.data;
-}
 
 /** Datasets with a committed base fixture and a registered normalizer, sorted. */
 export async function fixtureBundleDatasets(mode: BundleMode): Promise<NormalizeDataset[]> {

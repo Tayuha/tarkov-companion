@@ -1,0 +1,88 @@
+name: Data sync
+
+on:
+  schedule:
+    # Every 6 hours. GitHub may delay a scheduled run during peak load.
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+# Never run two publications at once. A queued run waits for the active one
+# instead of cancelling it mid-manifest-swap.
+concurrency:
+  group: data-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Fetch, bundle and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: pipeline/package-lock.json
+
+      - name: Restore pipeline cache
+        uses: actions/cache@v4
+        with:
+          # Conditional-request validators, dataset checksums and the
+          # normalized JSONL cache. A unique key per run keeps the cache
+          # immutable; `restore-keys` picks the newest previous run.
+          path: pipeline/.cache/pipeline
+          key: pipeline-cache-${{ github.run_id }}
+          restore-keys: |
+            pipeline-cache-
+
+      - name: Install pipeline dependencies
+        working-directory: pipeline
+        run: npm ci
+
+      - name: Sync data
+        working-directory: pipeline
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          npm run sync -- --all 2>&1 | tee data-sync.log
+
+      - name: Report failure
+        if: failure()
+        working-directory: pipeline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npm run report:status -- \
+            --status failure \
+            --log-file data-sync.log \
+            --report dist/sync-report.json \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+      - name: Report success
+        if: success()
+        working-directory: pipeline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npm run report:status -- \
+            --status success \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+      - name: Upload sync log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-sync-log
+          path: pipeline/data-sync.log
+          if-no-files-found: ignore

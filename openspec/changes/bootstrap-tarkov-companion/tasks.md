@@ -19,7 +19,7 @@
 - [x] 2.6 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
 - [x] 2.7 Implement dataset version comparison so unchanged upstream content publishes nothing, verified by a test where the second run over identical input emits no bundle and exits successfully
 - [x] 2.8 Implement bundle publication to GitHub Releases with an idempotent upload and a stable `latest` manifest pointer, verified by a dry-run mode test and one manual run against a test release
-- [ ] 2.9 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release
+- [x] 2.9 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release
 - [ ] 2.10 Document the pipeline contract (bundle layout, schema versions, manifest fields, localization) in `docs/data-bundles.md`, verified by a reader being able to hand-build a valid bundle from the document and pass a validation command
 - [ ] 2.11 Add a pipeline check that fails on missing translation coverage or compressed bundle size above the 10 MB budget, verified by tests with a missing-key fixture and an oversized synthetic dataset both failing the build
 

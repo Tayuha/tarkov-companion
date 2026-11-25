@@ -1,4 +1,4 @@
-import { readFixtureJson } from "../schemas/fixtures.js";
+import { FIXTURES_ROOT, readFixtureJson } from "../schemas/fixtures.js";
 import {
   formatIssues,
   getDatasetSchema,
@@ -49,11 +49,24 @@ export async function loadLocalizedFixture(
   mode: string,
   dataset: string,
 ): Promise<LocalizedFixture> {
+  return loadLocalizedFixtureFrom(FIXTURES_ROOT, mode, dataset);
+}
+
+/**
+ * Same loader as `loadLocalizedFixture`, but reading from an explicit fixture
+ * root. Used by the offline sync provider so `--fixtures <dir>` can point at a
+ * checkout or a test fixture set.
+ */
+export async function loadLocalizedFixtureFrom(
+  root: string,
+  mode: string,
+  dataset: string,
+): Promise<LocalizedFixture> {
   const definition = getDatasetSchema(mode, dataset);
   if (definition === undefined) throw new Error(`no schema registered for ${mode}/${dataset}`);
 
   const relativePath = `${mode}/${dataset}.json`;
-  const payload = await readFixtureJson(relativePath);
+  const payload = await readFixtureJson(relativePath, root);
 
   const envelope = parseDatasetEnvelope(mode, dataset, payload);
   if (!envelope.success) {
@@ -66,7 +79,7 @@ export async function loadLocalizedFixture(
   let dictionary: Record<string, string> = {};
   if (translations.length > 0) {
     const dictionaryPath = `${mode}/${dataset}_en.json`;
-    const dictionaryPayload = await readFixtureJson(dictionaryPath);
+    const dictionaryPayload = await readFixtureJson(dictionaryPath, root);
     const parsed = parseDictionary(dictionaryPayload);
     if (!parsed.success) {
       throw new Error(`${dictionaryPath}: ${formatIssues(parsed.error)}`);
