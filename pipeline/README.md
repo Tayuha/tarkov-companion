@@ -14,6 +14,8 @@ Implemented so far:
 - Fetch helper with timeouts, retries, user agent, and strict dictionary handling.
 - CLI to inspect any dataset.
 - Deterministic, committed upstream fixtures for the pipeline tests (`test/fixtures/upstream/`).
+- Zod schemas for every captured dataset, with a registry keyed by `{mode, dataset}` and an offline
+  fixture-validation CLI.
 
 Not implemented yet: normalization, bundle writing, publication, conditional requests. Those are tracked
 in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
@@ -25,6 +27,7 @@ npm ci
 npm test
 npm run lint
 npm run build
+npm run validate:fixtures   # offline: parse every committed fixture through its schema
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -40,6 +43,55 @@ Options: `--mode regular|pve|pvp-season`, `--dataset <name>`, `--lang <code>` (d
 Fixtures keep unresolved placeholders plus a filtered `_en` dictionary so tests exercise the
 resolver. See [`../test/fixtures/README.md`](../test/fixtures/README.md) for the trimming policy,
 layout, budget, and stale-pointer notes.
+
+## Schema validation
+
+Upstream payloads are validated with Zod before normalization. One module per dataset, plus shared
+primitives:
+
+```
+pipeline/src/schemas/
+  primitives.ts   ids, timestamps, URLs, prices, vectors, item filters
+  envelope.ts     { data, translations? } and { data: Record<string, string> }
+  items.ts        /{mode}/items (named collections, property unions)
+  tasks.ts        /regular/tasks (+ questItems, achievements, prestige)
+  traders.ts      /regular/traders (id-keyed)
+  hideout.ts      /regular/hideout (id-keyed)
+  crafts.ts       /regular/crafts (array)
+  barters.ts      /regular/barters (array)
+  maps.ts         /regular/maps (maps, mobs, loot containers, …)
+  prices.ts       /regular/prices/{itemId} (array)
+  status.ts       /common/status
+  season.ts       /pvp-season/season
+  registry.ts     {mode, dataset} -> schema, envelope, counts
+  fixtures.ts     offline fixture discovery helpers
+```
+
+`registry.ts` is the only place that maps a fixture to a schema. The test suite fails if a fixture
+directory/dataset has no schema, or if a registered schema has no fixture, so a newly captured dataset
+cannot slip through unvalidated.
+
+Strictness policy:
+
+- Objects are **loose**: unknown upstream fields are preserved and ignored, so a new field never breaks
+  a build. Known fields are strictly typed; a missing required field or a retyped one fails with a Zod
+  path naming it.
+- Fields selected by a discriminator (`ItemProperties*.propertiesType`, task objective `type`) are
+  typed but optional unless the fixture shows them on every record. The committed fixtures are trimmed
+  snapshots, so requiring every per-type field would reject valid upstream records.
+- Nulls and `nullish` are only used where a fixture justifies them: nullable price fields, task `map`,
+  barter `taskUnlock`, trader multipliers, season `points`, prestige customization `imageLink`, and
+  the few objective fields that are both absent and `null`.
+- Entity references (item, task, trader ids) are validated as non-empty strings, never checked for
+  existence: a fixture may reference a record trimmed out of another dataset.
+- Empty arrays are always valid.
+
+```bash
+npm run validate:fixtures
+```
+
+The CLI parses every committed base fixture and every dictionary, prints per-dataset record counts, and
+exits non-zero on the first schema regression. It performs no network I/O.
 
 ## Localization contract
 

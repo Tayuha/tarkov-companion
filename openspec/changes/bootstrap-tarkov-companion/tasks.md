@@ -13,7 +13,7 @@
 
 - [x] 2.1 Implement the localization resolver (JSONPath subset incl. recursive descent and key unions, dictionary lookup, stale/missing diagnostics) plus the fetch helper and CLI, verified by `npm test` covering 25,016 item and 3,642 task strings resolved with zero missing keys and zero unparsable pointers
 - [x] 2.2 Capture and commit trimmed upstream fixtures per dataset and game mode under `test/fixtures/upstream/`, verified by fixtures staying under 2 MB total and containing every field the schemas require
-- [ ] 2.3 Define Zod schemas for each upstream dataset (items, tasks, traders, hideout, crafts, barters, maps) from the captured fixtures, verified by schema tests that accept recorded payloads and reject mutated payloads
+- [x] 2.3 Define Zod schemas for each upstream dataset (items, tasks, traders, hideout, crafts, barters, maps) from the captured fixtures, verified by schema tests that accept recorded payloads and reject mutated payloads
 - [ ] 2.4 Extend the upstream fetcher with ETag/Last-Modified conditional requests and per-dataset checksum caching, verified by unit tests for 200, 304, 429, and 500 responses
 - [ ] 2.5 Implement normalization from the localized upstream shape to the bundle JSONL shape (stable keys, resolved references, price fields, objective types), verified by golden-file tests comparing normalized output for the fixtures
 - [ ] 2.6 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
