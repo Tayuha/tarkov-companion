@@ -119,8 +119,11 @@ const BUY_OFFER_CONSUMED = new Set([
   "price",
   "priceRUB",
   "currency",
+  "currencyItem",
   "minTraderLevel",
   "buyLimit",
+  "restockAmount",
+  "taskUnlock",
 ]);
 
 const SELL_OFFER_CONSUMED = new Set(["trader", "price", "priceRUB", "currency", "currencyItem"]);
@@ -424,10 +427,21 @@ function projectBuyOffers(
     const offer = requireRecord(entry, `${path}[${index}]`);
     const price = moneyValue(offer["priceRUB"] ?? offer["price"]);
     if (price === undefined) throw new Error(`${path}[${index}].price: expected a number`);
+    const restockAmount = integerValue(offer["restockAmount"]);
+    if (restockAmount === undefined) {
+      throw new Error(`${path}[${index}].restockAmount: expected a number`);
+    }
+    const taskUnlock = offer["taskUnlock"];
     const out: JsonRecord = {
       traderId: requireId(offer["trader"], `${path}[${index}].trader`),
       price,
       currency: requireString(offer["currency"], `${path}[${index}].currency`),
+      currencyItemId: requireId(offer["currencyItem"], `${path}[${index}].currencyItem`),
+      restockAmount,
+      taskUnlockId:
+        taskUnlock === null
+          ? null
+          : requireId(taskUnlock, `${path}[${index}].taskUnlock`),
     };
     if (typeof offer["minTraderLevel"] === "number") {
       out["loyaltyLevel"] = offer["minTraderLevel"];
@@ -455,6 +469,7 @@ function projectSellOffers(
       traderId: requireId(offer["trader"], `${path}[${index}].trader`),
       price,
       currency: requireString(offer["currency"], `${path}[${index}].currency`),
+      currencyItemId: requireId(offer["currencyItem"], `${path}[${index}].currencyItem`),
     };
     for (const key of Object.keys(offer)) {
       if (!SELL_OFFER_CONSUMED.has(key)) ctx.stats.drop(`${path}[${index}].${key}`);

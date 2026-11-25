@@ -204,6 +204,54 @@ describe("bundle JSONL invariants", () => {
     expect(objectives).toBeGreaterThan(0);
   });
 
+  it("preserves trader offer currency item, restock and task unlock", async () => {
+    const result = await normalized("items");
+    const record = result.records.find(
+      (entry) => entry.kind === "item" && entry.id === "5447a9cd4bdc2dbd208b4567",
+    );
+    expect(record).toBeDefined();
+
+    const buyOffers = record?.["buyFromTrader"];
+    expect(Array.isArray(buyOffers)).toBe(true);
+    if (Array.isArray(buyOffers) && isRecord(buyOffers[0])) {
+      expect(buyOffers[0]["currencyItemId"]).toBe("5449016a4bdc2d6f028b456f");
+      expect(buyOffers[0]["restockAmount"]).toBe(100000);
+      expect(buyOffers[0]).toHaveProperty("taskUnlockId");
+      expect(buyOffers[0]["taskUnlockId"]).toBeNull();
+    }
+
+    const sellOffers = record?.["sellToTrader"];
+    expect(Array.isArray(sellOffers)).toBe(true);
+    if (Array.isArray(sellOffers)) {
+      expect(sellOffers.length).toBeGreaterThan(0);
+      for (const offer of sellOffers) {
+        expect(isRecord(offer)).toBe(true);
+        expect(typeof (isRecord(offer) ? offer["currencyItemId"] : undefined)).toBe("string");
+      }
+    }
+
+    const fixture = await loadLocalizedFixture("regular", "items");
+    const data: unknown = structuredClone(fixture.data);
+    if (!isRecord(data)) throw new Error("items fixture data is not an object");
+    const items = data["items"];
+    if (!isRecord(items)) throw new Error("items fixture has no items map");
+    const item = items["5447a9cd4bdc2dbd208b4567"];
+    if (!isRecord(item)) throw new Error("M4A1 fixture item is missing");
+    const buy = item["buyFromTrader"];
+    if (!Array.isArray(buy) || !isRecord(buy[0])) throw new Error("M4A1 buy offers are missing");
+    buy[0]["taskUnlock"] = "5967530a86f77462ba22226b";
+
+    const synthetic = normalizeDataset("items", data);
+    const syntheticRecord = synthetic.records.find(
+      (entry) => entry.kind === "item" && entry.id === "5447a9cd4bdc2dbd208b4567",
+    );
+    const syntheticBuy = syntheticRecord?.["buyFromTrader"];
+    expect(Array.isArray(syntheticBuy)).toBe(true);
+    if (Array.isArray(syntheticBuy) && isRecord(syntheticBuy[0])) {
+      expect(syntheticBuy[0]["taskUnlockId"]).toBe("5967530a86f77462ba22226b");
+    }
+  });
+
   it("accounts for every record in the per-kind stats", async () => {
     for (const dataset of NORMALIZE_DATASETS) {
       const result = await normalized(dataset);

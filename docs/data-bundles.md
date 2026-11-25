@@ -68,21 +68,23 @@ emitted again.
 
 ### Trader offers
 
-Only the shape below is kept; upstream `currencyItem`, `restockAmount` and
-`taskUnlock` on buy offers are dropped by contract.
-
 ```json
 "buyFromTrader": [
   { "traderId": "5a7c2eca...", "price": 22997, "currency": "RUB",
-    "loyaltyLevel": 3, "buyLimit": 5 }
+    "currencyItemId": "5449016a...", "loyaltyLevel": 3, "buyLimit": 5,
+    "restockAmount": 100000, "taskUnlockId": null }
 ],
 "sellToTrader": [
-  { "traderId": "54cb50c7...", "price": 18000, "currency": "RUB" }
+  { "traderId": "54cb50c7...", "price": 18000, "currency": "RUB",
+    "currencyItemId": "5449016a..." }
 ]
 ```
 
-`loyaltyLevel` is the upstream `minTraderLevel`. The key is only present when
-upstream provides it.
+`loyaltyLevel` is the upstream `minTraderLevel` and is only present when
+upstream provides it. `currencyItemId` is the item used to pay (for example the
+roubles item id). `restockAmount` is the stock per trader reset.
+`taskUnlockId` references a task that unlocks the offer, or is `null` when no
+task is required; it is always present on buy offers.
 
 ## Intentional embedded values
 
@@ -154,13 +156,13 @@ source of names. `zones[].map` becomes `zones[].mapId`; a zone keeps its own
 
 ## Dropped fields in the fixtures
 
-`items` drops 138 fields, all from the prescribed trader-offer shape:
-`buyFromTrader[].currencyItem`, `restockAmount`, `taskUnlock` and
-`sellToTrader[].currencyItem`.
+`items` drops no fields. Every trader-offer field the item schema validates is
+preserved: `currencyItemId`, `restockAmount` and `taskUnlockId` now join the
+price and loyalty fields.
 
-`tasks` drops 17: 16 embedded worn-item `name` values and one upstream
-`craftUnlock.trader_name` that the schema does not model. Every other dataset
-drops zero fields.
+`tasks` drops 17: 16 embedded worn-item `name` values (denormalized display
+names) and one upstream `craftUnlock.trader_name` that the schema does not
+model. Every other dataset drops zero fields.
 
 ## Produce and verify
 
