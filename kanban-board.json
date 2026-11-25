@@ -516,6 +516,28 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 9,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data",
+        "tag_infra"
+      ],
+      "notes": "Completed 2026-11-25 in session ses_debd54a65ffeZJJCjKWemkbwZ4. Per-mode rolling releases data-<mode>-latest with stable manifest URL; content-addressed <dataset>-<sha12>.jsonl.zst assets uploaded first, manifest last; no-op on identical content; optional --prune. GhReleaseClient via execFile with GH_TOKEN mapping. Manual test release created, published twice (second no-op), manifest downloaded and verified, release deleted. 167 tests. Commit 16e5858.",
+      "sessionID": "ses_debd54a65ffeZJJCjKWemkbwZ4",
+      "createdAt": 1795634683547,
+      "updatedAt": 1795635475815,
+      "archived": false
+    },
+    {
+      "id": "task_impl_2_9",
+      "title": "T2.9 Scheduled data sync workflow",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
@@ -523,10 +545,10 @@
         "tag_data",
         "tag_infra"
       ],
-      "notes": "In progress in a linked child session. Fixed design: one rolling release per mode tagged data-<mode>-latest, stable manifest URL, immutable <dataset>-<sha12>.jsonl.zst assets, manifest uploaded last, no-op on identical content, optional --prune. Acceptance: ReleaseClient abstraction, gh implementation, dry-run zero mutations, manual test release created/published twice/inspected/deleted, task 2.8 checked.",
-      "sessionID": "ses_debd54a65ffeZJJCjKWemkbwZ4",
-      "createdAt": 1795634683547,
-      "updatedAt": 1795634683547,
+      "notes": "In progress in a linked child session. Builds the missing production orchestration (fetch -> validate -> normalize -> bundle -> publish) with conditional-cache reuse, then the 6-hour workflow with concurrency, Actions cache, and failure issue lifecycle. First dispatch creates the three real data-<mode>-latest releases; second dispatch must no-op. Task 2.9 checked.",
+      "sessionID": "ses_debc9307cffeZjp8XBkW5muRiC",
+      "createdAt": 1795635475815,
+      "updatedAt": 1795635475815,
       "archived": false
     }
   ]
