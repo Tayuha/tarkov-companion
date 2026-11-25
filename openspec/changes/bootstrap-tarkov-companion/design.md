@@ -100,10 +100,14 @@ Linux/Windows tooling less mature; no benefit here).
 resolves localization dictionaries, validates and normalizes the result, and publishes:
 
 ```
-manifest.json
+bundles/<mode>/manifest.json          # one self-describing manifest per mode
 bundles/<mode>/<dataset>.jsonl.zst     # games: regular | pve | pvp-season
                                        # datasets: items, tasks, traders, hideout, crafts, barters, maps
 ```
+
+A per-mode manifest (rather than a single root pointer) was chosen during task 2.6: a client fetches
+exactly one document for the mode it needs, and the file paths stay relative to that manifest. Publication
+(2.8) will decide how a "latest" pointer is exposed across modes.
 
 The app downloads the manifest, compares dataset checksums, downloads only changed datasets, verifies
 SHA-256, and ingests them into its own SQLite database inside a transaction.

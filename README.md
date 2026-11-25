@@ -54,7 +54,7 @@ dataset by SHA-256 and ingests it transactionally into its own schema. See
 
 ## Building
 
-Prerequisites: Flutter (stable), Node.js 22+, Git.
+Prerequisites: Flutter (stable), Node.js 24+ (the bundle writer uses built-in zstd), Git.
 
 ```bash
 git clone git@github.com:Tayuha/tarkov-companion.git
