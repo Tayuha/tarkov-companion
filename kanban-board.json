@@ -390,16 +390,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 3,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: deterministic capture script, all mode-scoped datasets for regular + pve/pvp-season markers, status/season/price-history samples, manifest with ETag and sha256, total fixtures < 2,000,000 bytes, offline tests, task 2.2 checked off. Verify: npm run lint && npm test && npm run build; openspec validate --strict.",
+      "notes": "Completed 2026-11-25 in session ses_dec1a9b3cffeu6w8Wia010VBXL. 1,665,700 bytes total (1.59 MB). Regular: 60 items, 80 tasks, 16 traders, 26 hideout, 20 crafts, 20 barters, 2 maps + mobs, 120 price points. pve/pvp-season markers plus season and status. Deterministic capture script (npm run fixtures) and pure trim module. 44 tests, lint/build/validate green. Commit a0c3437. Known: 2 upstream-stale item pointers, 14 task pointers (11 upstream, 3 trimming), 1 maps btrStops, 9 mode-marker pointers; all recorded in manifests, no missing dictionary keys.",
       "sessionID": "ses_dec1a9b3cffeu6w8Wia010VBXL",
       "createdAt": 1795630277636,
-      "updatedAt": 1795630277636,
+      "updatedAt": 1795631014762,
       "archived": false
     }
   ]
