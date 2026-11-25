@@ -67,7 +67,13 @@ const definitionsByKey = new Map(
 );
 
 export function getDatasetSchema(mode: string, dataset: string): DatasetDefinition | undefined {
-  return definitionsByKey.get(`${mode}/${dataset}`);
+  const exact = definitionsByKey.get(`${mode}/${dataset}`);
+  if (exact !== undefined) return exact;
+
+  // Game modes share the same payload shape. When a mode has no fixture (and
+  // therefore no exact entry), fall back to the regular contract so PvE and
+  // season data is still validated instead of silently skipped.
+  return definitionsByKey.get(`regular/${dataset}`);
 }
 
 /**

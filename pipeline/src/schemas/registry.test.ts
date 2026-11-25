@@ -4,6 +4,7 @@ import {
   DATASET_DEFINITIONS,
   datasetForFixturePath,
   formatIssues,
+  getDatasetSchema,
   parseDatasetData,
   parseDatasetEnvelope,
   parseDictionary,
@@ -239,6 +240,22 @@ describe("upstream schema registry", () => {
     ).sort();
 
     expect(fixtureKeys).toEqual(schemaKeys);
+  });
+
+  it("validates every game mode through the regular contract when a mode has no fixture", () => {
+    for (const dataset of ["items", "tasks", "traders", "hideout", "crafts", "barters", "maps", "prices"]) {
+      const regular = getDatasetSchema("regular", dataset);
+      expect(regular, `regular/${dataset} must be registered`).toBeDefined();
+
+      for (const mode of ["pve", "pvp-season"]) {
+        const definition = getDatasetSchema(mode, dataset);
+        expect(definition, `${mode}/${dataset} must resolve`).toBeDefined();
+        expect(definition?.data).toBe(regular?.data);
+      }
+    }
+
+    expect(getDatasetSchema("pvp-season", "season")).toBeDefined();
+    expect(getDatasetSchema("common", "status")).toBeDefined();
   });
 
   it("accepts every base fixture through its registered envelope and data schema", async () => {
