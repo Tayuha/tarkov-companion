@@ -1,10 +1,10 @@
 # Data bundles
 
-> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest) and
-> task 2.7 the comparison/no-op gate. Task 2.8 adds publication and task 2.10
-> finalizes the public contract. This document already describes the exact bytes
-> and manifest fields the writer produces; treat changes here as a contract
-> change.
+> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest),
+> task 2.7 the comparison/no-op gate, and task 2.8 publication to GitHub
+> Releases. Task 2.10 finalizes the public contract. This document already
+> describes the exact bytes and manifest fields the writer produces and the
+> release layout the publisher uses; treat changes here as a contract change.
 
 The pipeline turns each validated, localized upstream dataset into **JSONL**:
 one JSON object per line, one record kind per line. The app ingests the records
@@ -252,6 +252,141 @@ validated. `--json` prints the machine-readable plan:
 }
 ```
 
+## Publication to GitHub Releases
+
+Each game mode has **one rolling release**; the pipeline never creates a release
+per build. A release is identified by its tag:
+
+| Mode | Tag | Title |
+|---|---|---|
+| `regular` | `data-regular-latest` | `Tarkov Companion data — regular` |
+| `pve` | `data-pve-latest` | `Tarkov Companion data — pve` |
+| `pvp-season` | `data-pvp-season-latest` | `Tarkov Companion data — pvp-season` |
+
+The stable manifest URL is therefore:
+
+```
+https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json
+```
+
+The repository is private today, so this URL requires an authenticated request
+while it stays private. The client contract is the same once the repository is
+public. Data releases are created with `--latest=false`, so they never become
+the repository's "Latest" release (that slot is for app releases).
+
+### Release assets
+
+GitHub release assets are **flat**: an asset name cannot contain `/`, so the
+mode directory from the local bundle layout cannot be uploaded as-is. Each
+release holds exactly:
+
+```
+manifest.json
+<dataset>-<sha12>.jsonl.zst
+```
+
+`<sha12>` is the first 12 lowercase hex characters of that dataset's `sha256`
+(which is the checksum of the compressed `.jsonl.zst` bytes). For example:
+
+```
+items-bc330ec05ae3.jsonl.zst
+tasks-627bbfd58410.jsonl.zst
+```
+
+A dataset asset is **immutable and content-addressed**: a changed dataset has a
+different checksum, so it is uploaded under a new name and the previous asset is
+left in place. That is what makes an interrupted publication recoverable.
+
+Before upload, every `datasets[].path` in the manifest is rewritten from the
+local file name (`items.jsonl.zst`) to the versioned asset name
+(`items-bc330ec05ae3.jsonl.zst`). Every other manifest field is unchanged.
+
+**Client resolution rule:** the client takes the stable manifest URL as its
+base and resolves each dataset path relative to it:
+
+```
+new URL("items-bc330ec05ae3.jsonl.zst",
+        "https://github.com/Tayuha/tarkov-companion/releases/download/data-regular-latest/manifest.json")
+  -> https://github.com/Tayuha/tarkov-companion/releases/download/data-regular-latest/items-bc330ec05ae3.jsonl.zst
+```
+
+The resolved asset is a sibling in the same release; there is no `/<mode>/`
+segment in the asset URL.
+
+### Upload order and atomic swap
+
+1. All changed or new dataset assets, sorted by dataset name.
+2. `manifest.json` **last**.
+
+Until the manifest is replaced, clients keep reading the previous manifest,
+which still points at the old immutable assets. A client therefore never sees a
+manifest that references an asset that has not finished uploading.
+
+### Idempotency and the no-op rule
+
+An asset that already exists with the same name and size is skipped. Because
+asset names are content-addressed, "same name" already implies "same bytes" for
+a healthy publication; the size check also repairs a partial or corrupted
+upload.
+
+`manifest.json` is replaced only when the task 2.7 comparison reports an added,
+changed or removed dataset, a `bundleSchemaVersion`/`minAppSchemaVersion` change,
+or when the published manifest does not use versioned asset paths. A rebuild
+that only moves `generatedAt` (or upstream `ETag`/timestamps) is not a change.
+
+Consequences:
+
+- Re-running a publication with no upstream changes makes **zero create, upload
+  or delete calls** and exits 0.
+- A publication interrupted after some dataset uploads resumes on the next run:
+  the already-uploaded assets are skipped by name + size and only the missing
+  assets plus the manifest are sent.
+- A missing release or a release without `manifest.json` means "publish
+  everything"; existing matching dataset assets are still skipped.
+
+### Pruning (opt-in)
+
+`--prune` deletes dataset assets that the new manifest does not reference, after
+the manifest swap. `manifest.json` is never a prune candidate.
+
+Pruning is **off by default** because it removes rollback capability: a client
+still holding the previous manifest may request an asset that has just been
+deleted, and there is no way to roll the release back to the previous checksum.
+Run it only when you accept losing the old datasets. Without pruning, old
+immutable assets accumulate in the rolling release.
+
+### Commands
+
+```bash
+cd pipeline
+
+npm run bundle -- --all
+npm run publish -- --mode regular --dry-run      # exact plan, zero mutations
+npm run publish -- --mode regular                # create/update the rolling release
+npm run publish -- --mode regular --prune        # also delete unreferenced assets
+npm run publish -- --mode regular --json         # machine-readable report
+
+# Custom tag (the manual test uses this one; it never touches data-regular-latest)
+npm run publish -- --mode regular --tag data-test-regular-latest
+```
+
+Options:
+
+| Option | Meaning |
+|---|---|
+| `--mode regular\|pve\|pvp-season` | Required. Selects the local mode directory and the default tag. |
+| `--bundles <dir>` | Bundles root; default `dist/bundles`. |
+| `--tag <tag>` | Release tag; default `data-<mode>-latest`. Custom tags are allowed, but a stable tag for another mode is refused. |
+| `--dry-run` | Reads the release and prints the ordered plan; performs no create/upload/delete. |
+| `--prune` | Deletes unreferenced dataset assets after the manifest swap. |
+| `--json` | Prints the report as JSON instead of the human summary. |
+
+Publication fails with a typed error and exit code 1 when `gh` is missing, gh is
+not authenticated, the tag is invalid or belongs to another mode, the local
+manifest is missing/invalid, a local dataset is missing, or a dataset file does
+not match the manifest's size and SHA-256. Dry-run uses the same validation, so
+a plan either reflects a publishable bundle or fails before any mutation.
+
 ## Field conventions
 
 | Concern | Convention |
@@ -408,7 +543,12 @@ npm run compare -- --previous /tmp/bundles/regular/manifest.json \
                    --current /tmp/fresh/regular/manifest.json      # human summary
 npm run compare -- --previous old.json --current new.json --json   # machine output
 
-npm test                                   # golden, bundle, comparison and invariant suite
+npm run publish -- --mode regular --dry-run                  # plan only, no mutations
+npm run publish -- --mode regular                            # rolling release
+npm run publish -- --mode regular --prune                    # also drop old assets
+npm run publish -- --mode regular --tag data-test-regular-latest
+
+npm test                                   # golden, bundle, comparison, release and invariant suite
 ```
 
 `--previous` accepts three forms:
@@ -424,6 +564,12 @@ mode; a single manifest file is only unambiguous for one mode.
 exits 0 even when datasets differ. See
 ["Comparison and no-op publishing"](#comparison-and-no-op-publishing) for the
 classification rules and the JSON shape.
+
+`npm run publish` is the only pipeline command that touches the network. It
+needs `gh` installed and authenticated (`GH_TOKEN`/`GITHUB_TOKEN` are honored)
+because it reads the current release manifest and asset list; `--dry-run` makes
+no create/upload/delete call. The release test suite runs the publisher offline
+against an in-memory release client.
 
 `npm run normalize` localizes and validates each committed fixture offline,
 normalizes it, and writes the plain JSONL with per-kind counts, output bytes,

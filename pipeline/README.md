@@ -25,9 +25,11 @@ Implemented so far:
   fixtures.
 - Content-based bundle comparison and no-op gating: `bundle --previous` writes nothing when no dataset
   checksum changed, and `npm run compare` reports the per-dataset plan.
+- Idempotent publication to GitHub Releases: one rolling release per mode, content-addressed dataset
+  assets, a stable `manifest.json` pointer swapped last, and a dry-run plan with zero mutations.
 
-Not implemented yet: publishing bundles to GitHub Releases and the scheduled sync workflow. Those are
-tracked in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
+Not implemented yet: the scheduled sync workflow (`data-sync.yml`). It is tracked in
+`openspec/changes/bootstrap-tarkov-companion/tasks.md`.
 
 Bundle writing uses zstd from `node:zlib`, so the pipeline requires **Node 24 or newer** (declared in
 `engines`); no native module or WASM dependency is involved.
@@ -54,6 +56,13 @@ npm run bundle -- --mode regular --previous /tmp/bundles/regular/manifest.json
 # Report a comparison without building or writing anything
 npm run compare -- --previous /tmp/old/regular/manifest.json --current /tmp/new/regular/manifest.json
 npm run compare -- --previous old.json --current new.json --json
+
+# Publish the built bundle to its rolling GitHub release (network)
+npm run publish -- --mode regular --dry-run      # exact plan, zero mutations
+npm run publish -- --mode regular                # create/update data-regular-latest
+npm run publish -- --mode regular --prune        # also delete unreferenced assets
+npm run publish -- --mode regular --json
+npm run publish -- --mode regular --tag data-test-regular-latest
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -219,6 +228,63 @@ summary, or the plan as JSON with `--json`.
 `npm run bundle -- --all` prints per-dataset records, uncompressed and compressed bytes, compression
 ratio and a checksum prefix, plus the manifest path.
 
+## Publication
+
+```
+pipeline/src/release/
+  assets.ts         tag/asset naming, stable URL, manifest path rewriting
+  client.ts         ReleaseClient interface
+  gh-client.ts      gh CLI implementation (execFile, never a shell)
+  memory-client.ts  offline test double
+  plan.ts           pure ordered plan: uploads, skips, prune candidates, noop
+  publish.ts        validate, read remote manifest, plan, apply
+  report.ts         human summary and --json report
+pipeline/src/cli/publish.ts   npm run publish
+```
+
+Each mode publishes to **one rolling release**, tagged `data-<mode>-latest`
+(`regular`, `pve`, `pvp-season`) and titled `Tarkov Companion data — <mode>`.
+The stable client pointer is:
+
+```
+https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json
+```
+
+Release assets are flat because GitHub forbids `/` in asset names:
+
+```
+manifest.json
+<dataset>-<sha12>.jsonl.zst     # sha12 = first 12 hex chars of the dataset sha256
+```
+
+Before upload every manifest `datasets[].path` is rewritten to the versioned
+asset name. The client resolves each path relative to the manifest URL, so it
+lands on a sibling asset in the same release.
+
+**Order and atomicity.** Changed/new dataset assets are uploaded first, sorted
+by dataset name; `manifest.json` is replaced last. Until that swap, clients read
+the previous manifest and its still-present immutable assets, so no reader ever
+sees a manifest pointing at an asset that is not fully uploaded.
+
+**Idempotency.** An existing asset with the same name and size is skipped. The
+manifest is replaced only when `compareBundles` reports added/changed/removed
+datasets, a contract-version change, or a published manifest whose paths are not
+versioned; `generatedAt` alone does not count. A re-run with no changes makes
+zero create/upload/delete calls and exits 0, and an interrupted run resumes by
+skipping the assets it already uploaded.
+
+**Pruning.** Off by default. `--prune` deletes dataset assets the new manifest
+does not reference, after the manifest swap; `manifest.json` is never deleted.
+It removes rollback capability (a client on the previous manifest may ask for a
+deleted asset), so use it deliberately.
+
+`--dry-run` reads the release and prints the exact ordered plan but performs no
+mutation. `--json` emits the machine-readable report. Missing `gh`, an
+unauthenticated gh, an invalid tag (or another mode's stable tag), a missing
+local manifest, and a local dataset that does not match its checksum are typed
+errors with exit code 1. `GH_TOKEN` and `GITHUB_TOKEN` are honored through gh;
+otherwise the existing gh login is used. Full contract, examples and the client
+resolution rule: [`../docs/data-bundles.md`](../docs/data-bundles.md#publication-to-github-releases).
 
 ## Localization contract
 
