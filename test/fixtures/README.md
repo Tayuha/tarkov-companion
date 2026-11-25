@@ -100,6 +100,15 @@ stale-pointer list exactly against the manifest. Known causes:
 If upstream adds a real dictionary gap, the localization test fails on `missingKeys` rather than
 silently accepting placeholder text.
 
+## Normalized goldens
+
+`test/fixtures/normalized/<dataset>.jsonl` holds the byte-for-byte output of
+`pipeline/src/normalize/` for each committed regular fixture. They are generated
+offline by localizing the fixture and running `npm run normalize -- --all --out
+../test/fixtures/normalized`. `npm test` compares every dataset against its
+golden; update a golden only after reviewing the diff, since it is the bundle
+contract. See [`docs/data-bundles.md`](../../docs/data-bundles.md).
+
 ## Budget
 
 The whole directory must stay under **2,000,000 bytes** on disk. The test suite enforces this, and the

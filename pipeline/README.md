@@ -18,8 +18,10 @@ Implemented so far:
 - Deterministic, committed upstream fixtures for the pipeline tests (`test/fixtures/upstream/`).
 - Zod schemas for every captured dataset, with a registry keyed by `{mode, dataset}` and an offline
   fixture-validation CLI.
+- Deterministic normalization from the localized upstream shape to bundle JSONL records, with a dataset
+  registry, per-kind counts, dropped-field stats, and golden-file tests.
 
-Not implemented yet: normalization, bundle writing, publication. Those are tracked in
+Not implemented yet: bundle writing (zstd + manifest + checksums) and publication. Those are tracked in
 `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
 
 ## Usage
@@ -30,6 +32,8 @@ npm test
 npm run lint
 npm run build
 npm run validate:fixtures   # offline: parse every committed fixture through its schema
+npm run normalize -- --all  # offline: write dist/normalized/<dataset>.jsonl
+npm run normalize -- --dataset items --out /tmp/normalized
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -95,6 +99,39 @@ npm run validate:fixtures
 
 The CLI parses every committed base fixture and every dictionary, prints per-dataset record counts, and
 exits non-zero on the first schema regression. It performs no network I/O.
+
+## Normalization
+
+`src/normalize/` converts a validated, localized payload into the bundle record shape. It is pure: no
+I/O, no clock, no randomness.
+
+```
+pipeline/src/normalize/
+  contract.ts   BundleRecord, field projection, ids/money/timestamps, contract checks
+  items.ts      item + itemCategory, handbookCategory, fleaMarket, armorMaterial,
+                playerLevel, mastering, skill, specialItem, setting
+  tasks.ts      task + questItem, achievement, prestige
+  traders.ts    trader
+  hideout.ts    hideoutStation
+  crafts.ts     craft
+  barters.ts    barter
+  maps.ts       map, mob, lootContainer, stationaryWeapon, goonReport
+  registry.ts   dataset -> normalizer, deterministic ordering
+  index.ts      normalizeDataset() and serializeJsonl()
+```
+
+- Every line has `kind` and `id`; `kind` + `id` is unique per dataset.
+- Records sort by `kind` then `id`, keys are canonical, and the file has a trailing newline, so the same
+  input is byte-identical output.
+- References are ids ending in `Id`; related entities are never embedded. Money is integer roubles,
+  weights are kilograms, grid sizes are integers, and timestamps are ISO 8601 UTC strings.
+- Items fold the price snapshot into a `price` object; task objectives are discriminated by `type` and
+  only carry the fields their type admits.
+- Unknown upstream fields are dropped and counted in `stats.droppedFields`; a placeholder-shaped string,
+  duplicate `kind`+`id`, missing id or non-finite number fails normalization.
+
+The full contract is in [`../docs/data-bundles.md`](../docs/data-bundles.md). Goldens for every dataset
+live in `test/fixtures/normalized/` and are compared byte for byte by `npm test`.
 
 ## Localization contract
 

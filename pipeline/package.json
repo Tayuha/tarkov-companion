@@ -14,6 +14,7 @@
     "test:watch": "vitest",
     "fetch": "tsx src/cli/fetch.ts",
     "fixtures": "tsx src/scripts/capture-fixtures.ts",
+    "normalize": "tsx src/cli/normalize.ts",
     "validate:fixtures": "tsx src/cli/validate-fixtures.ts"
   },
   "devDependencies": {
