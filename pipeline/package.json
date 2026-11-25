@@ -1,0 +1,26 @@
+{
+  "name": "@tarkov-companion/pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Normalizes json.tarkov.dev data into versioned bundles for the Tarkov Companion app",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint . && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "fetch": "tsx src/cli/fetch.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.47.0",
+    "vitest": "^4.0.10"
+  }
+}

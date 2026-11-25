@@ -6,21 +6,22 @@
 - [ ] 1.2 Add MIT `LICENSE`, `NOTICE` with tarkov.dev attribution and trademark disclaimer, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`, verified by every file referenced from README resolving and `LICENSE` matching the OSI MIT text
 - [ ] 1.3 Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters
 - [ ] 1.4 Create the Flutter project in `app/` with Windows and Android targets enabled, verified by `flutter config` listing both platforms and `flutter build windows --debug` succeeding on a clean machine
-- [ ] 1.5 Create the TypeScript pipeline in `pipeline/` with strict `tsconfig`, linting, and a `npm test` runner, verified by `npm run lint && npm test` passing with one placeholder test
+- [x] 1.5 Create the TypeScript pipeline in `pipeline/` with strict `tsconfig`, linting, and a `npm test` runner, verified by `npm run lint && npm test` passing with one placeholder test
 - [ ] 1.6 Add `.github/workflows/ci.yml` running app analyze/test, pipeline lint/test, and a Windows debug build, verified by the workflow succeeding on a pull request
 
 ## 2. Data pipeline
 
-- [ ] 2.1 Define Zod schemas for each upstream dataset (items, tasks, traders, hideout, crafts, barters, maps) from captured fixtures, verified by schema tests that accept recorded payloads and reject mutated payloads
-- [ ] 2.2 Capture and commit trimmed upstream fixtures per dataset and game mode under `test/fixtures/`, verified by fixtures staying under 2 MB total and containing every field the schemas require
-- [ ] 2.3 Implement the upstream fetcher with ETag/Last-Modified support, timeouts, retry with backoff, and a user agent, verified by unit tests using a mock HTTP server for 200, 304, 429, and 500 responses
-- [ ] 2.4 Implement normalization from upstream shape to the bundle JSONL shape (stable keys, resolved references, price fields, objective types), verified by golden-file tests comparing normalized output for the fixtures
-- [ ] 2.5 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
-- [ ] 2.6 Implement dataset version comparison so unchanged upstream content publishes nothing, verified by a test where the second run over identical input emits no bundle and exits successfully
-- [ ] 2.7 Implement bundle publication to GitHub Releases with an idempotent upload and a stable `latest` manifest pointer, verified by a dry-run mode test and one manual run against a test release
-- [ ] 2.8 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release
-- [ ] 2.9 Document the pipeline contract (bundle layout, schema versions, manifest fields) in `docs/data-bundles.md`, verified by a reader being able to hand-build a valid bundle from the document and pass a validation command
-- [ ] 2.10 Add a pipeline check that fails when compressed bundle size exceeds the 10 MB budget, verified by a test with an oversized synthetic dataset failing the build
+- [x] 2.1 Implement the localization resolver (JSONPath subset incl. recursive descent and key unions, dictionary lookup, stale/missing diagnostics) plus the fetch helper and CLI, verified by `npm test` covering 25,016 item and 3,642 task strings resolved with zero missing keys and zero unparsable pointers
+- [ ] 2.2 Capture and commit trimmed upstream fixtures per dataset and game mode under `test/fixtures/upstream/`, verified by fixtures staying under 2 MB total and containing every field the schemas require
+- [ ] 2.3 Define Zod schemas for each upstream dataset (items, tasks, traders, hideout, crafts, barters, maps) from the captured fixtures, verified by schema tests that accept recorded payloads and reject mutated payloads
+- [ ] 2.4 Extend the upstream fetcher with ETag/Last-Modified conditional requests and per-dataset checksum caching, verified by unit tests for 200, 304, 429, and 500 responses
+- [ ] 2.5 Implement normalization from the localized upstream shape to the bundle JSONL shape (stable keys, resolved references, price fields, objective types), verified by golden-file tests comparing normalized output for the fixtures
+- [ ] 2.6 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
+- [ ] 2.7 Implement dataset version comparison so unchanged upstream content publishes nothing, verified by a test where the second run over identical input emits no bundle and exits successfully
+- [ ] 2.8 Implement bundle publication to GitHub Releases with an idempotent upload and a stable `latest` manifest pointer, verified by a dry-run mode test and one manual run against a test release
+- [ ] 2.9 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release
+- [ ] 2.10 Document the pipeline contract (bundle layout, schema versions, manifest fields, localization) in `docs/data-bundles.md`, verified by a reader being able to hand-build a valid bundle from the document and pass a validation command
+- [ ] 2.11 Add a pipeline check that fails on missing translation coverage or compressed bundle size above the 10 MB budget, verified by tests with a missing-key fixture and an oversized synthetic dataset both failing the build
 
 ## 3. Client foundation
 

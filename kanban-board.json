@@ -1,195 +1,318 @@
 {
   "version": 1,
   "tags": [
-    { "id": "tag_decision", "name": "decision", "color": "#c69026" },
-    { "id": "tag_spike", "name": "spike", "color": "#5b8def" },
-    { "id": "tag_legal", "name": "legal", "color": "#b05ccc" },
-    { "id": "tag_data", "name": "data", "color": "#2f9e6e" },
-    { "id": "tag_infra", "name": "infra", "color": "#8a8f98" },
-    { "id": "tag_design", "name": "design", "color": "#e0638c" }
+    {
+      "id": "tag_decision",
+      "name": "decision",
+      "color": "#c69026"
+    },
+    {
+      "id": "tag_spike",
+      "name": "spike",
+      "color": "#5b8def"
+    },
+    {
+      "id": "tag_legal",
+      "name": "legal",
+      "color": "#b05ccc"
+    },
+    {
+      "id": "tag_data",
+      "name": "data",
+      "color": "#2f9e6e"
+    },
+    {
+      "id": "tag_infra",
+      "name": "infra",
+      "color": "#8a8f98"
+    },
+    {
+      "id": "tag_design",
+      "name": "design",
+      "color": "#e0638c"
+    }
   ],
+  "tagsByProject": {
+    "proj_tarkov_companion": [
+      {
+        "id": "tag_decision",
+        "name": "decision",
+        "color": "#c69026"
+      },
+      {
+        "id": "tag_spike",
+        "name": "spike",
+        "color": "#5b8def"
+      },
+      {
+        "id": "tag_legal",
+        "name": "legal",
+        "color": "#b05ccc"
+      },
+      {
+        "id": "tag_data",
+        "name": "data",
+        "color": "#2f9e6e"
+      },
+      {
+        "id": "tag_infra",
+        "name": "infra",
+        "color": "#8a8f98"
+      },
+      {
+        "id": "tag_design",
+        "name": "design",
+        "color": "#e0638c"
+      }
+    ]
+  },
   "categories": [
-    { "id": "backlog", "name": "Backlog", "color": "#8a8f98", "position": 0 },
-    { "id": "ready", "name": "Ready", "color": "#5b8def", "position": 1 },
-    { "id": "inprogress", "name": "In Progress", "color": "#c69026", "position": 2 },
-    { "id": "review", "name": "Review", "color": "#b05ccc", "position": 3 },
-    { "id": "done", "name": "Done", "color": "#2f9e6e", "position": 4 }
+    {
+      "id": "backlog",
+      "name": "Backlog",
+      "color": "#8a8f98",
+      "position": 0
+    },
+    {
+      "id": "ready",
+      "name": "Ready",
+      "color": "#5b8def",
+      "position": 1
+    },
+    {
+      "id": "inprogress",
+      "name": "In Progress",
+      "color": "#c69026",
+      "position": 2
+    },
+    {
+      "id": "review",
+      "name": "Review",
+      "color": "#b05ccc",
+      "position": 3
+    },
+    {
+      "id": "done",
+      "name": "Done",
+      "color": "#2f9e6e",
+      "position": 4
+    }
   ],
   "tasks": [
     {
       "id": "task_plan_review_artifacts",
       "title": "Review and approve proposal, specs, design, and tasks",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
       "position": 0,
-      "tagIDs": ["tag_decision"],
+      "tagIDs": [
+        "tag_decision"
+      ],
       "notes": "Read openspec/changes/bootstrap-tarkov-companion/. Confirm capability boundaries, MVP scope, and the 5 specs. Verify with: openspec validate bootstrap-tarkov-companion --strict. Record requested edits before implementation starts.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_translations",
       "title": "Verify upstream English data and translation availability",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "ready",
-      "position": 1,
-      "tagIDs": ["tag_spike", "tag_data"],
-      "notes": "Live API returns placeholder names (\"<id> Name\") for items and tasks even with ?lang= and Accept-Language. Determine whether English names are exposed differently (GraphQL, separate translations source, or a temporary upstream defect). Output: a documented decision in design.md D-section and a fallback rule. Unlocks the v1 language claim.",
+      "categoryID": "done",
+      "position": 0,
+      "tagIDs": [
+        "tag_spike",
+        "tag_data"
+      ],
+      "notes": "RESOLVED 2026-11-25. Upstream ships a root-level `translations` JSONPath array plus a dictionary at /{mode}/{dataset}_{lang}, keyed by placeholder string, not by path. Measured regular/en: items 25,016/25,016 strings, tasks 3,642/3,642, traders 32/32, zero missing keys. Found 13 stale task pointers and reward customization names absent from the dictionary. Helper implemented in pipeline/src/upstream with 28 tests.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1764115200000,
       "archived": false
     },
     {
       "id": "task_plan_bundle_spike",
       "title": "Spike: build one real bundle from the live API and ingest it",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
-      "position": 2,
-      "tagIDs": ["tag_spike", "tag_data"],
+      "position": 1,
+      "tagIDs": [
+        "tag_spike",
+        "tag_data"
+      ],
       "notes": "Throwaway script: fetch /regular/items + /regular/tasks, normalize to JSONL, compress with zstd, measure size and ingest time into SQLite. Success criteria: items bundle under 10 MB compressed and ingest under 10 s on a mid-range machine; document measured numbers in design.md.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_branding",
       "title": "Decide public project name and branding constraints",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
-      "position": 3,
-      "tagIDs": ["tag_decision", "tag_legal"],
+      "position": 2,
+      "tagIDs": [
+        "tag_decision",
+        "tag_legal"
+      ],
       "notes": "Tarkov is a Battlestate Games trademark. Decide whether to ship as \"Tarkov Companion\", a neutral name, and confirm the disclaimer wording and absence of official logos. Output: final name in README, NOTICE, and package identifiers.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_license_boundary",
       "title": "Confirm license boundary with the GPL-3 upstream API repo",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
-      "position": 4,
-      "tagIDs": ["tag_legal"],
+      "position": 3,
+      "tagIDs": [
+        "tag_legal"
+      ],
       "notes": "Upstream the-hideout/tarkov-api is GPL-3.0; this client is MIT and consumes the public API. Confirm that shipping normalized derivative data and an independent client is acceptable, and that NOTICE attribution is sufficient. Output: short note in docs/legal-notes.md.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_freshness_budget",
       "title": "Approve data freshness cadence and bandwidth budget",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
-      "position": 5,
-      "tagIDs": ["tag_decision", "tag_data"],
+      "position": 4,
+      "tagIDs": [
+        "tag_decision",
+        "tag_data"
+      ],
       "notes": "Design assumes a 6-hour pipeline cadence, a 10 MB per-mode compressed budget, and 24 h price freshness. Validate against GitHub Actions minutes, release asset churn, and player expectations. Output: accepted numbers reflected in specs/data-sync and design.md.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_season_scope",
       "title": "Decide pvp-season profile scoping",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "ready",
-      "position": 6,
-      "tagIDs": ["tag_decision", "tag_data"],
+      "position": 5,
+      "tagIDs": [
+        "tag_decision",
+        "tag_data"
+      ],
       "notes": "Spec assumes one profile per game mode. Seasons reset progress, so a per-season profile may be required. Decide before profiles are implemented; if per-season, update specs/local-profiles and the schema task. Check /pvp-season/season payload for season identity.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_signing",
       "title": "Decide Windows code signing approach and budget",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
       "position": 0,
-      "tagIDs": ["tag_decision", "tag_infra"],
+      "tagIDs": [
+        "tag_decision",
+        "tag_infra"
+      ],
       "notes": "Unsigned installers trigger SmartScreen. Evaluate OV/EV certificate cost, Azure Trusted Signing eligibility for an OSS project, or shipping unsigned with documented verification. Output: chosen path plus release-notes wording.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626675684,
       "archived": false
     },
     {
       "id": "task_plan_release_policy",
       "title": "Define versioning and release policy",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
       "position": 1,
-      "tagIDs": ["tag_decision", "tag_infra"],
+      "tagIDs": [
+        "tag_decision",
+        "tag_infra"
+      ],
       "notes": "SemVer for app, independent versions for bundle schema and progress format. Define support window (latest only pre-1.0), rollback expectations, and how a bad bundle is withdrawn. Output: docs/release-policy.md.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_github_settings",
       "title": "Configure repository settings for OSS collaboration",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
       "position": 2,
-      "tagIDs": ["tag_infra"],
+      "tagIDs": [
+        "tag_infra"
+      ],
       "notes": "Branch protection on main, required CI checks, Actions workflow permissions (read-only default, write only in release jobs), Dependabot, secret scanning, private vulnerability reporting, issue/PR templates, labels. Output: settings checklist completed and documented.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     },
     {
       "id": "task_plan_ui_exploration",
       "title": "Plan the UI layout and design exploration change",
-      "projectID": "proj_tarkov_companion",
+      "projectID": "faf097576943ad9f3a68fd01972644ac00d243a3",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
+      "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
       "position": 3,
-      "tagIDs": ["tag_design"],
+      "tagIDs": [
+        "tag_design"
+      ],
       "notes": "Explicitly deferred by the user. Prepare a follow-up OpenSpec change covering navigation model, information density for desktop, keyboard-first flows, and eventual mobile adaptation. Do not start before the data and tracker specs are implemented.",
       "createdAt": 1764082800000,
-      "updatedAt": 1764082800000,
+      "updatedAt": 1795626664847,
       "archived": false
     }
   ]

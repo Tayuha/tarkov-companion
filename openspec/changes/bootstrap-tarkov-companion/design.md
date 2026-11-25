@@ -20,10 +20,43 @@ this design were measured against the live API on 2026-11-25:
 Additional observed facts:
 
 - Responses are plain JSON under `{"data": ...}` and include `ETag`, `Last-Modified`, and `Content-Length`.
-- Item and task names came back as placeholders (`"<id> Name"`) even with `?lang=` and `Accept-Language`.
-  English localization must be verified before it is treated as available.
+- Item and task text fields arrive as unresolved localization keys, with a root-level `translations`
+  array of JSONPath pointers and a matching dictionary at `/{mode}/{dataset}_{lang}` (see
+  "Localization contract" below).
+- `pve/items_en` is byte-identical to `regular/items_en` (same md5), so mode-level dictionary caching must
+  key on content, not just mode.
+- The translation metadata is itself stale in places: 13 task pointers reference a removed `story`
+  collection or a rewards shape that no longer matches, and reward customization names have no dictionary
+  entry at all.
 - Item records already carry `lastLowPrice`, `avg24hPrice`, `changeLast48h`, `buyFromTrader`,
   `sellToTrader`, so live prices arrive with the catalog; history is a separate per-item call.
+
+### Localization contract
+
+Each translatable dataset ships as a pair:
+
+```
+GET /{mode}/{dataset}          -> { "data": {...}, "translations": ["$.data.items.*.name", ...] }
+GET /{mode}/{dataset}_{lang}   -> { "data": { "5447a9cd... Name": "Colt M4A1 ..." } }
+```
+
+The dictionary is keyed by the placeholder string, not by path. Resolution is therefore: walk every node
+selected by each pointer, and if the node is a string with a dictionary entry, replace it in place.
+
+Measured coverage (2026-11-25, `regular`, `en`):
+
+| Dataset | Pointers | Strings resolved | Stale pointers | Unparsable |
+|---|---|---|---|---|
+| items | 17 | 25,016 / 25,016 | 2 | 0 |
+| tasks | 32 | 3,642 / 3,642 | 13 | 0 |
+| traders | 2 | 32 / 32 | 0 | 0 |
+
+Pointers use more than dotted keys: `..bodyParts[*]` (recursive descent) and
+`['startRewards','finishRewards']` (key unions) both appear in the tasks payload. The resolver supports
+that subset and reports, rather than throws, on anything outside it.
+
+Stale pointers are not fatal: affected values stay as placeholders and are reported. Missing dictionary
+keys are reported individually so the pipeline can fail a build when coverage regresses.
 
 ## Goals / Non-Goals
 
@@ -64,7 +97,7 @@ Linux/Windows tooling less mature; no benefit here).
 ### D2. Prebuilt data bundles published as GitHub Releases
 
 **Chosen:** A Node/TypeScript pipeline in `pipeline/`, scheduled by GitHub Actions, fetches upstream,
-validates and normalizes it, and publishes:
+resolves localization dictionaries, validates and normalizes the result, and publishes:
 
 ```
 manifest.json
@@ -216,8 +249,11 @@ are resolved per quest by the user with explicit choices; replace mode is opt-in
 
 ## Risks / Trade-offs
 
-- **Upstream translation gap** (placeholders observed) → verify English data before claiming localization;
-  fall back to `normalizedName` and wiki titles if needed; keep the app English-only for v1 and i18n-ready.
+- **Upstream translation metadata drifts** → the resolver reports stale pointers and missing keys; the
+  pipeline fails when missing coverage exceeds the configured threshold instead of publishing a bundle
+  with placeholder names; normalization falls back to `normalizedName` where a display name is missing.
+- **Reward customization names have no dictionary entries** → these are cosmetic clothing rewards; render
+  them as "Unnamed customization" with the image when no name resolves, and track the gap upstream.
 - **Upstream schema drift breaks the pipeline** → strict validation, last-good bundle stays published,
   failure notification, and a pipeline version pinned in CI.
 - **GitHub Releases as a CDN** → acceptable for this scale; mitigate with ETag/If-None-Match, compressed
@@ -248,8 +284,8 @@ This is the initial release, so there is no data to migrate. The forward plan:
 
 ## Open Questions
 
-- Which upstream fields are genuinely localized, and is the placeholder name a temporary API state? This
-  affects the v1 label "English" but not the architecture.
 - Final public project name and branding, given trademark constraints.
 - Whether `pvp-season` progress should be scoped per season (new profile per season) or reuse one profile.
 - Whether a compact daily price aggregate is needed in bundles, or on-demand history is sufficient.
+- Why `pve/items_en` is byte-identical to `regular/items_en`; if PvE ever diverges, dictionary caching must
+  follow content and not assume mode identity.
