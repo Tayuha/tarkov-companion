@@ -432,16 +432,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 5,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: If-None-Match / If-Modified-Since per dataset and dictionary, explicit 304 outcome, SHA-256 content checksum with changed flag, file-backed cache store with in-memory test double, offline tests for 200/304/429/500, call sites updated, task 2.4 checked.",
+      "notes": "Completed 2026-11-25 in session ses_debfe5fa6ffeS7SVlc0I6Q0KoX. Conditional If-None-Match / If-Modified-Since per dataset and dictionary, explicit not-modified union (no body read), SHA-256 over canonical localized JSON with changed flag, atomic per-key file cache under .cache/pipeline (gitignored), 88 tests across 7 files, statuses 200/304/429/500/404 covered. Commit 08230bd. Capture script forces refresh on 304.",
       "sessionID": "ses_debfe5fa6ffeS7SVlc0I6Q0KoX",
       "createdAt": 1795631992415,
-      "updatedAt": 1795631992415,
+      "updatedAt": 1795632359393,
       "archived": false
     }
   ]
