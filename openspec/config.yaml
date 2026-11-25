@@ -1,0 +1,39 @@
+schema: spec-driven
+
+context: |
+  Language: English
+  All artifacts must be written in English.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Project: Tarkov Companion, an open-source, local-first companion app for Escape from Tarkov.
+  Client: Flutter (Dart) with drift/SQLite; Windows desktop at launch, Android and iOS kept buildable.
+  Data: a Node/TypeScript pipeline normalizes json.tarkov.dev JSON into versioned JSONL.zst bundles
+  published as GitHub Releases assets. The app never calls upstream directly and never ships a
+  prebuilt database; it ingests bundles into its own schema.
+  Progress: local only, one profile per game mode (regular, pve, pvp-season), export/import as JSON.
+  No accounts, no telemetry, no backend. License: MIT.
+  MVP: item catalog (search/filter/detail/prices/history) and quest tracker (objectives, requirements,
+  derived availability, per-profile progress). Out of scope: maps UI, hideout/craft calculators,
+  barter profit, stash OCR, cloud sync, visual design system.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

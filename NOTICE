@@ -1,0 +1,27 @@
+# NOTICE
+
+## Upstream data
+
+This project consumes the community-maintained API at <https://json.tarkov.dev>, provided by the
+[tarkov.dev](https://tarkov.dev) project and the `the-hideout` community. The upstream API server
+implementation is published under GPL-3.0:
+
+- <https://github.com/the-hideout/tarkov-api>
+
+This application is an independent client. It does not include or link upstream server code, and it
+distributes normalized derivative data generated from the public API. We are grateful to the tarkov.dev
+contributors and data maintainers for keeping the dataset open.
+
+Item images are loaded from `https://assets.tarkov.dev`, operated by the same community project.
+
+## Trademarks
+
+Escape from Tarkov and Battlestate Games are trademarks or registered trademarks of Battlestate Games
+Limited. This project is not affiliated with, endorsed by, sponsored by, or approved by Battlestate Games.
+All game names, item names, and related marks are the property of their respective owners and are used
+here for identification and interoperability purposes only.
+
+## Assets
+
+The application does not bundle official game artwork. Images are fetched at runtime from the upstream
+community asset host and cached locally for offline display.

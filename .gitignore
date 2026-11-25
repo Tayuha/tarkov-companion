@@ -1,0 +1,53 @@
+# Flutter / Dart
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.packages
+app/pubspec.lock
+*.iml
+.pub-cache/
+.pub/
+
+# Node
+node_modules/
+pipeline/dist/
+pipeline/coverage/
+npm-debug.log*
+
+# Bundles and build output
+dist/
+*.jsonl.zst
+!test/fixtures/**/*.jsonl.zst
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local data
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+!test/fixtures/**/*.db
+
+# Local env and logs
+.env
+.env.*
+!.env.example
+*.log
+logs/
+
+# Kanban snapshots
+kanban-board.json.bak
+kanban-board.backup.json
+kanban-board.json.tmp-*
