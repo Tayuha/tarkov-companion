@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
+import { FileDatasetCacheStore } from "../upstream/cache.js";
 import { fetchDataset, type GameMode } from "../upstream/fetch.js";
 
 const GAME_MODES: readonly GameMode[] = ["regular", "pve", "pvp-season"];
@@ -34,6 +35,8 @@ async function main(): Promise<void> {
       lang: { type: "string", default: "en" },
       out: { type: "string" },
       "base-url": { type: "string" },
+      "cache-dir": { type: "string" },
+      refresh: { type: "boolean", default: false },
       sample: { type: "string", default: "5" },
     },
   });
@@ -46,20 +49,41 @@ async function main(): Promise<void> {
   const dataset = values.dataset;
   if (!dataset) throw new Error("Missing --dataset");
 
+  const cache = new FileDatasetCacheStore(
+    values["cache-dir"] === undefined ? {} : { dir: values["cache-dir"] },
+  );
+
   const started = performance.now();
   const result = await fetchDataset({
     mode,
     dataset,
     lang: values.lang,
+    cache,
+    forceRefresh: values.refresh,
     ...(values["base-url"] ? { baseUrl: values["base-url"] } : {}),
   });
   const elapsed = performance.now() - started;
+
+  if (result.status === "not-modified") {
+    console.log(`dataset      ${mode}/${dataset} (${result.meta.lang})`);
+    console.log(`data         ${result.sources.data}`);
+    console.log("not modified 304 — cached metadata reused, no body downloaded");
+    console.log(`etag         ${result.meta.etag ?? "(none)"}`);
+    console.log(`last-mod     ${result.meta.lastModified ?? "(none)"}`);
+    console.log(`checksum     ${result.cache.checksum}`);
+    console.log(`fetched      ${result.meta.fetchedAt}`);
+    console.log(`size         ${formatBytes(result.cache.byteSize)}`);
+    console.log(`elapsed      ${elapsed.toFixed(0)} ms`);
+    if (values.out) console.log("written      skipped (not modified; use --refresh to download)");
+    return;
+  }
 
   const payload = JSON.stringify(result.data);
   console.log(`dataset      ${mode}/${dataset} (${result.meta.lang})`);
   console.log(`data         ${result.sources.data}`);
   console.log(`dictionary   ${result.sources.dictionary ?? "(none)"}`);
   console.log(`payload      ${formatBytes(Buffer.byteLength(payload))}`);
+  console.log(`checksum     ${result.cache.checksum}${result.changed ? " (changed)" : " (unchanged)"}`);
   console.log(`elapsed      ${elapsed.toFixed(0)} ms`);
   console.log(
     `translated   ${result.stats.translated} strings across ${result.stats.visited} visited nodes`,
@@ -84,7 +108,7 @@ async function main(): Promise<void> {
   if (values.out) {
     await writeFile(
       values.out,
-      `${JSON.stringify({ meta: result.meta, stats: result.stats, data: result.data }, null, 2)}\n`,
+      `${JSON.stringify({ meta: result.meta, cache: result.cache, stats: result.stats, data: result.data }, null, 2)}\n`,
     );
     console.log(`written      ${values.out}`);
   }

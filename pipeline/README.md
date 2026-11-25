@@ -12,13 +12,15 @@ Implemented so far:
   `..key`, `..*`, `['a','b']`).
 - Locale dictionary lookup and in-place resolution with diagnostics.
 - Fetch helper with timeouts, retries, user agent, and strict dictionary handling.
+- Conditional requests (`If-None-Match` / `If-Modified-Since`) plus a per-dataset checksum cache, so an
+  unchanged dataset is skipped instead of re-downloaded and re-published.
 - CLI to inspect any dataset.
 - Deterministic, committed upstream fixtures for the pipeline tests (`test/fixtures/upstream/`).
 - Zod schemas for every captured dataset, with a registry keyed by `{mode, dataset}` and an offline
   fixture-validation CLI.
 
-Not implemented yet: normalization, bundle writing, publication, conditional requests. Those are tracked
-in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
+Not implemented yet: normalization, bundle writing, publication. Those are tracked in
+`openspec/changes/bootstrap-tarkov-companion/tasks.md`.
 
 ## Usage
 
@@ -35,10 +37,11 @@ npm run fetch -- --dataset items --sample 3 --out /tmp/items.localized.json
 
 # Refresh the committed upstream fixtures (network; rewrites test/fixtures/upstream/)
 npm run fixtures
+npm run fixtures -- --refresh   # ignore cached validators and re-download everything
 ```
 
 Options: `--mode regular|pve|pvp-season`, `--dataset <name>`, `--lang <code>` (default `en`),
-`--base-url <url>`, `--out <file>`, `--sample <n>`.
+`--base-url <url>`, `--out <file>`, `--sample <n>`, `--cache-dir <dir>`, `--refresh`.
 
 Fixtures keep unresolved placeholders plus a filtered `_en` dictionary so tests exercise the
 resolver. See [`../test/fixtures/README.md`](../test/fixtures/README.md) for the trimming policy,
@@ -127,14 +130,72 @@ Measured on 2026-11-25 for `regular/en`: items 25,016 strings, tasks 3,642, trad
 missing keys. Known gaps: 13 stale task pointers and reward customization names absent from the
 dictionary.
 
-## API
+## Conditional fetching and dataset checksums
+
+`fetchDataset` accepts an optional `cache: DatasetCacheStore`. When one is supplied, every request is
+conditional and the result is a discriminated union, so callers cannot forget the `304` case:
 
 ```ts
 import { fetchDataset } from "./src/upstream/fetch.js";
+import { FileDatasetCacheStore } from "./src/upstream/cache.js";
 
-const { data, stats, warnings } = await fetchDataset({ mode: "regular", dataset: "items" });
+const cache = new FileDatasetCacheStore(); // default: .cache/pipeline/
+const result = await fetchDataset({ mode: "regular", dataset: "items", cache });
+
+if (result.status === "not-modified") {
+  // Nothing was downloaded; result.cache is the previously stored entry.
+  return;
+}
+
+// result.status === "modified"
+result.data;      // localized dataset, ready for normalization
+result.stats;     // localization diagnostics
+result.changed;   // false when the localized content checksum is unchanged
+result.cache;     // { checksum, etag, lastModified, dictionaryEtag, …, fetchedAt, byteSize }
 ```
 
-`fetchDataset` mutates its own parsed payload and returns `data` ready for normalization. Pass
-`allowMissingDictionary: true` only for diagnostics; the default fails closed so untranslated placeholders
-never reach a bundle silently.
+- `If-None-Match` and `If-Modified-Since` are stored and sent per `{mode, dataset, lang}` for both the
+  base dataset and its `_{lang}` dictionary. ETag values (weak `W/"…"` or strong `"…"`) are forwarded
+  verbatim.
+- A `304` on the base dataset short-circuits the call: no body is read and the dictionary is **not**
+  requested. The cached entry's validators were written atomically with the content they describe, so
+  the dataset and dictionary checksums still apply. `meta.fetchedAt` stays at the time the cached
+  content was downloaded.
+- The dictionary is only requested when the base dataset came back `200`. If the dictionary itself
+  answers `304` (base changed, dictionary did not), bodies are not cached, so the fetcher performs one
+  unconditional dictionary GET and stores its new validators.
+- `changed` is computed from a SHA-256 over the canonical JSON of the localized `data` (sorted object
+  keys, no insignificant whitespace), so reordered keys or a re-serialized payload do not trigger a
+  publish. It is `true` when there is no cached entry or the checksum differs.
+- `allowMissingDictionary: true` still tolerates a `404` on the dictionary; a `404` on the base dataset
+  always throws `UpstreamError`.
+- `429` and `5xx` responses are retried with exponential backoff before a typed `UpstreamError` is
+  raised. `forceRefresh: true` skips conditional headers for both resources.
+
+### Cache file
+
+One JSON file per dataset in `.cache/pipeline/` (gitignored), named
+`<mode>__<dataset>__<lang>.json`; override the directory with `--cache-dir` or
+`new FileDatasetCacheStore({ dir })`. The entry is exactly:
+
+```json
+{
+  "mode": "regular",
+  "dataset": "items",
+  "lang": "en",
+  "etag": "W/\"abc123\"",
+  "lastModified": "Wed, 25 Nov 2026 10:00:00 GMT",
+  "dictionaryEtag": "\"def456\"",
+  "dictionaryLastModified": "Wed, 25 Nov 2026 10:00:00 GMT",
+  "checksum": "<sha256 hex over canonical localized JSON>",
+  "fetchedAt": "2026-11-25T12:00:00.000Z",
+  "byteSize": 17229444
+}
+```
+
+Writes are atomic (temporary file + rename). A missing, unreadable, or malformed entry is treated as a
+cache miss, never a failure. `npm run fixtures` accepts `--refresh`; without it a cached `304` is
+detected and the capture retries with a forced refresh so fixtures always contain full payloads.
+
+`fetchDataset` returns `data` ready for normalization. Pass `allowMissingDictionary: true` only for
+diagnostics; the default fails closed so untranslated placeholders never reach a bundle silently.

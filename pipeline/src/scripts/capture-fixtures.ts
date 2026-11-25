@@ -10,16 +10,21 @@ import {
   UpstreamError,
   USER_AGENT,
   type GameMode,
+  type ModifiedDatasetResult,
 } from "../upstream/fetch.js";
+import {
+  FileDatasetCacheStore,
+  type DatasetCacheStore,
+} from "../upstream/cache.js";
 import {
   selectRecords,
   shapeSignature,
-  sortKeysDeep,
   truncateArrays,
   trimPayload,
   type CollectionPlan,
   type TrimPlan,
 } from "../fixtures/trim.js";
+import { sortKeysDeep } from "../util/canonical.js";
 
 /**
  * Record a trimmed, fully localizable snapshot of json.tarkov.dev.
@@ -381,14 +386,40 @@ async function fetchJson(url: string): Promise<{
   };
 }
 
+/**
+ * Capture needs the complete payload, so a cached `304` is retried with a
+ * forced refresh. `--refresh` skips the conditional round trip entirely.
+ */
+async function fetchForCapture(
+  mode: GameMode,
+  dataset: string,
+  baseUrl: string,
+  cache: DatasetCacheStore,
+  refresh: boolean,
+): Promise<ModifiedDatasetResult> {
+  const result = await fetchDataset({ mode, dataset, baseUrl, cache, forceRefresh: refresh });
+  if (result.status === "modified") return result;
+
+  console.warn(
+    `not modified ${baseUrl}/${mode}/${dataset}: forcing a refresh so fixtures stay complete`,
+  );
+  const refreshed = await fetchDataset({ mode, dataset, baseUrl, cache, forceRefresh: true });
+  if (refreshed.status !== "modified") {
+    throw new Error(`forced refresh of ${baseUrl}/${mode}/${dataset} returned 304`);
+  }
+  return refreshed;
+}
+
 async function captureDatasetPair(
   dir: string,
   mode: GameMode,
   dataset: string,
   baseUrl: string,
   fetchedAt: string,
+  cache: DatasetCacheStore,
+  refresh: boolean,
 ): Promise<WriteResult> {
-  const result = await fetchDataset({ mode, dataset, baseUrl });
+  const result = await fetchForCapture(mode, dataset, baseUrl, cache, refresh);
   return writePair({
     dir,
     fileBase: dataset,
@@ -411,8 +442,10 @@ async function captureModeMarker(
   mode: GameMode,
   baseUrl: string,
   fetchedAt: string,
+  cache: DatasetCacheStore,
+  refresh: boolean,
 ): Promise<WriteResult> {
-  const result = await fetchDataset({ mode, dataset: "items", baseUrl });
+  const result = await fetchForCapture(mode, "items", baseUrl, cache, refresh);
   return writePair({
     dir,
     fileBase: "items",
@@ -639,12 +672,18 @@ async function main(): Promise<void> {
     options: {
       out: { type: "string" },
       "base-url": { type: "string" },
+      "cache-dir": { type: "string" },
+      refresh: { type: "boolean", default: false },
     },
   });
 
   const outDir = values.out ?? OUT_DIR;
   const baseUrl = values["base-url"] ?? DEFAULT_BASE_URL;
   const fetchedAt = new Date().toISOString();
+  const cache = new FileDatasetCacheStore(
+    values["cache-dir"] === undefined ? {} : { dir: values["cache-dir"] },
+  );
+  const refresh = values.refresh;
 
   for (const name of ["common", "regular", "pve", "pvp-season"]) {
     await rm(join(outDir, name), { recursive: true, force: true });
@@ -672,6 +711,8 @@ async function main(): Promise<void> {
         dataset,
         baseUrl,
         fetchedAt,
+        cache,
+        refresh,
       );
       mergeFiles(regularFiles, result.files);
       mergeCounts(regularCounts, result.counts, `${dataset}.`);
@@ -698,7 +739,14 @@ async function main(): Promise<void> {
   for (const mode of ["pve", "pvp-season"] as const) {
     const files: Record<string, ManifestFile> = {};
     try {
-      const result = await captureModeMarker(join(outDir, mode), mode, baseUrl, fetchedAt);
+      const result = await captureModeMarker(
+        join(outDir, mode),
+        mode,
+        baseUrl,
+        fetchedAt,
+        cache,
+        refresh,
+      );
       mergeFiles(files, result.files);
       console.log(`${`${mode}/items`.padEnd(20)} ${JSON.stringify(result.counts)}`);
     } catch (error) {

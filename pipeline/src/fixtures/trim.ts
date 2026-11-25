@@ -10,25 +10,15 @@
  * the network.
  */
 
+import { canonicalJson } from "../util/canonical.js";
+
+// Re-exported for existing fixture callers/tests; the implementation lives in
+// `util/canonical.ts` so the upstream fetcher can hash payloads without a
+// dependency on fixture-only code.
+export { canonicalJson, sortKeysDeep } from "../util/canonical.js";
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/** Recursively sort object keys; array order is left untouched. */
-export function sortKeysDeep(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortKeysDeep);
-  if (!isRecord(value)) return value;
-
-  const sorted: Record<string, unknown> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = sortKeysDeep(value[key]);
-  }
-  return sorted;
-}
-
-/** Canonical JSON with sorted keys and no insignificant whitespace. */
-export function canonicalJson(value: unknown): string {
-  return JSON.stringify(sortKeysDeep(value));
 }
 
 /**

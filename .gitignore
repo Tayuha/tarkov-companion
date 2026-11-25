@@ -20,6 +20,9 @@ dist/
 *.jsonl.zst
 !test/fixtures/**/*.jsonl.zst
 
+# Pipeline fetch cache (conditional request validators + dataset checksums)
+.cache/
+
 # Editors
 .idea/
 .vscode/
