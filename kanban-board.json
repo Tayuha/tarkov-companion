@@ -453,16 +453,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 6,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: per-dataset normalizers with kind discriminators, stable camelCase fields and *Id references, normalized price objects, typed objectives, deterministic kind+id ordering, golden JSONL files, invariant tests (no duplicates, no placeholders), offline normalize CLI, contract documented in docs/data-bundles.md, task 2.5 checked.",
+      "notes": "Completed 2026-11-25 in session ses_debf743f9ffemMNoSQBc5F5nXY. 7 dataset normalizers emitting kind-tagged JSONL with stable camelCase fields, *Id references, price objects, 23 typed objective variants, deterministic kind+id ordering, golden files (890,950 bytes), 103 tests. Commits e4434a1, a126026. Review fix: buy offers now preserve currencyItemId, restockAmount, taskUnlockId; sell offers preserve currencyItemId, so items dropped fields went 138 -> 0. Remaining drops: 16 denormalized worn-item names and one craftUnlock.trader_name, both joined by id in the client.",
       "sessionID": "ses_debf743f9ffemMNoSQBc5F5nXY",
       "createdAt": 1795632452691,
-      "updatedAt": 1795632452691,
+      "updatedAt": 1795633340775,
       "archived": false
     }
   ]
