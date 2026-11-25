@@ -474,16 +474,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 7,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data"
+      ],
+      "notes": "Completed 2026-11-25 in session ses_debe2f492ffearfEQWeOWDHkNU. Node built-in zstd (level 3, requires Node >=24), per-mode manifest + .jsonl.zst layout, canonical manifest, SHA-256/sizes/records/source metadata, stale asset cleanup, manifest written last. Regular bundle: 7 datasets, 1,064 records, 890,950 B -> 133,008 B (6.70x). Two builds byte-identical. Commit 3231a0a. Review: aligned design layout and root README Node 24+; per-mode manifest is now the documented contract.",
+      "sessionID": "ses_debe2f492ffearfEQWeOWDHkNU",
+      "createdAt": 1795633787042,
+      "updatedAt": 1795634292884,
+      "archived": false
+    },
+    {
+      "id": "task_impl_2_7",
+      "title": "T2.7 Skip publishing unchanged datasets",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: per-mode manifest and .jsonl.zst datasets, fixed compression level, SHA-256 + compressed/uncompressed sizes + record counts + source timestamps, canonical manifest JSON, offline bundle CLI, two identical builds produce identical dataset bytes and checksums, task 2.6 checked.",
-      "sessionID": "ses_debe2f492ffearfEQWeOWDHkNU",
-      "createdAt": 1795633787042,
-      "updatedAt": 1795633787042,
+      "notes": "In progress in a linked child session. Acceptance: pure compareBundles plan, content-only comparison (ignore timestamps), schema-version bump forces all changed, added/removed detection, bundle --previous no-op writes nothing and exits 0, compare CLI with --json, tests, task 2.7 checked.",
+      "sessionID": "ses_debdb6fe2ffexwZSmEj2TUo6jH",
+      "createdAt": 1795634292884,
+      "updatedAt": 1795634292884,
       "archived": false
     }
   ]
