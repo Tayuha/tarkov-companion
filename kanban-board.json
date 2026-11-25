@@ -411,16 +411,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 4,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: zod schemas for items, tasks, traders, hideout, crafts, barters, maps, status, season, price history and dictionaries; tolerant of unknown fields but failing on missing or retyped known fields; mutation tests per dataset; registry test that every fixture is validated; offline validate:fixtures CLI; task 2.3 checked.",
+      "notes": "Completed 2026-11-25 in session ses_dec0a0ce5ffeaJuDXfHPDKkC0U. 14 zod modules + registry + fixtures CLI; 12 dataset files, 8 dictionaries PASS. Tolerant of unknown fields, strict on known ones; mutation and registry-coverage tests. 72 tests at handoff, 73 after review fix. Commits f46884e, 6692800. Review fix: pve/pvp-season datasets now resolve through the regular contract instead of returning undefined and silently skipping validation.",
       "sessionID": "ses_dec0a0ce5ffeaJuDXfHPDKkC0U",
       "createdAt": 1795631224402,
-      "updatedAt": 1795631224402,
+      "updatedAt": 1795631933222,
       "archived": false
     }
   ]
