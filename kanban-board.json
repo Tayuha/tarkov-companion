@@ -495,16 +495,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 8,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: pure compareBundles plan, content-only comparison (ignore timestamps), schema-version bump forces all changed, added/removed detection, bundle --previous no-op writes nothing and exits 0, compare CLI with --json, tests, task 2.7 checked.",
+      "notes": "Completed 2026-11-25 in session ses_debdb6fe2ffexwZSmEj2TUo6jH. compareBundles with added/changed/unchanged/removed and reasons, content-only comparison (timestamps ignored), contract bumps force changed, typed manifest errors, compare CLI with --json, bundle --previous no-op writes nothing and exits 0. 135 tests. Commit 16f48cf.",
       "sessionID": "ses_debdb6fe2ffexwZSmEj2TUo6jH",
       "createdAt": 1795634292884,
-      "updatedAt": 1795634292884,
+      "updatedAt": 1795634683547,
+      "archived": false
+    },
+    {
+      "id": "task_impl_2_8",
+      "title": "T2.8 Publish content-addressed bundles",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data",
+        "tag_infra"
+      ],
+      "notes": "In progress in a linked child session. Fixed design: one rolling release per mode tagged data-<mode>-latest, stable manifest URL, immutable <dataset>-<sha12>.jsonl.zst assets, manifest uploaded last, no-op on identical content, optional --prune. Acceptance: ReleaseClient abstraction, gh implementation, dry-run zero mutations, manual test release created/published twice/inspected/deleted, task 2.8 checked.",
+      "sessionID": "ses_debd54a65ffeZJJCjKWemkbwZ4",
+      "createdAt": 1795634683547,
+      "updatedAt": 1795634683547,
       "archived": false
     }
   ]
