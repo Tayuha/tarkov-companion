@@ -23,6 +23,8 @@ Implemented so far:
 - Deterministic bundle writing: per-dataset `.jsonl.zst` files plus a canonical `manifest.json` with
   SHA-256 checksums, sizes, schema versions and upstream source timestamps, offline from the committed
   fixtures.
+- Content-based bundle comparison and no-op gating: `bundle --previous` writes nothing when no dataset
+  checksum changed, and `npm run compare` reports the per-dataset plan.
 
 Not implemented yet: publishing bundles to GitHub Releases and the scheduled sync workflow. Those are
 tracked in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
@@ -44,6 +46,14 @@ npm run bundle               # offline: write dist/bundles/regular/
 npm run bundle -- --mode pve
 npm run bundle -- --all      # every mode with fixtures
 npm run bundle -- --mode regular --out /tmp/bundles
+
+# Compare with a published bundle and skip writing when nothing changed
+npm run bundle -- --mode regular --previous /tmp/bundles
+npm run bundle -- --mode regular --previous /tmp/bundles/regular/manifest.json
+
+# Report a comparison without building or writing anything
+npm run compare -- --previous /tmp/old/regular/manifest.json --current /tmp/new/regular/manifest.json
+npm run compare -- --previous old.json --current new.json --json
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -150,9 +160,11 @@ pipeline/src/bundle/
   manifest.ts   version constants, Zod manifest schema, canonical serializer
   zstd.ts       deterministic zstd wrapper (built-in node:zlib)
   writer.ts     buildBundle() (no I/O) and writeBundle() (atomic files)
+  compare.ts    compareBundles(), manifest loading, no-op classification
   index.ts      public exports
 pipeline/src/fixtures/bundle-set.ts   fixtures -> normalized bundle input
-pipeline/src/cli/bundle.ts            npm run bundle
+pipeline/src/cli/bundle.ts            npm run bundle (with --previous)
+pipeline/src/cli/compare.ts           npm run compare
 ```
 
 Output layout (relative to `--out`, default `dist/bundles`):
@@ -185,6 +197,24 @@ for the trimmed `pve`/`pvp-season` fixture sets, which only carry item markers).
 supplied with zero records **fails the build**, because an empty file would erase the client's rows.
 The writer removes stale `*.jsonl.zst` files from the mode directory and writes the manifest last, each
 through a temporary file plus rename.
+
+**Comparison and no-op builds.** `src/bundle/compare.ts` compares two manifests by dataset presence and
+`sha256`: only in current is `added`, only in previous is `removed`, a different checksum is `changed`,
+an equal checksum is `unchanged`. `generatedAt`, `source.capturedAt`, per-dataset `source.*`
+(`url`/`etag`/`lastModified`/`fetchedAt`), paths, sizes, counts and totals are ignored because they do
+not describe the downloaded bytes. A `bundleSchemaVersion` or `minAppSchemaVersion` difference instead
+marks every dataset present on both sides as changed, with the version bump named in its reason.
+
+`npm run bundle -- --previous <path>` builds in memory, loads the previous manifest and, when nothing
+changed, writes no files at all, prints `no changes` and exits 0. With changes it writes the full bundle
+and reports each dataset's status and reason. `--previous` accepts a manifest file, a bundles root
+(`<root>/<mode>/manifest.json`) or a mode directory (`<dir>/manifest.json`); with `--all` a directory
+must hold a manifest for every selected mode. A missing or invalid previous manifest is a typed error
+and exits non-zero — it is never treated as an empty baseline.
+
+`npm run compare -- --previous <manifest> --current <manifest>` applies the same rules without building
+or writing. It exits 0 whether or not datasets differ (non-zero only on invalid input) and prints a human
+summary, or the plan as JSON with `--json`.
 
 `npm run bundle -- --all` prints per-dataset records, uncompressed and compressed bytes, compression
 ratio and a checksum prefix, plus the manifest path.

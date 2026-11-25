@@ -1,6 +1,15 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { buildBundle, isBundleMode, writeBundle, type BundleMode } from "../bundle/index.js";
+import {
+  ManifestError,
+  buildBundle,
+  compareBundles,
+  describeComparison,
+  isBundleMode,
+  loadPreviousManifest,
+  writeBundle,
+  type BundleMode,
+} from "../bundle/index.js";
 import { fixtureBundleModes, loadFixtureBundleInput } from "../fixtures/bundle-set.js";
 
 /**
@@ -10,9 +19,17 @@ import { fixtureBundleModes, loadFixtureBundleInput } from "../fixtures/bundle-s
  *   npm run bundle -- --mode pve
  *   npm run bundle -- --all               # every mode with fixtures
  *   npm run bundle -- --out /tmp/bundles
+ *   npm run bundle -- --previous /tmp/bundles
+ *   npm run bundle -- --previous /tmp/bundles/regular/manifest.json
  *
  * Output: `dist/bundles/<mode>/manifest.json` and
  * `dist/bundles/<mode>/<dataset>.jsonl.zst`.
+ *
+ * With `--previous`, the bundle is built in memory and compared with the
+ * previous manifest first. When every dataset checksum matches (and the client
+ * contract versions agree), nothing is written, `no changes` is printed and
+ * the process exits 0. `--previous` accepts a manifest file, a bundles root
+ * (`<root>/<mode>/manifest.json`) or a mode directory (`<dir>/manifest.json`).
  */
 
 const DEFAULT_OUT_DIR = "dist/bundles";
@@ -47,11 +64,14 @@ async function main(): Promise<void> {
       mode: { type: "string" },
       all: { type: "boolean", default: false },
       out: { type: "string" },
+      previous: { type: "string" },
     },
   });
 
   const modes = await selectedModes(values);
   const outDir = resolve(process.cwd(), values.out ?? DEFAULT_OUT_DIR);
+  const previousInput =
+    values.previous === undefined ? undefined : resolve(process.cwd(), values.previous);
   const generatedAt = new Date().toISOString();
 
   for (const mode of modes) {
@@ -61,6 +81,22 @@ async function main(): Promise<void> {
     }
 
     const bundle = buildBundle(input, generatedAt);
+
+    if (previousInput !== undefined) {
+      const previous = await loadPreviousManifest(previousInput, mode);
+      const comparison = compareBundles(previous.manifest, bundle.manifest);
+      if (!comparison.hasChanges) {
+        console.log(
+          `${mode}: no changes against ${previous.path} ` +
+            `(${bundle.manifest.totals.datasets} dataset(s)); nothing written`,
+        );
+        continue;
+      }
+
+      console.log(`${mode}: changes against ${previous.path}`);
+      for (const line of describeComparison(comparison)) console.log(line);
+    }
+
     const written = await writeBundle(bundle, { outDir });
     const { totals } = bundle.manifest;
 
@@ -90,6 +126,10 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
+  if (error instanceof ManifestError) {
+    console.error(`${error.kind}: ${error.message}`);
+  } else {
+    console.error(error instanceof Error ? error.message : error);
+  }
   process.exitCode = 1;
 });

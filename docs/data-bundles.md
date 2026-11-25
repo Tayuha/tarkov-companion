@@ -1,9 +1,10 @@
 # Data bundles
 
-> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest).
-> Task 2.8 adds publication and task 2.10 finalizes the public contract. This
-> document already describes the exact bytes and manifest fields the writer
-> produces; treat changes here as a contract change.
+> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest) and
+> task 2.7 the comparison/no-op gate. Task 2.8 adds publication and task 2.10
+> finalizes the public contract. This document already describes the exact bytes
+> and manifest fields the writer produces; treat changes here as a contract
+> change.
 
 The pipeline turns each validated, localized upstream dataset into **JSONL**:
 one JSON object per line, one record kind per line. The app ingests the records
@@ -183,6 +184,74 @@ Given the same normalized records and the same zstd compressor version:
 decompressing every file back to the committed normalized goldens, and
 comparing bytes and checksums.
 
+## Comparison and no-op publishing
+
+Publishing is gated on content, not on the clock. Before writing anything, the
+pipeline can compare a freshly built manifest with the manifest of the bundle
+that is already published and skip publication when nothing changed.
+
+The comparison (`compareBundles` in `pipeline/src/bundle/compare.ts`) looks only
+at dataset presence and each dataset's `sha256` (the checksum of the compressed
+file the client downloads):
+
+| Previous | Current | Classification |
+|---|---|---|
+| absent | present | `added` |
+| present | absent | `removed` |
+| present | present, same `sha256` | `unchanged` |
+| present | present, different `sha256` | `changed` |
+
+If `bundleSchemaVersion` or `minAppSchemaVersion` differs between the two
+manifests, every dataset present on both sides is classified as `changed` even
+when its checksum matches, and the reason names the version bump. A client has to
+reconsider the whole bundle when the client contract moved, so a silent no-op
+would strand it on an incompatible contract. `added` and `removed` keep their
+classification, because a dataset that does not exist on one side cannot be
+"changed".
+
+Deliberately ignored: `generatedAt`, `source.capturedAt`, the per-dataset
+`source.url`/`.etag`/`.lastModified`/`.fetchedAt`, `path`, byte sizes, record
+counts and `totals`. None of them describes the bytes a client downloads:
+timestamps come from the build clock or from the upstream transport, sizes are
+derived from the checksummed file, and an upstream `ETag` can change while the
+content does not. Comparing them would publish a "new" release on every run and
+defeat the no-op.
+
+Rules:
+
+- Both manifests are validated against the manifest Zod schema before comparing;
+  a malformed, incomplete, missing or wrong-mode previous manifest is an error.
+  It is never treated as an empty baseline, because that would publish a whole
+  bundle on a typo.
+- A first run without a previous manifest writes the full bundle as before.
+- A run with no changes writes **no files at all** — no dataset file, no
+  manifest, no directory cleanup — prints `no changes` and exits 0.
+- A run with changes writes the complete bundle, exactly as today, and reports
+  which datasets were added, changed or removed and why.
+
+`npm run compare` reports the same classification without building or writing
+anything. It exits 0 whether or not there are changes (it is a report), and
+non-zero only when an argument is missing or a manifest cannot be read or
+validated. `--json` prints the machine-readable plan:
+
+```json
+{
+  "mode": "regular",
+  "hasChanges": true,
+  "added": [],
+  "changed": ["items"],
+  "unchanged": ["tasks", "traders"],
+  "removed": [],
+  "reasons": {
+    "items": "sha256 bc330ec05ae3 -> 0e11c1bce6b8",
+    "tasks": "sha256 627bbfd58410 matches",
+    "traders": "sha256 e5b5a695ca4d matches"
+  },
+  "previous": { "path": "/bundles/regular/manifest.json", "generatedAt": "2026-11-25T20:00:00.000Z" },
+  "current": { "path": "/tmp/regular/manifest.json", "generatedAt": "2026-11-25T23:59:59.000Z" }
+}
+```
+
 ## Field conventions
 
 | Concern | Convention |
@@ -332,16 +401,38 @@ npm run bundle                             # regular -> dist/bundles/regular/
 npm run bundle -- --mode pve               # one mode
 npm run bundle -- --all                    # every mode with fixtures
 npm run bundle -- --mode regular --out /tmp/bundles
+npm run bundle -- --mode regular --previous /tmp/bundles          # skip when unchanged
+npm run bundle -- --mode regular --previous /tmp/bundles/regular/manifest.json
 
-npm test                                   # golden, bundle and invariant suite
+npm run compare -- --previous /tmp/bundles/regular/manifest.json \
+                   --current /tmp/fresh/regular/manifest.json      # human summary
+npm run compare -- --previous old.json --current new.json --json   # machine output
+
+npm test                                   # golden, bundle, comparison and invariant suite
 ```
+
+`--previous` accepts three forms:
+
+- a manifest file: `/tmp/bundles/regular/manifest.json`;
+- a bundles root: `/tmp/bundles`, resolved as `/tmp/bundles/<mode>/manifest.json`;
+- a mode directory: `/tmp/bundles/regular`, resolved as `<dir>/manifest.json`.
+
+With `--all`, use a directory form that contains a manifest for every selected
+mode; a single manifest file is only unambiguous for one mode.
+
+`npm run compare` only reads the two manifests: it never builds, never writes and
+exits 0 even when datasets differ. See
+["Comparison and no-op publishing"](#comparison-and-no-op-publishing) for the
+classification rules and the JSON shape.
 
 `npm run normalize` localizes and validates each committed fixture offline,
 normalizes it, and writes the plain JSONL with per-kind counts, output bytes,
 dropped-field counts and fallbacks. `npm run bundle` runs the same load path and
 then writes the zstd files and manifest, printing records, uncompressed and
 compressed bytes, compression ratio, a checksum prefix, skipped datasets and
-the manifest path.
+the manifest path. With `--previous` it first compares the in-memory build with
+the published manifest and prints `no changes ... nothing written` instead of
+touching the output directory.
 
 To confirm determinism locally, build twice and compare the checksums:
 
@@ -363,3 +454,11 @@ decompressed back to the committed normalized golden, the manifest is validated
 with Zod, records are counted, input order is reversed to prove order
 independence, and the `pve`/`pvp-season` marker bundles and the
 missing/empty-dataset rules are exercised.
+
+Comparison tests run the real CLIs in temp directories: a second
+`bundle --previous` run over the same fixtures emits no files and exits 0,
+changed/added/removed datasets are classified individually, a
+`bundleSchemaVersion` or `minAppSchemaVersion` bump marks every dataset changed,
+timestamp-only differences compare as unchanged, and invalid or missing previous
+manifests exit non-zero with an error naming the problem. `npm run compare`
+covers both exit codes and the `--json` shape.

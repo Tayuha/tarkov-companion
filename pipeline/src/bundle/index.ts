@@ -33,3 +33,13 @@ export type {
   WrittenBundle,
 } from "./writer.js";
 export { ZSTD_COMPRESSION_LEVEL, compressZstd, decompressZstd } from "./zstd.js";
+export {
+  ManifestError,
+  compareBundles,
+  describeComparison,
+  loadPreviousManifest,
+  parseManifest,
+  readManifestFile,
+  resolveManifestPath,
+} from "./compare.js";
+export type { BundleComparison, ManifestErrorKind } from "./compare.js";

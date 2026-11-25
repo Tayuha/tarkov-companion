@@ -16,6 +16,7 @@
     "fixtures": "tsx src/scripts/capture-fixtures.ts",
     "normalize": "tsx src/cli/normalize.ts",
     "bundle": "tsx src/cli/bundle.ts",
+    "compare": "tsx src/cli/compare.ts",
     "validate:fixtures": "tsx src/cli/validate-fixtures.ts"
   },
   "devDependencies": {
