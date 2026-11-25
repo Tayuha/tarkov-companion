@@ -1,0 +1,59 @@
+{
+  "byteBudget": 2000000,
+  "capturedAt": "2026-11-25T18:22:15.457Z",
+  "files": {
+    "items.json": {
+      "bytes": 24355,
+      "dictionarySource": "https://json.tarkov.dev/pve/items_en",
+      "entries": null,
+      "etag": "W/\"dcbd6c27304b2b26ef4f87658f26ed9f\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Wed, 25 Nov 2026 18:20:47 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": 3,
+      "role": "dataset",
+      "sha256": "1f0376a0cd1e1b7d53fd363d900582e343c17934ddee8d8f0cfe9828926bb992",
+      "source": "https://json.tarkov.dev/pve/items",
+      "translations": 17,
+      "unresolvedPointers": [
+        "$.data.armorMaterial.*.name",
+        "$.data.fleaMarket.*.name",
+        "$.data.items.*.properties.armorSlots[*].armorType",
+        "$.data.items.*.properties.armorSlots[*].name",
+        "$.data.items.*.properties.armorSlots[*].zones[*]",
+        "$.data.items.*.properties.armorType",
+        "$.data.items.*.properties.content[*]",
+        "$.data.items.*.properties.stimEffects[*].type",
+        "$.data.items.*.properties.zones[*]"
+      ]
+    },
+    "items_en.json": {
+      "bytes": 1913,
+      "dictionarySource": "items.json",
+      "entries": 32,
+      "etag": "W/\"24b385a6657332e8df8b0b848dd96f94\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Tue, 24 Nov 2026 18:26:00 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": null,
+      "role": "dictionary",
+      "sha256": "6bb989244ce7cd46b8fe9b2cc262a2e281d3ecea22b035347d5b7eddf6edb6bf",
+      "source": "https://json.tarkov.dev/pve/items_en",
+      "translations": 0,
+      "unresolvedPointers": []
+    }
+  },
+  "fixtureSet": "pve",
+  "generatedBy": "pipeline/src/scripts/capture-fixtures.ts",
+  "schemaVersion": 1,
+  "skipped": [],
+  "sourceBaseUrl": "https://json.tarkov.dev",
+  "totals": {
+    "bytes": 26268,
+    "files": 2
+  }
+}

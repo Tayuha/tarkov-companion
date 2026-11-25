@@ -1,0 +1,753 @@
+{
+  "data": {
+    "armorMaterials": {
+      "Aluminium": {
+        "destructibility": 0.45,
+        "explosionDestructibility": 0.45,
+        "id": "Aluminium",
+        "maxRepairDegradation": 0.1,
+        "maxRepairKitDegradation": 0.09,
+        "minRepairDegradation": 0.06,
+        "minRepairKitDegradation": 0.055,
+        "name": "MatAluminium"
+      },
+      "Aramid": {
+        "destructibility": 0.1875,
+        "explosionDestructibility": 0.15,
+        "id": "Aramid",
+        "maxRepairDegradation": 0.07,
+        "maxRepairKitDegradation": 0.065,
+        "minRepairDegradation": 0.03,
+        "minRepairKitDegradation": 0.025,
+        "name": "MatAramid"
+      },
+      "ArmoredSteel": {
+        "destructibility": 0.525,
+        "explosionDestructibility": 0.45,
+        "id": "ArmoredSteel",
+        "maxRepairDegradation": 0.03,
+        "maxRepairKitDegradation": 0.025,
+        "minRepairDegradation": 0.01,
+        "minRepairKitDegradation": 0.005,
+        "name": "MatArmoredSteel"
+      }
+    },
+    "fleaMarket": {
+      "enabled": true,
+      "foundInRaidRequired": false,
+      "minPlayerLevel": 15,
+      "name": "FleaMarket",
+      "normalizedName": "flea-market",
+      "reputationLevels": [
+        {
+          "maxRep": -10,
+          "minRep": -10000,
+          "offers": 1,
+          "offersSpecialEditions": 1
+        },
+        {
+          "maxRep": -2,
+          "minRep": -10,
+          "offers": 2,
+          "offersSpecialEditions": 3
+        },
+        {
+          "maxRep": 0.2,
+          "minRep": -2,
+          "offers": 3,
+          "offersSpecialEditions": 4
+        },
+        {
+          "maxRep": 7,
+          "minRep": 0.2,
+          "offers": 4,
+          "offersSpecialEditions": 5
+        },
+        {
+          "maxRep": 30,
+          "minRep": 7,
+          "offers": 5,
+          "offersSpecialEditions": 6
+        },
+        {
+          "maxRep": 60,
+          "minRep": 30,
+          "offers": 6,
+          "offersSpecialEditions": 7
+        },
+        {
+          "maxRep": 150,
+          "minRep": 60,
+          "offers": 7,
+          "offersSpecialEditions": 8
+        },
+        {
+          "maxRep": 200,
+          "minRep": 150,
+          "offers": 8,
+          "offersSpecialEditions": 9
+        },
+        {
+          "maxRep": 250,
+          "minRep": 200,
+          "offers": 9,
+          "offersSpecialEditions": 10
+        },
+        {
+          "maxRep": 500,
+          "minRep": 250,
+          "offers": 10,
+          "offersSpecialEditions": 11
+        },
+        {
+          "maxRep": 750,
+          "minRep": 500,
+          "offers": 11,
+          "offersSpecialEditions": 12
+        },
+        {
+          "maxRep": 1000,
+          "minRep": 750,
+          "offers": 12,
+          "offersSpecialEditions": 13
+        },
+        {
+          "maxRep": 10000,
+          "minRep": 1000,
+          "offers": 15,
+          "offersSpecialEditions": 16
+        }
+      ],
+      "sellOfferFeeRate": 0.05,
+      "sellRequirementFeeRate": 0.05
+    },
+    "handbookCategories": {
+      "5b47574386f77428ca22b2ed": {
+        "children": [],
+        "id": "5b47574386f77428ca22b2ed",
+        "imageLink": "https://assets.tarkov.dev/handbook-category-5b47574386f77428ca22b2ed-icon.webp",
+        "minLevelForFlea": 20,
+        "name": "5b47574386f77428ca22b2ed",
+        "normalizedName": "energy-elements",
+        "parent": "5b47574386f77428ca22b33e"
+      },
+      "5b47574386f77428ca22b2ee": {
+        "children": [],
+        "id": "5b47574386f77428ca22b2ee",
+        "imageLink": "https://assets.tarkov.dev/handbook-category-5b47574386f77428ca22b2ee-icon.webp",
+        "minLevelForFlea": 0,
+        "name": "5b47574386f77428ca22b2ee",
+        "normalizedName": "building-materials",
+        "parent": "5b47574386f77428ca22b33e"
+      },
+      "5b47574386f77428ca22b2ef": {
+        "children": [],
+        "id": "5b47574386f77428ca22b2ef",
+        "imageLink": "https://assets.tarkov.dev/handbook-category-5b47574386f77428ca22b2ef-icon.webp",
+        "minLevelForFlea": 20,
+        "name": "5b47574386f77428ca22b2ef",
+        "normalizedName": "electronics",
+        "parent": "5b47574386f77428ca22b33e"
+      }
+    },
+    "itemCategories": {
+      "54009119af1c881c07000029": {
+        "children": [
+          "566162e44bdc2d3f298b4573",
+          "5661632d4bdc2d903d8b456b",
+          "543be5e94bdc2df1348b4568",
+          "543be6564bdc2df4348b4568",
+          "543be6674bdc2df1348b4569",
+          "5447e1d04bdc2dff2f8b4567"
+        ],
+        "id": "54009119af1c881c07000029",
+        "name": "54009119af1c881c07000029 Name",
+        "normalizedName": "item",
+        "parent": ""
+      },
+      "5422acb9af1c889c16000029": {
+        "children": [
+          "5447b5f14bdc2d61278b4567",
+          "5447b5cf4bdc2d65278b4567",
+          "5447b6094bdc2dc3278b4567",
+          "5447b6254bdc2dc3278b4568",
+          "5447b5fc4bdc2d87278b4567",
+          "5447b6194bdc2d67278b4567"
+        ],
+        "id": "5422acb9af1c889c16000029",
+        "name": "5422acb9af1c889c16000029 Name",
+        "normalizedName": "weapon",
+        "parent": "566162e44bdc2d3f298b4573"
+      },
+      "543be5664bdc2dd4348b4569": {
+        "children": [
+          "5448f3ac4bdc2dce718b4569",
+          "5448f3a14bdc2d27728b4569",
+          "5448f3a64bdc2d60728b456a",
+          "5448f39d4bdc2d0a728b4568"
+        ],
+        "id": "543be5664bdc2dd4348b4569",
+        "name": "543be5664bdc2dd4348b4569 Name",
+        "normalizedName": "meds",
+        "parent": "54009119af1c881c07000029"
+      }
+    },
+    "items": {
+      "5447a9cd4bdc2dbd208b4567": {
+        "avg24hPrice": 46433,
+        "backgroundColor": "black",
+        "baseImageLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-base-image.webp",
+        "basePrice": 18397,
+        "buyFromTrader": [
+          {
+            "buyLimit": 5,
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "minTraderLevel": 3,
+            "price": 22997,
+            "priceRUB": 22997,
+            "restockAmount": 80000,
+            "taskUnlock": null,
+            "trader": "5a7c2eca46aef81a7ca2145d"
+          }
+        ],
+        "categories": [
+          "5447b5f14bdc2d61278b4567",
+          "5422acb9af1c889c16000029",
+          "566162e44bdc2d3f298b4573",
+          "54009119af1c881c07000029"
+        ],
+        "changeLast48h": -361,
+        "changeLast48hPercent": -0.77,
+        "conflictingCategories": [],
+        "conflictingItems": [],
+        "conflictingSlotIds": [],
+        "containsItems": [
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "55d4b9964bdc2d1d4e8b456e"
+          },
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "55d4887d4bdc2d962f8b4570"
+          },
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "55d355e64bdc2d962f8b4569"
+          },
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "55d3632e4bdc2d972f8b4569"
+          },
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "544a38634bdc2d58388b4568"
+          },
+          {
+            "attributes": {},
+            "count": 1,
+            "item": "5ae30e795acfc408fb139a0b"
+          }
+        ],
+        "description": "5447a9cd4bdc2dbd208b4567 Description",
+        "discardLimit": -1,
+        "ergonomicsModifier": 48,
+        "gridImageLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-grid-image.webp",
+        "handbookCategories": [
+          "5b5f78fc86f77409407a7f90",
+          "5b5f78dc86f77409407a7f8e"
+        ],
+        "hasGrid": false,
+        "height": 1,
+        "high24hPrice": 65555,
+        "iconLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-icon.webp",
+        "id": "5447a9cd4bdc2dbd208b4567",
+        "image512pxLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-512.webp",
+        "image8xLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-8x.webp",
+        "inspectImageLink": "https://assets.tarkov.dev/5447a9cd4bdc2dbd208b4567-image.webp",
+        "lastLowPrice": 20000,
+        "lastOfferCount": 152,
+        "lastScan": "2026-11-25T16:28:29.000Z",
+        "link": "https://tarkov.dev/item/colt-m4a1-556x45-assault-rifle",
+        "low24hPrice": 18888,
+        "maxDurability": 100,
+        "minLevelForFlea": 25,
+        "name": "5447a9cd4bdc2dbd208b4567 Name",
+        "normalizedName": "colt-m4a1-556x45-assault-rifle",
+        "properties": {
+          "allowedAmmo": [
+            "59e6920f86f77411d82aa167",
+            "59e6927d86f77411da468256",
+            "54527a984bdc2d4e668b4567",
+            "54527ac44bdc2d36668b4567",
+            "59e68f6f86f7746c9f75e846",
+            "59e6906286f7746c9f75e847"
+          ],
+          "caliber": "Caliber556x45NATO",
+          "cameraSnap": 3.5,
+          "centerOfImpact": 0.01,
+          "defaultAmmo": "54527a984bdc2d4e668b4567",
+          "defaultErgonomics": null,
+          "defaultHeight": 2,
+          "defaultPreset": "5af08cf886f774223c269184",
+          "defaultRecoilHorizontal": null,
+          "defaultRecoilVertical": null,
+          "defaultWeight": null,
+          "defaultWidth": 5,
+          "deviationCurve": 1.35,
+          "deviationMax": 23,
+          "effectiveDistance": 500,
+          "ergonomics": 48,
+          "fireModes": [
+            "single",
+            "fullauto"
+          ],
+          "fireRate": 800,
+          "maxDurability": 100,
+          "presets": [
+            "5a32808386f774764a3226d9",
+            "5a8ae36686f774377d6ce226",
+            "5a8ae73886f7747b2e6e1416",
+            "5af08cc686f77424a61595f2",
+            "5af08cf886f774223c269184",
+            "5bbf1c5a88a45017bb03d7aa"
+          ],
+          "propertiesType": "ItemPropertiesWeapon",
+          "recoilAngle": 90,
+          "recoilDispersion": 10,
+          "recoilHorizontal": 342,
+          "recoilVertical": 119,
+          "repairCost": 166,
+          "sightingRange": 100,
+          "slots": [
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "5c0e2ff6d174af02a1659d4a",
+                  "5a33e75ac4a2826c6e06d759",
+                  "55d4b9964bdc2d1d4e8b456e",
+                  "571659bb2459771fb2755a12",
+                  "602e71bd53a60014f9705bfa",
+                  "6113c3586c780c1e710c90bc"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "55d354084bdc2d8c2f8b4568",
+              "name": "MOD_PISTOL_GRIP",
+              "nameId": "mod_pistol_grip",
+              "required": true
+            },
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "55d4887d4bdc2d962f8b4570",
+                  "61840bedd92c473c77021635",
+                  "61840d85568c120fdd2962a5",
+                  "5c05413a0db834001c390617",
+                  "5c6d450c2e221600114c997d",
+                  "5c6d42cb2e2216000e69d7d1"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "55d3555c4bdc2d962f8b4568",
+              "name": "MOD_MAGAZINE",
+              "nameId": "mod_magazine",
+              "required": false
+            },
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "5c0e2f26d174af02a9625114",
+                  "55d355e64bdc2d962f8b4569",
+                  "5d4405aaa4b9361e6a4e6bd3",
+                  "5c07a8770db8340023300450",
+                  "59bfe68886f7746004266202",
+                  "63f5ed14534b2c3d5479a677"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "55d5a2ec4bdc2d972f8b4575",
+              "name": "MOD_RECIEVER",
+              "nameId": "mod_reciever",
+              "required": true
+            },
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "5a33ca0fc4a282000d72292f",
+                  "5c0faeddd174af02a962601f",
+                  "5649be884bdc2d79388b4577",
+                  "5d120a10d7ad1a4e1026ba85",
+                  "5b0800175acfc400153aebd4",
+                  "5947e98b86f774778f1448bc"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "55d5a3074bdc2d61338b4574",
+              "name": "MOD_STOCK",
+              "nameId": "mod_stock",
+              "required": true
+            },
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "5c0faf68d174af02a96260b8",
+                  "56ea7165d2720b6e518b4583",
+                  "55d44fd14bdc2d962f8b456e",
+                  "5ea16d4d5aad6446a939753d",
+                  "5bb20dbcd4351e44f824c04e",
+                  "6033749e88382f4fab3fd2c5"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "55d5a30f4bdc2d882f8b4574",
+              "name": "MOD_CHARGE",
+              "nameId": "mod_charge",
+              "required": true
+            },
+            {
+              "filters": {
+                "allowedCategories": [],
+                "allowedItems": [
+                  "675307301f7c19a9780f2668"
+                ],
+                "excludedCategories": [],
+                "excludedItems": []
+              },
+              "id": "67530a90d8f555dc210c7c36",
+              "name": "MOD_CHARGE",
+              "nameId": "mod_charge_001",
+              "required": false
+            }
+          ]
+        },
+        "sellToTrader": [
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 7358,
+            "priceRUB": 7358,
+            "trader": "54cb50c76803fa8b248b4571"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 4415,
+            "priceRUB": 4415,
+            "trader": "579dc571d53a0658a154fbec"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 7174,
+            "priceRUB": 7174,
+            "trader": "58330581ace78e27b8b10cee"
+          },
+          {
+            "currency": "USD",
+            "currencyItem": "5696686a4bdc2da3298b456a",
+            "price": 54,
+            "priceRUB": 6622,
+            "trader": "5935c25fb3acc3127c3d8cd9"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 8278,
+            "priceRUB": 8278,
+            "trader": "5a7c2eca46aef81a7ca2145d"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 7358,
+            "priceRUB": 7358,
+            "trader": "6617beeaa9cfa777ca915b7c"
+          }
+        ],
+        "shortName": "5447a9cd4bdc2dbd208b4567 ShortName",
+        "stackMaxSize": 1,
+        "types": [
+          "gun",
+          "wearable"
+        ],
+        "updated": "2026-11-25T17:08:03.000Z",
+        "velocity": 0,
+        "weight": 0.75,
+        "width": 1,
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/Colt_M4A1_5.56x45_assault_rifle"
+      },
+      "5447ac644bdc2d6c208b4567": {
+        "avg24hPrice": 34006,
+        "backgroundColor": "yellow",
+        "baseImageLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-base-image.webp",
+        "basePrice": 1000,
+        "buyFromTrader": [],
+        "categories": [
+          "543be5cb4bdc2deb348b4568",
+          "5661632d4bdc2d903d8b456b",
+          "54009119af1c881c07000029"
+        ],
+        "changeLast48h": -475,
+        "changeLast48hPercent": -1.38,
+        "conflictingCategories": [],
+        "conflictingItems": [],
+        "conflictingSlotIds": [],
+        "containsItems": [
+          {
+            "attributes": {},
+            "count": 50,
+            "item": "54527a984bdc2d4e668b4567"
+          }
+        ],
+        "description": "5447ac644bdc2d6c208b4567 Description",
+        "discardLimit": -1,
+        "gridImageLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-grid-image.webp",
+        "handbookCategories": [
+          "5b47574386f77428ca22b33c",
+          "5b47574386f77428ca22b346"
+        ],
+        "hasGrid": false,
+        "height": 1,
+        "high24hPrice": 79980,
+        "iconLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-icon.webp",
+        "id": "5447ac644bdc2d6c208b4567",
+        "image512pxLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-512.webp",
+        "image8xLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-8x.webp",
+        "inspectImageLink": "https://assets.tarkov.dev/5447ac644bdc2d6c208b4567-image.webp",
+        "lastLowPrice": 25000,
+        "lastOfferCount": 30,
+        "lastScan": "2026-11-25T16:48:04.000Z",
+        "link": "https://tarkov.dev/item/556x45mm-m855-ammo-pack-50-pcs",
+        "low24hPrice": 18000,
+        "minLevelForFlea": 25,
+        "name": "5447ac644bdc2d6c208b4567 Name",
+        "normalizedName": "556x45mm-m855-ammo-pack-50-pcs",
+        "properties": null,
+        "sellToTrader": [
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 240,
+            "priceRUB": 240,
+            "trader": "579dc571d53a0658a154fbec"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 450,
+            "priceRUB": 450,
+            "trader": "5a7c2eca46aef81a7ca2145d"
+          }
+        ],
+        "shortName": "5447ac644bdc2d6c208b4567 ShortName",
+        "stackMaxSize": 1,
+        "types": [
+          "ammoBox"
+        ],
+        "updated": "2026-11-25T17:28:02.000Z",
+        "weight": 0.01,
+        "width": 1,
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/5.56x45mm_M855_ammo_pack_(50_pcs)"
+      },
+      "5448ba0b4bdc2d02308b456c": {
+        "avg24hPrice": 686339,
+        "backgroundColor": "green",
+        "baseImageLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-base-image.webp",
+        "basePrice": 51111,
+        "buyFromTrader": [],
+        "categories": [
+          "5c99f98d86f7745c314214b3",
+          "543be5e94bdc2df1348b4568",
+          "54009119af1c881c07000029"
+        ],
+        "changeLast48h": -55252,
+        "changeLast48hPercent": -7.45,
+        "conflictingCategories": [],
+        "conflictingItems": [],
+        "conflictingSlotIds": [],
+        "containsItems": [],
+        "description": "5448ba0b4bdc2d02308b456c Description",
+        "discardLimit": 1,
+        "gridImageLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-grid-image.webp",
+        "handbookCategories": [
+          "6ae9b44437a968c81e0e635d",
+          "5c518ec986f7743b68682ce2"
+        ],
+        "hasGrid": false,
+        "height": 1,
+        "high24hPrice": 1000000,
+        "iconLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-icon.webp",
+        "id": "5448ba0b4bdc2d02308b456c",
+        "image512pxLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-512.webp",
+        "image8xLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-8x.webp",
+        "inspectImageLink": "https://assets.tarkov.dev/5448ba0b4bdc2d02308b456c-image.webp",
+        "lastLowPrice": 750000,
+        "lastOfferCount": 9,
+        "lastScan": "2026-11-25T16:38:04.000Z",
+        "link": "https://tarkov.dev/item/factory-emergency-exit-key",
+        "low24hPrice": 444444,
+        "minLevelForFlea": 25,
+        "name": "5448ba0b4bdc2d02308b456c Name",
+        "normalizedName": "factory-emergency-exit-key",
+        "properties": {
+          "propertiesType": "ItemPropertiesKey",
+          "uses": 20
+        },
+        "sellToTrader": [
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 20444,
+            "priceRUB": 20444,
+            "trader": "54cb50c76803fa8b248b4571"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 26066,
+            "priceRUB": 26066,
+            "trader": "54cb57776803fa99248b456e"
+          },
+          {
+            "currency": "RUB",
+            "currencyItem": "5449016a4bdc2d6f028b456f",
+            "price": 12266,
+            "priceRUB": 12266,
+            "trader": "579dc571d53a0658a154fbec"
+          }
+        ],
+        "shortName": "5448ba0b4bdc2d02308b456c ShortName",
+        "stackMaxSize": 1,
+        "types": [
+          "keys"
+        ],
+        "updated": "2026-11-25T17:18:02.000Z",
+        "weight": 0.01,
+        "width": 1,
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/Factory_emergency_exit_key"
+      }
+    },
+    "mastering": [
+      {
+        "id": "M4",
+        "level2": 1600,
+        "level3": 2000,
+        "weapons": [
+          "5c07c60e0db834002330051f",
+          "5447a9cd4bdc2dbd208b4567",
+          "5bb2475ed4351e00853264e3",
+          "5d43021ca4b9362eab4b5e25",
+          "68a639748e1fe612970728e9",
+          "68a6399922b1e0bd360afe56"
+        ]
+      },
+      {
+        "id": "AKM",
+        "level2": 500,
+        "level3": 600,
+        "weapons": [
+          "59d6088586f774275f37482f",
+          "5a0ec13bfcdbcb00165aa685",
+          "59ff346386f77477562ff5e2",
+          "5abcbc27d8ce8700182eceeb",
+          "59e6687d86f77411d949b251",
+          "59e6152586f77473dc057aa1"
+        ]
+      },
+      {
+        "id": "SKS",
+        "level2": 200,
+        "level3": 300,
+        "weapons": [
+          "587e02ff24597743df3deaeb",
+          "574d967124597745970e7c94"
+        ]
+      }
+    ],
+    "playerLevels": [
+      {
+        "exp": 0,
+        "level": 1,
+        "levelBadgeImageLink": "https://assets.tarkov.dev/player-level-group-1.png"
+      },
+      {
+        "exp": 1000,
+        "level": 2,
+        "levelBadgeImageLink": "https://assets.tarkov.dev/player-level-group-1.png"
+      },
+      {
+        "exp": 3017,
+        "level": 3,
+        "levelBadgeImageLink": "https://assets.tarkov.dev/player-level-group-1.png"
+      }
+    ],
+    "settings": {
+      "globalMaxTraders": false,
+      "gpCoinValue": 32748,
+      "scavCooldownSeconds": 1500
+    },
+    "skills": [
+      {
+        "id": "AimDrills",
+        "imageLink": "https://assets.tarkov.dev/skill-AimDrills-icon.webp",
+        "name": "AimDrills",
+        "normalizedName": "aim-drills",
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/Aim_Drills"
+      },
+      {
+        "id": "Assault",
+        "imageLink": "https://assets.tarkov.dev/skill-Assault-icon.webp",
+        "name": "Assault",
+        "normalizedName": "assault-rifles",
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/Assault_Rifles"
+      },
+      {
+        "id": "AttachedLauncher",
+        "imageLink": "https://assets.tarkov.dev/skill-AttachedLauncher-icon.webp",
+        "name": "AttachedLauncher",
+        "normalizedName": "underbarrel-launchers",
+        "wikiLink": "https://escapefromtarkov.fandom.com/wiki/Underbarrel_Launchers"
+      }
+    ],
+    "specialItems": [
+      "5f4fbaaca5573a5ac31db429",
+      "61605ddea09d851a0a0c1bbc",
+      "62e9103049c018f425059f38"
+    ]
+  },
+  "translations": [
+    "$.data.items.*.name",
+    "$.data.items.*.shortName",
+    "$.data.items.*.description",
+    "$.data.items.*.properties.slots[*].name",
+    "$.data.items.*.properties.zones[*]",
+    "$.data.items.*.properties.armorType",
+    "$.data.items.*.properties.armorSlots[*].name",
+    "$.data.items.*.properties.armorSlots[*].zones[*]",
+    "$.data.items.*.properties.armorSlots[*].armorType",
+    "$.data.items.*.properties.stimEffects[*].type",
+    "$.data.items.*.properties.fireModes[*]",
+    "$.data.items.*.properties.content[*]",
+    "$.data.fleaMarket.*.name",
+    "$.data.armorMaterial.*.name",
+    "$.data.skills.*.name",
+    "$.data.itemCategories.*.name",
+    "$.data.handbookCategories.*.name"
+  ]
+}

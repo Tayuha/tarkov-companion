@@ -1,0 +1,161 @@
+{
+  "data": {
+    "end": 1796634039000,
+    "id": "69e232a764dfe95549003f0f",
+    "name": "69e232a764dfe95549003f0f name",
+    "perks": {
+      "common": [
+        {
+          "description": "69c41a19cd28c936320a7523 description",
+          "exclusiveToPerks": [],
+          "id": "69c41a19cd28c936320a7523",
+          "imageLink": "https://assets.tarkov.dev/69c41a19cd28c936320a7523.webp",
+          "name": "69c41a19cd28c936320a7523 name",
+          "points": null
+        },
+        {
+          "description": "69c41a86383fc5c9ad03f3d5 description",
+          "exclusiveToPerks": [],
+          "id": "69c41a86383fc5c9ad03f3d5",
+          "imageLink": "https://assets.tarkov.dev/69c41a86383fc5c9ad03f3d5.webp",
+          "name": "69c41a86383fc5c9ad03f3d5 name",
+          "points": null
+        },
+        {
+          "description": "69c41adf883efd5e3b09ccae description",
+          "exclusiveToPerks": [],
+          "id": "69c41adf883efd5e3b09ccae",
+          "imageLink": "https://assets.tarkov.dev/69c41adf883efd5e3b09ccae.webp",
+          "name": "69c41adf883efd5e3b09ccae name",
+          "points": null
+        },
+        {
+          "description": "69ce5d9296f3b267fa08f137 description",
+          "exclusiveToPerks": [],
+          "id": "69ce5d9296f3b267fa08f137",
+          "imageLink": "https://assets.tarkov.dev/69ce5d9296f3b267fa08f137.webp",
+          "name": "69ce5d9296f3b267fa08f137 name",
+          "points": null
+        },
+        {
+          "description": "69ce5e104e0a1c7ca20781c9 description",
+          "exclusiveToPerks": [],
+          "id": "69ce5e104e0a1c7ca20781c9",
+          "imageLink": "https://assets.tarkov.dev/69ce5e104e0a1c7ca20781c9.webp",
+          "name": "69ce5e104e0a1c7ca20781c9 name",
+          "points": null
+        },
+        {
+          "description": "69ce5eb3e4b79de94a0d78c8 description",
+          "exclusiveToPerks": [],
+          "id": "69ce5eb3e4b79de94a0d78c8",
+          "imageLink": "https://assets.tarkov.dev/69ce5eb3e4b79de94a0d78c8.webp",
+          "name": "69ce5eb3e4b79de94a0d78c8 name",
+          "points": null
+        }
+      ],
+      "personal": [
+        {
+          "description": "69c3cd003ffdba4e68086bd7 description",
+          "exclusiveToPerks": [
+            "69c4116a383fc5c9ad03f3d1"
+          ],
+          "id": "69c3cd003ffdba4e68086bd7",
+          "imageLink": "https://assets.tarkov.dev/69c3cd003ffdba4e68086bd7.webp",
+          "name": "69c3cd003ffdba4e68086bd7 name",
+          "points": 2
+        },
+        {
+          "description": "69c3cddcfb79911cf20022d6 description",
+          "exclusiveToPerks": [
+            "69c41632d7a7b2ca660e0c59"
+          ],
+          "id": "69c3cddcfb79911cf20022d6",
+          "imageLink": "https://assets.tarkov.dev/69c3cddcfb79911cf20022d6.webp",
+          "name": "69c3cddcfb79911cf20022d6 name",
+          "points": 3
+        },
+        {
+          "description": "69c3d036042c81ad9209eeae description",
+          "exclusiveToPerks": [],
+          "id": "69c3d036042c81ad9209eeae",
+          "imageLink": "https://assets.tarkov.dev/69c3d036042c81ad9209eeae.webp",
+          "name": "69c3d036042c81ad9209eeae name",
+          "points": 2
+        },
+        {
+          "description": "69c3d21749d7d7c520026425 description",
+          "exclusiveToPerks": [
+            "69ce64064e0a1c7ca20781d3",
+            "6a578102e7737aa469066518"
+          ],
+          "id": "69c3d21749d7d7c520026425",
+          "imageLink": "https://assets.tarkov.dev/69c3d21749d7d7c520026425.webp",
+          "name": "69c3d21749d7d7c520026425 name",
+          "points": 10
+        },
+        {
+          "description": "69c3d2acfe3c5632e4045fe8 description",
+          "exclusiveToPerks": [
+            "69c411d8883efd5e3b09ccab"
+          ],
+          "id": "69c3d2acfe3c5632e4045fe8",
+          "imageLink": "https://assets.tarkov.dev/69c3d2acfe3c5632e4045fe8.webp",
+          "name": "69c3d2acfe3c5632e4045fe8 name",
+          "points": 2
+        },
+        {
+          "description": "69c3d35feaf97663fb0bb367 description",
+          "exclusiveToPerks": [
+            "69c412519b5263783d0fe520",
+            "69c40c0f5e9ce5a8970f6be9"
+          ],
+          "id": "69c3d35feaf97663fb0bb367",
+          "imageLink": "https://assets.tarkov.dev/69c3d35feaf97663fb0bb367.webp",
+          "name": "69c3d35feaf97663fb0bb367 name",
+          "points": 2
+        },
+        {
+          "description": "69c3d43030f896ebef0ed357 description",
+          "exclusiveToPerks": [
+            "69ce62886e199f4bbe0ab19b"
+          ],
+          "id": "69c3d43030f896ebef0ed357",
+          "imageLink": "https://assets.tarkov.dev/69c3d43030f896ebef0ed357.webp",
+          "name": "69c3d43030f896ebef0ed357 name",
+          "points": 2
+        },
+        {
+          "description": "69c3d4e949d7d7c52002642a description",
+          "exclusiveToPerks": [],
+          "id": "69c3d4e949d7d7c52002642a",
+          "imageLink": "https://assets.tarkov.dev/69c3d4e949d7d7c52002642a.webp",
+          "name": "69c3d4e949d7d7c52002642a name",
+          "points": 1
+        },
+        {
+          "description": "69c3d6a9af28f094100fe128 description",
+          "exclusiveToPerks": [],
+          "id": "69c3d6a9af28f094100fe128",
+          "imageLink": "https://assets.tarkov.dev/69c3d6a9af28f094100fe128.webp",
+          "name": "69c3d6a9af28f094100fe128 name",
+          "points": 3
+        },
+        {
+          "description": "69c3da8fc0e4deb02605f3c9 description",
+          "exclusiveToPerks": [],
+          "id": "69c3da8fc0e4deb02605f3c9",
+          "imageLink": "https://assets.tarkov.dev/69c3da8fc0e4deb02605f3c9.webp",
+          "name": "69c3da8fc0e4deb02605f3c9 name",
+          "points": 10
+        }
+      ]
+    },
+    "start": 1776431739000
+  },
+  "translations": [
+    "$.data.name",
+    "$.data.perks.*.*.name",
+    "$.data.perks.*.*.description"
+  ]
+}

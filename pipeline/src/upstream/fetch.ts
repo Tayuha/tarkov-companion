@@ -47,9 +47,22 @@ export interface DatasetMeta {
   readonly lastModified: string | null;
 }
 
+export interface DictionaryMeta {
+  readonly etag: string | null;
+  readonly lastModified: string | null;
+}
+
 export interface FetchDatasetResult {
   /** Localized dataset, ready for normalization. Mutated copy of the payload's `data`. */
   readonly data: unknown;
+  /** Unresolved copy of the payload's `data`, useful for recording fixtures. */
+  readonly rawData: unknown;
+  /** Locale dictionary used to resolve `rawData`, keyed by placeholder string. */
+  readonly dictionary: Readonly<Record<string, string>>;
+  /** Conditional-request metadata for the dictionary response, when fetched. */
+  readonly dictionaryMeta: DictionaryMeta | null;
+  /** Translation pointers declared by the upstream payload, preserved for fixtures. */
+  readonly translations: readonly string[];
   readonly stats: LocalizationStats;
   readonly sources: { readonly data: string; readonly dictionary: string | null };
   readonly meta: DatasetMeta;
@@ -183,6 +196,7 @@ export async function fetchDataset(options: FetchDatasetOptions): Promise<FetchD
   }
 
   const payload = response.body as { data: unknown; translations?: unknown };
+  const rawData = structuredClone(payload.data);
   const translations = Array.isArray(payload.translations)
     ? payload.translations.filter((path): path is string => typeof path === "string")
     : [];
@@ -190,12 +204,17 @@ export async function fetchDataset(options: FetchDatasetOptions): Promise<FetchD
   const warnings: string[] = [];
   let dictionary: Record<string, string> = {};
   let dictionaryUrl: string | null = null;
+  let dictionaryMeta: DictionaryMeta | null = null;
 
   if (translations.length > 0) {
     dictionaryUrl = `${baseUrl}/${mode}/${dataset}_${lang}`;
     try {
       const dictionaryResponse = await requestJson(dictionaryUrl, requestOptions);
       dictionary = readDictionary(dictionaryResponse.body, dictionaryUrl);
+      dictionaryMeta = {
+        etag: dictionaryResponse.etag,
+        lastModified: dictionaryResponse.lastModified,
+      };
     } catch (error) {
       if (error instanceof UpstreamError && error.status === 404 && allowMissingDictionary) {
         warnings.push(
@@ -217,6 +236,10 @@ export async function fetchDataset(options: FetchDatasetOptions): Promise<FetchD
 
   return {
     data: payload.data,
+    rawData,
+    dictionary,
+    dictionaryMeta,
+    translations,
     stats,
     sources: { data: dataUrl, dictionary: dictionaryUrl },
     meta: {

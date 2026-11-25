@@ -13,6 +13,7 @@ Implemented so far:
 - Locale dictionary lookup and in-place resolution with diagnostics.
 - Fetch helper with timeouts, retries, user agent, and strict dictionary handling.
 - CLI to inspect any dataset.
+- Deterministic, committed upstream fixtures for the pipeline tests (`test/fixtures/upstream/`).
 
 Not implemented yet: normalization, bundle writing, publication, conditional requests. Those are tracked
 in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
@@ -28,10 +29,17 @@ npm run build
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
 npm run fetch -- --dataset items --sample 3 --out /tmp/items.localized.json
+
+# Refresh the committed upstream fixtures (network; rewrites test/fixtures/upstream/)
+npm run fixtures
 ```
 
 Options: `--mode regular|pve|pvp-season`, `--dataset <name>`, `--lang <code>` (default `en`),
 `--base-url <url>`, `--out <file>`, `--sample <n>`.
+
+Fixtures keep unresolved placeholders plus a filtered `_en` dictionary so tests exercise the
+resolver. See [`../test/fixtures/README.md`](../test/fixtures/README.md) for the trimming policy,
+layout, budget, and stale-pointer notes.
 
 ## Localization contract
 

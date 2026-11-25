@@ -1,0 +1,32 @@
+{
+  "byteBudget": 2000000,
+  "capturedAt": "2026-11-25T18:22:15.457Z",
+  "files": {
+    "status.json": {
+      "bytes": 1575,
+      "dictionarySource": null,
+      "entries": null,
+      "etag": "W/\"59a8c2833a236456e4f8ae85dc5f1dfb\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Thu, 05 Nov 2026 07:15:05 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": null,
+      "role": "status",
+      "sha256": "e79b165ec85dc109e6a3b8d0cbb1a8b9b0ce54eee84a842d54ed52a71acf63ec",
+      "source": "https://json.tarkov.dev/status",
+      "translations": 0,
+      "unresolvedPointers": []
+    }
+  },
+  "fixtureSet": "common",
+  "generatedBy": "pipeline/src/scripts/capture-fixtures.ts",
+  "schemaVersion": 1,
+  "skipped": [],
+  "sourceBaseUrl": "https://json.tarkov.dev",
+  "totals": {
+    "bytes": 1575,
+    "files": 1
+  }
+}

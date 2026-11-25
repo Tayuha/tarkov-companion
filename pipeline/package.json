@@ -12,7 +12,8 @@
     "lint": "eslint . && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "fetch": "tsx src/cli/fetch.ts"
+    "fetch": "tsx src/cli/fetch.ts",
+    "fixtures": "tsx src/scripts/capture-fixtures.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

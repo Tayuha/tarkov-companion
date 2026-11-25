@@ -1,0 +1,4990 @@
+{
+  "data": {
+    "5d388e97081959000a123acf": {
+      "areaType": 5,
+      "id": "5d388e97081959000a123acf",
+      "imageLink": "https://assets.tarkov.dev/station-heating.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.04
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_5_stage_1_description",
+          "id": "5d388e97081959000a123acf-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 25000,
+              "id": "5d388e97081959000a123acf-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d388e97081959000a123acf-1-1",
+              "item": "57347b8b24597737dd42e192"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.08
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_5_stage_2_description",
+          "id": "5d388e97081959000a123acf-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 50000,
+              "id": "5d388e97081959000a123acf-2-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d388e97081959000a123acf-2-4",
+              "item": "5e2af2bc86f7746d3f3c33fc"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d388e97081959000a123acf-2-5",
+              "item": "590a373286f774287540368b"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d388e97081959000a123acf-2-6",
+              "item": "56742c284bdc2d98058b456d"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [
+            {
+              "id": "5d388e97081959000a123acf-2-3",
+              "level": 1,
+              "skill": "Endurance"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d388e97081959000a123acf-2-1",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d388e97081959000a123acf-2-2",
+              "level": 1,
+              "station": "5d388e97081959000a123acf"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.12
+            },
+            {
+              "name": "hideout_DebuffEndDelay",
+              "passive": true,
+              "production": false,
+              "type": "DebuffEndDelay",
+              "value": -0.5
+            }
+          ],
+          "constructionTime": 28800,
+          "description": "hideout_area_5_stage_3_description",
+          "id": "5d388e97081959000a123acf-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d388e97081959000a123acf-3-0",
+              "item": "5d1c774f86f7746d6620f8db"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d388e97081959000a123acf-3-1",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 4,
+              "id": "5d388e97081959000a123acf-3-6",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d388e97081959000a123acf-3-7",
+              "item": "619cbf476b8a1b37a54eebf8"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d388e97081959000a123acf-3-2",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d388e97081959000a123acf-3-3",
+              "level": 2,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d388e97081959000a123acf-3-5",
+              "level": 2,
+              "station": "5d388e97081959000a123acf"
+            }
+          ],
+          "traderRequirements": [
+            {
+              "compareMethod": ">=",
+              "id": "5d388e97081959000a123acf-3-4",
+              "requirementType": "level",
+              "trader": "5ac3b934156ae10c4430e83c",
+              "value": 2
+            }
+          ]
+        }
+      ],
+      "name": "hideout_area_5_name",
+      "normalizedName": "heating"
+    },
+    "5d3b396e33c48f02b81cd9f3": {
+      "areaType": 4,
+      "id": "5d3b396e33c48f02b81cd9f3",
+      "imageLink": "https://assets.tarkov.dev/station-generator.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "5d1b371186f774253763a656",
+                "5d1b36a186f7742523398433"
+              ],
+              "type": "AdditionalSlots",
+              "value": 2
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_4_stage_1_description",
+          "id": "5d3b396e33c48f02b81cd9f3-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 100000,
+              "id": "5d3b396e33c48f02b81cd9f3-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d3b396e33c48f02b81cd9f3-1-2",
+              "item": "590a3c0a86f774385a33c450"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-1-1",
+              "level": 1,
+              "station": "5d484fb3654e7600681d9314"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "5d1b371186f774253763a656",
+                "5d1b36a186f7742523398433"
+              ],
+              "type": "AdditionalSlots",
+              "value": 2
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_4_stage_2_description",
+          "id": "5d3b396e33c48f02b81cd9f3-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d3b396e33c48f02b81cd9f3-2-2",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d3b396e33c48f02b81cd9f3-2-3",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d3b396e33c48f02b81cd9f3-2-4",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d3b396e33c48f02b81cd9f3-2-6",
+              "item": "619cbfeb6b8a1b37a54eebfa"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-2-0",
+              "level": 1,
+              "station": "5d484fb3654e7600681d9314"
+            },
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-2-1",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-2-5",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "5d1b371186f774253763a656",
+                "5d1b36a186f7742523398433"
+              ],
+              "type": "AdditionalSlots",
+              "value": 2
+            }
+          ],
+          "constructionTime": 57600,
+          "description": "hideout_area_4_stage_3_description",
+          "id": "5d3b396e33c48f02b81cd9f3-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 12,
+              "id": "5d3b396e33c48f02b81cd9f3-3-2",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d3b396e33c48f02b81cd9f3-3-3",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 16,
+              "id": "5d3b396e33c48f02b81cd9f3-3-4",
+              "item": "590a3c0a86f774385a33c450"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 5,
+              "id": "5d3b396e33c48f02b81cd9f3-3-5",
+              "item": "57347c2e24597744902c94a1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d3b396e33c48f02b81cd9f3-3-7",
+              "item": "61bf7b6302b3924be92fa8c3"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-3-0",
+              "level": 3,
+              "station": "5d484fb3654e7600681d9314"
+            },
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-3-1",
+              "level": 3,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d3b396e33c48f02b81cd9f3-3-6",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_4_name",
+      "normalizedName": "generator"
+    },
+    "5d473c1e081959000e530190": {
+      "areaType": 0,
+      "id": "5d473c1e081959000e530190",
+      "imageLink": "https://assets.tarkov.dev/station-vents.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 0,
+          "description": "hideout_area_0_stage_1_description",
+          "id": "5d473c1e081959000e530190-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 25000,
+              "id": "5d473c1e081959000e530190-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 3600,
+          "description": "hideout_area_0_stage_2_description",
+          "id": "5d473c1e081959000e530190-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d473c1e081959000e530190-2-0",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d473c1e081959000e530190-2-1",
+              "item": "5733279d245977289b77ec24"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d473c1e081959000e530190-2-3",
+              "item": "5734779624597737e04bf329"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d473c1e081959000e530190-2-4",
+              "item": "61bf7b6302b3924be92fa8c3"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d473c1e081959000e530190-2-2",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 36000,
+          "description": "hideout_area_0_stage_3_description",
+          "id": "5d473c1e081959000e530190-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 4,
+              "id": "5d473c1e081959000e530190-3-1",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 14,
+              "id": "5d473c1e081959000e530190-3-2",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d473c1e081959000e530190-3-3",
+              "item": "590a3b0486f7743954552bdb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 4,
+              "id": "5d473c1e081959000e530190-3-4",
+              "item": "5733279d245977289b77ec24"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d473c1e081959000e530190-3-7",
+              "item": "61bf7b6302b3924be92fa8c3"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [
+            {
+              "id": "5d473c1e081959000e530190-3-5",
+              "level": 2,
+              "skill": "Strength"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d473c1e081959000e530190-3-0",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d473c1e081959000e530190-3-6",
+              "level": 2,
+              "station": "5d473c1e081959000e530190"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_0_name",
+      "normalizedName": "vents"
+    },
+    "5d484fb3654e7600681d9314": {
+      "areaType": 1,
+      "id": "5d484fb3654e7600681d9314",
+      "imageLink": "https://assets.tarkov.dev/station-security.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 0,
+          "description": "hideout_area_1_stage_1_description",
+          "id": "5d484fb3654e7600681d9314-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 20000,
+              "id": "5d484fb3654e7600681d9314-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fb3654e7600681d9314-1-1",
+              "item": "590c2c9c86f774245b1f03f2"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 3600,
+          "description": "hideout_area_1_stage_2_description",
+          "id": "5d484fb3654e7600681d9314-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 45000,
+              "id": "5d484fb3654e7600681d9314-2-2",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fb3654e7600681d9314-2-4",
+              "item": "5af04b6486f774195a3ebb49"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fb3654e7600681d9314-2-5",
+              "item": "590c5bbd86f774785762df04"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fb3654e7600681d9314-2-6",
+              "item": "60391b0fb847c71012789415"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [
+            {
+              "id": "5d484fb3654e7600681d9314-2-1",
+              "level": 2,
+              "skill": "Endurance"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fb3654e7600681d9314-2-0",
+              "level": 1,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "5d484fb3654e7600681d9314-2-3",
+              "level": 1,
+              "station": "5d484fb3654e7600681d9314"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 61200,
+          "description": "hideout_area_1_stage_3_description",
+          "id": "5d484fb3654e7600681d9314-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fb3654e7600681d9314-3-1",
+              "item": "5d1b304286f774253763a528"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fb3654e7600681d9314-3-2",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fb3654e7600681d9314-3-3",
+              "item": "5d1b2ffd86f77425243e8d17"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fb3654e7600681d9314-3-4",
+              "item": "590c392f86f77444754deb29"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fb3654e7600681d9314-3-0",
+              "level": 3,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "5d484fb3654e7600681d9314-3-5",
+              "level": 2,
+              "station": "5d484fb3654e7600681d9314"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_1_name",
+      "normalizedName": "security"
+    },
+    "5d484fba654e7600691aadf7": {
+      "areaType": 2,
+      "id": "5d484fba654e7600691aadf7",
+      "imageLink": "https://assets.tarkov.dev/station-lavatory.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_UnlockArmorRepair",
+              "passive": true,
+              "production": false,
+              "type": "UnlockArmorRepair",
+              "value": 1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_2_stage_1_description",
+          "id": "5d484fba654e7600691aadf7-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2000,
+              "id": "5d484fba654e7600691aadf7-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-1-1",
+              "item": "5c13cef886f774072e618e82"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-1-2",
+              "item": "57347c93245977448d35f6e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-1-3",
+              "item": "5c13cd2486f774072c757944"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-1-4",
+              "item": "62a0a098de7ac8199358053b"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_RepairArmorBonus",
+              "passive": true,
+              "production": false,
+              "type": "RepairArmorBonus",
+              "value": 0.03
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_2_stage_2_description",
+          "id": "5d484fba654e7600691aadf7-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fba654e7600691aadf7-2-0",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fba654e7600691aadf7-2-1",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-2-2",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fba654e7600691aadf7-2-6",
+              "item": "5e2af29386f7746d4159f077"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fba654e7600691aadf7-2-7",
+              "item": "61bf83814088ec1a363d7097"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fba654e7600691aadf7-2-3",
+              "level": 1,
+              "station": "5d484fc8654e760065037abf"
+            },
+            {
+              "id": "5d484fba654e7600691aadf7-2-4",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d484fba654e7600691aadf7-2-5",
+              "level": 1,
+              "station": "5d484fba654e7600691aadf7"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_RepairArmorBonus",
+              "passive": true,
+              "production": false,
+              "type": "RepairArmorBonus",
+              "value": 0.06
+            }
+          ],
+          "constructionTime": 25200,
+          "description": "hideout_area_2_stage_3_description",
+          "id": "5d484fba654e7600691aadf7-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fba654e7600691aadf7-3-0",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fba654e7600691aadf7-3-1",
+              "item": "5d1b327086f7742525194449"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fba654e7600691aadf7-3-2",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fba654e7600691aadf7-3-5",
+              "item": "590c346786f77423e50ed342"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fba654e7600691aadf7-3-3",
+              "level": 2,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d484fba654e7600691aadf7-3-4",
+              "level": 2,
+              "station": "5d484fc8654e760065037abf"
+            },
+            {
+              "id": "5d484fba654e7600691aadf7-3-6",
+              "level": 2,
+              "station": "5d484fba654e7600691aadf7"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_2_name",
+      "normalizedName": "lavatory"
+    },
+    "5d484fc0654e76006657e0ab": {
+      "areaType": 3,
+      "id": "5d484fc0654e76006657e0ab",
+      "imageLink": "https://assets.tarkov.dev/station-stash.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_StashSize",
+              "passive": true,
+              "production": false,
+              "type": "StashSize",
+              "value": 300
+            },
+            {
+              "name": "hideout_UnlockWeaponModification",
+              "passive": true,
+              "production": false,
+              "type": "UnlockWeaponModification",
+              "value": 1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_3_stage_1_description",
+          "id": "5d484fc0654e76006657e0ab-1",
+          "itemRequirements": [],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_StashSize",
+              "passive": true,
+              "production": false,
+              "type": "StashSize",
+              "value": 400
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_3_stage_2_description",
+          "id": "5d484fc0654e76006657e0ab-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fc0654e76006657e0ab-2-0",
+              "item": "5d1b317c86f7742523398392"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fc0654e76006657e0ab-2-1",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 4,
+              "id": "5d484fc0654e76006657e0ab-2-2",
+              "item": "590c5bbd86f774785762df04"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2500000,
+              "id": "5d484fc0654e76006657e0ab-2-4",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fc0654e76006657e0ab-2-6",
+              "item": "590c31c586f774245e3141b2"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fc0654e76006657e0ab-2-3",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-2-5",
+              "level": 1,
+              "station": "5d484fc0654e76006657e0ab"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_StashSize",
+              "passive": true,
+              "production": false,
+              "type": "StashSize",
+              "value": 500
+            }
+          ],
+          "constructionTime": 43200,
+          "description": "hideout_area_3_stage_3_description",
+          "id": "5d484fc0654e76006657e0ab-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fc0654e76006657e0ab-3-2",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d484fc0654e76006657e0ab-3-3",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8500000,
+              "id": "5d484fc0654e76006657e0ab-3-4",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 7,
+              "id": "5d484fc0654e76006657e0ab-3-6",
+              "item": "590c31c586f774245e3141b2"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fc0654e76006657e0ab-3-0",
+              "level": 2,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-3-1",
+              "level": 2,
+              "station": "5d388e97081959000a123acf"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-3-5",
+              "level": 2,
+              "station": "5d484fc0654e76006657e0ab"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_StashSize",
+              "passive": true,
+              "production": false,
+              "type": "StashSize",
+              "value": 680
+            }
+          ],
+          "constructionTime": 345600,
+          "description": "hideout_area_3_stage_4_description",
+          "id": "5d484fc0654e76006657e0ab-4",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 200000,
+              "id": "5d484fc0654e76006657e0ab-4-3",
+              "item": "569668774bdc2da2298b4568"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fc0654e76006657e0ab-4-6",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fc0654e76006657e0ab-4-7",
+              "item": "57347c77245977448d35f6e2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fc0654e76006657e0ab-4-8",
+              "item": "590c35a486f774273531c822"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fc0654e76006657e0ab-4-9",
+              "item": "60391afc25aff57af81f7085"
+            }
+          ],
+          "level": 4,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fc0654e76006657e0ab-4-0",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-4-1",
+              "level": 3,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-4-2",
+              "level": 3,
+              "station": "5d388e97081959000a123acf"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-4-4",
+              "level": 3,
+              "station": "5d484fc0654e76006657e0ab"
+            },
+            {
+              "id": "5d484fc0654e76006657e0ab-4-5",
+              "level": 2,
+              "station": "5d484fdf654e7600691aadf8"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_3_name",
+      "normalizedName": "stash"
+    },
+    "5d484fc8654e760065037abf": {
+      "areaType": 6,
+      "id": "5d484fc8654e760065037abf",
+      "imageLink": "https://assets.tarkov.dev/station-water-collector.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HydrationRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HydrationRegeneration",
+              "value": 0.1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_6_stage_1_description",
+          "id": "5d484fc8654e760065037abf-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 4,
+              "id": "5d484fc8654e760065037abf-1-0",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fc8654e760065037abf-1-1",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fc8654e760065037abf-1-2",
+              "item": "57347c77245977448d35f6e2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fc8654e760065037abf-1-3",
+              "item": "57347c1124597737fb1379e3"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HydrationRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HydrationRegeneration",
+              "value": 0.2
+            }
+          ],
+          "constructionTime": 7200,
+          "description": "hideout_area_6_stage_2_description",
+          "id": "5d484fc8654e760065037abf-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fc8654e760065037abf-2-0",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fc8654e760065037abf-2-1",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fc8654e760065037abf-2-2",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fc8654e760065037abf-2-6",
+              "item": "5e2af29386f7746d4159f077"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [
+            {
+              "id": "5d484fc8654e760065037abf-2-3",
+              "level": 3,
+              "skill": "Attention"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fc8654e760065037abf-2-4",
+              "level": 1,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d484fc8654e760065037abf-2-5",
+              "level": 1,
+              "station": "5d484fc8654e760065037abf"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HydrationRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HydrationRegeneration",
+              "value": 0.3
+            },
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "5d1b385e86f774252167b98a",
+                "6a9980872a87c16fef04789f"
+              ],
+              "type": "AdditionalSlots",
+              "value": 1
+            }
+          ],
+          "constructionTime": 57600,
+          "description": "hideout_area_6_stage_3_description",
+          "id": "5d484fc8654e760065037abf-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 20000,
+              "id": "5d484fc8654e760065037abf-3-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fc8654e760065037abf-3-2",
+              "item": "5af04b6486f774195a3ebb49"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fc8654e760065037abf-3-3",
+              "item": "590c35a486f774273531c822"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fc8654e760065037abf-3-6",
+              "item": "60391afc25aff57af81f7085"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fc8654e760065037abf-3-1",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fc8654e760065037abf-3-4",
+              "level": 2,
+              "station": "5d484fc8654e760065037abf"
+            },
+            {
+              "id": "5d484fc8654e760065037abf-3-5",
+              "level": 2,
+              "station": "5d388e97081959000a123acf"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_6_name",
+      "normalizedName": "water-collector"
+    },
+    "5d484fcd654e7668ec2ec322": {
+      "areaType": 7,
+      "id": "5d484fcd654e7668ec2ec322",
+      "imageLink": "https://assets.tarkov.dev/station-medstation.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.06
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_7_stage_1_description",
+          "id": "5d484fcd654e7668ec2ec322-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 50000,
+              "id": "5d484fcd654e7668ec2ec322-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fcd654e7668ec2ec322-1-1",
+              "item": "5d1b3f2d86f774253763b735"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fcd654e7668ec2ec322-1-2",
+              "item": "5d1b3a5d86f774252167ba22"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fcd654e7668ec2ec322-1-3",
+              "item": "544fb25a4bdc2dfb738b4567"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fcd654e7668ec2ec322-1-4",
+              "item": "62a0a043cf4a99369e2624a5"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.12
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_7_stage_2_description",
+          "id": "5d484fcd654e7668ec2ec322-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 150000,
+              "id": "5d484fcd654e7668ec2ec322-2-1",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fcd654e7668ec2ec322-2-3",
+              "item": "5b4335ba86f7744d2837a264"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fcd654e7668ec2ec322-2-4",
+              "item": "59e3606886f77417674759a5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fcd654e7668ec2ec322-2-6",
+              "item": "5e831507ea0a7c419c2f9bd9"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fcd654e7668ec2ec322-2-7",
+              "item": "619cc01e0a7c3a1a2731940c"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [
+            {
+              "id": "5d484fcd654e7668ec2ec322-2-2",
+              "level": 2,
+              "skill": "Health"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fcd654e7668ec2ec322-2-0",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fcd654e7668ec2ec322-2-5",
+              "level": 1,
+              "station": "5d484fcd654e7668ec2ec322"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.2
+            }
+          ],
+          "constructionTime": 43200,
+          "description": "hideout_area_7_stage_3_description",
+          "id": "5d484fcd654e7668ec2ec322-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 500000,
+              "id": "5d484fcd654e7668ec2ec322-3-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fcd654e7668ec2ec322-3-3",
+              "item": "59e3606886f77417674759a5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fcd654e7668ec2ec322-3-4",
+              "item": "5c0530ee86f774697952d952"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fcd654e7668ec2ec322-3-7",
+              "item": "5af0534a86f7743b6f354284"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [
+            {
+              "id": "5d484fcd654e7668ec2ec322-3-6",
+              "level": 3,
+              "skill": "Vitality"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fcd654e7668ec2ec322-3-1",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fcd654e7668ec2ec322-3-2",
+              "level": 2,
+              "station": "5d484fba654e7600691aadf7"
+            },
+            {
+              "id": "5d484fcd654e7668ec2ec322-3-5",
+              "level": 2,
+              "station": "5d484fcd654e7668ec2ec322"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_7_name",
+      "normalizedName": "medstation"
+    },
+    "5d484fd1654e76006732bf2e": {
+      "areaType": 8,
+      "id": "5d484fd1654e76006732bf2e",
+      "imageLink": "https://assets.tarkov.dev/station-nutrition-unit.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_8_stage_1_description",
+          "id": "5d484fd1654e76006732bf2e-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 25000,
+              "id": "5d484fd1654e76006732bf2e-1-1",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fd1654e76006732bf2e-1-2",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd1654e76006732bf2e-1-3",
+              "item": "59e36c6f86f774176c10a2a7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd1654e76006732bf2e-1-4",
+              "item": "62a09ee4cf4a99369e262453"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd1654e76006732bf2e-1-0",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.2
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.07
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_8_stage_2_description",
+          "id": "5d484fd1654e76006732bf2e-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 4,
+              "id": "5d484fd1654e76006732bf2e-2-1",
+              "item": "590c311186f77424d1667482"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 4,
+              "id": "5d484fd1654e76006732bf2e-2-2",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fd1654e76006732bf2e-2-3",
+              "item": "59faf98186f774067b6be103"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fd1654e76006732bf2e-2-5",
+              "item": "5d1b313086f77425227d1678"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd1654e76006732bf2e-2-0",
+              "level": 2,
+              "station": "5d484fba654e7600691aadf7"
+            },
+            {
+              "id": "5d484fd1654e76006732bf2e-2-4",
+              "level": 1,
+              "station": "5d484fd1654e76006732bf2e"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.3
+            },
+            {
+              "name": "hideout_HydrationRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HydrationRegeneration",
+              "value": 0.2
+            }
+          ],
+          "constructionTime": 50400,
+          "description": "hideout_area_8_stage_3_description",
+          "id": "5d484fd1654e76006732bf2e-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 125000,
+              "id": "5d484fd1654e76006732bf2e-3-3",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fd1654e76006732bf2e-3-6",
+              "item": "5af0484c86f7740f02001f7f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fd1654e76006732bf2e-3-7",
+              "item": "59e35abd86f7741778269d82"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fd1654e76006732bf2e-3-8",
+              "item": "5e2af00086f7746d3f3c33f7"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [
+            {
+              "id": "5d484fd1654e76006732bf2e-3-4",
+              "level": 3,
+              "skill": "Metabolism"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd1654e76006732bf2e-3-0",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fd1654e76006732bf2e-3-1",
+              "level": 2,
+              "station": "5d484fba654e7600691aadf7"
+            },
+            {
+              "id": "5d484fd1654e76006732bf2e-3-2",
+              "level": 2,
+              "station": "5d484fc0654e76006657e0ab"
+            },
+            {
+              "id": "5d484fd1654e76006732bf2e-3-5",
+              "level": 2,
+              "station": "5d484fd1654e76006732bf2e"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_8_name",
+      "normalizedName": "nutrition-unit"
+    },
+    "5d484fd6654e76051d3cc791": {
+      "areaType": 9,
+      "id": "5d484fd6654e76051d3cc791",
+      "imageLink": "https://assets.tarkov.dev/station-rest-space.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_DebuffEndDelay",
+              "passive": true,
+              "production": false,
+              "type": "DebuffEndDelay",
+              "value": -0.1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_9_stage_1_description",
+          "id": "5d484fd6654e76051d3cc791-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10000,
+              "id": "5d484fd6654e76051d3cc791-1-1",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd6654e76051d3cc791-1-2",
+              "item": "57347c1124597737fb1379e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd6654e76051d3cc791-1-3",
+              "item": "57347b8b24597737dd42e192"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd6654e76051d3cc791-1-0",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.05
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.05
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_9_stage_2_description",
+          "id": "5d484fd6654e76051d3cc791-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 75000,
+              "id": "5d484fd6654e76051d3cc791-2-1",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd6654e76051d3cc791-2-3",
+              "item": "5734781f24597737e04bf32a"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fd6654e76051d3cc791-2-4",
+              "item": "590a391c86f774385a33c404"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fd6654e76051d3cc791-2-5",
+              "item": "590a3cd386f77436f20848cb"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd6654e76051d3cc791-2-0",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fd6654e76051d3cc791-2-2",
+              "level": 1,
+              "station": "5d484fd6654e76051d3cc791"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.1
+            },
+            {
+              "name": "hideout_MaximumEnergyReserve",
+              "passive": true,
+              "production": false,
+              "type": "MaximumEnergyReserve",
+              "value": 10
+            },
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "68406efe068a2d99940c1ce3",
+                "68750378555049ec270cdab7",
+                "689f6f33b3b8c90a1c0545b8"
+              ],
+              "type": "AdditionalSlots",
+              "value": 1
+            }
+          ],
+          "constructionTime": 7200,
+          "description": "hideout_area_9_stage_3_description",
+          "id": "5d484fd6654e76051d3cc791-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fd6654e76051d3cc791-3-0",
+              "item": "59e36c6f86f774176c10a2a7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fd6654e76051d3cc791-3-1",
+              "item": "5c06782b86f77426df5407d2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fd6654e76051d3cc791-3-2",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 4,
+              "id": "5d484fd6654e76051d3cc791-3-3",
+              "item": "5e2aedd986f7746d404f3aa4"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fd6654e76051d3cc791-3-4",
+              "level": 2,
+              "station": "5d484fd6654e76051d3cc791"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_9_name",
+      "normalizedName": "rest-space"
+    },
+    "5d484fda654e7600681d9315": {
+      "areaType": 10,
+      "id": "5d484fda654e7600681d9315",
+      "imageLink": "https://assets.tarkov.dev/station-workbench.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_UnlockWeaponRepair",
+              "passive": true,
+              "production": false,
+              "type": "UnlockWeaponRepair",
+              "value": 1
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_10_stage_1_description",
+          "id": "5d484fda654e7600681d9315-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fda654e7600681d9315-1-0",
+              "item": "57347c77245977448d35f6e2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fda654e7600681d9315-1-1",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fda654e7600681d9315-1-2",
+              "item": "544fb5454bdc2df8738b456a"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_RepairWeaponBonus",
+              "passive": true,
+              "production": false,
+              "type": "RepairWeaponBonus",
+              "value": 0.03
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_10_stage_2_description",
+          "id": "5d484fda654e7600681d9315-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fda654e7600681d9315-2-1",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fda654e7600681d9315-2-2",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fda654e7600681d9315-2-3",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fda654e7600681d9315-2-5",
+              "item": "5d1c819a86f774771b0acd6c"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fda654e7600681d9315-2-6",
+              "item": "62a0a0bb621468534a797ad5"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fda654e7600681d9315-2-0",
+              "level": 1,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "5d484fda654e7600681d9315-2-4",
+              "level": 1,
+              "station": "5d484fda654e7600681d9315"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_RepairWeaponBonus",
+              "passive": true,
+              "production": false,
+              "type": "RepairWeaponBonus",
+              "value": 0.06
+            }
+          ],
+          "constructionTime": 39604,
+          "description": "hideout_area_10_stage_3_description",
+          "id": "5d484fda654e7600681d9315-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 395000,
+              "id": "5d484fda654e7600681d9315-3-2",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fda654e7600681d9315-3-4",
+              "item": "5af04b6486f774195a3ebb49"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fda654e7600681d9315-3-5",
+              "item": "5bc9b355d4351e6d1509862a"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fda654e7600681d9315-3-6",
+              "item": "60391a8b3364dc22b04d0ce5"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fda654e7600681d9315-3-0",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fda654e7600681d9315-3-1",
+              "level": 2,
+              "station": "5d484fc0654e76006657e0ab"
+            },
+            {
+              "id": "5d484fda654e7600681d9315-3-3",
+              "level": 2,
+              "station": "5d484fda654e7600681d9315"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_10_name",
+      "normalizedName": "workbench"
+    },
+    "5d484fdf654e7600691aadf8": {
+      "areaType": 11,
+      "id": "5d484fdf654e7600691aadf8",
+      "imageLink": "https://assets.tarkov.dev/station-intelligence-center.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_ScavCooldownTimer",
+              "passive": true,
+              "production": false,
+              "type": "ScavCooldownTimer",
+              "value": -0.15
+            },
+            {
+              "name": "hideout_QuestMoneyReward",
+              "passive": true,
+              "production": false,
+              "type": "QuestMoneyReward",
+              "value": 0.05
+            }
+          ],
+          "constructionTime": 0,
+          "description": "hideout_area_11_stage_1_description",
+          "id": "5d484fdf654e7600691aadf8-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-1-2",
+              "item": "5c12613b86f7743bbe2c3f76"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-1-3",
+              "item": "62a0a124de7ac81993580542"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-1-4",
+              "item": "574eb85c245977648157eec3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-1-7",
+              "item": "5d1b304286f774253763a528"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-1-8",
+              "item": "59e36c6f86f774176c10a2a7"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fdf654e7600691aadf8-1-0",
+              "level": 1,
+              "station": "5d484fb3654e7600681d9314"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-1-1",
+              "level": 1,
+              "station": "5d473c1e081959000e530190"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-1-5",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-1-6",
+              "level": 1,
+              "station": "5d484fda654e7600681d9315"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_QuestMoneyReward",
+              "passive": true,
+              "production": false,
+              "type": "QuestMoneyReward",
+              "value": 0.1
+            },
+            {
+              "name": "hideout_InsuranceReturnTime",
+              "passive": true,
+              "production": false,
+              "type": "InsuranceReturnTime",
+              "value": -0.2
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_11_stage_2_description",
+          "id": "5d484fdf654e7600691aadf8-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fdf654e7600691aadf8-2-0",
+              "item": "5c12613b86f7743bbe2c3f76"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fdf654e7600691aadf8-2-1",
+              "item": "590c621186f774138d11ea29"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 7,
+              "id": "5d484fdf654e7600691aadf8-2-2",
+              "item": "59e36c6f86f774176c10a2a7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fdf654e7600691aadf8-2-3",
+              "item": "590a386e86f77429692b27ab"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [
+            {
+              "id": "5d484fdf654e7600691aadf8-2-7",
+              "level": 3,
+              "skill": "Attention"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fdf654e7600691aadf8-2-4",
+              "level": 2,
+              "station": "5d484fb3654e7600681d9314"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-2-5",
+              "level": 2,
+              "station": "5d484fcd654e7668ec2ec322"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-2-6",
+              "level": 2,
+              "station": "5d484fd1654e76006732bf2e"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-2-8",
+              "level": 1,
+              "station": "5d484fdf654e7600691aadf8"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_ScavCooldownTimer",
+              "passive": true,
+              "production": false,
+              "type": "ScavCooldownTimer",
+              "value": -0.2
+            },
+            {
+              "name": "hideout_RagfairCommission",
+              "passive": true,
+              "production": false,
+              "type": "RagfairCommission",
+              "value": -0.3
+            }
+          ],
+          "constructionTime": 86400,
+          "description": "hideout_area_11_stage_3_description",
+          "id": "5d484fdf654e7600691aadf8-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d484fdf654e7600691aadf8-3-0",
+              "item": "5c052f6886f7746b1e3db148"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fdf654e7600691aadf8-3-1",
+              "item": "5c05300686f7746dce784e5d"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fdf654e7600691aadf8-3-2",
+              "item": "62a0a16d0b9d3c46de5b6e97"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fdf654e7600691aadf8-3-3",
+              "item": "5d0375ff86f774186372f685"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d484fdf654e7600691aadf8-3-7",
+              "item": "61bf7c024770ee6f9c6b8b53"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fdf654e7600691aadf8-3-8",
+              "item": "6389c7f115805221fb410466"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fdf654e7600691aadf8-3-4",
+              "level": 3,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-3-5",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d484fdf654e7600691aadf8-3-6",
+              "level": 2,
+              "station": "5d484fdf654e7600691aadf8"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_11_name",
+      "normalizedName": "intelligence-center"
+    },
+    "5d484fe3654e76006657e0ac": {
+      "areaType": 12,
+      "id": "5d484fe3654e76006657e0ac",
+      "imageLink": "https://assets.tarkov.dev/station-shooting-range.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 3600,
+          "description": "hideout_area_12_stage_1_description",
+          "id": "5d484fe3654e76006657e0ac-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-1-1",
+              "item": "57347c77245977448d35f6e2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-1-2",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-1-3",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 20000,
+              "id": "5d484fe3654e76006657e0ac-1-4",
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fe3654e76006657e0ac-1-0",
+              "level": 1,
+              "station": "5d494a205b56502f18c98a06"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 86400,
+          "description": "hideout_area_12_stage_2_description",
+          "id": "5d484fe3654e76006657e0ac-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-2-2",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d484fe3654e76006657e0ac-2-3",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-2-4",
+              "item": "590c2c9c86f774245b1f03f2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fe3654e76006657e0ac-2-5",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fe3654e76006657e0ac-2-6",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d484fe3654e76006657e0ac-2-7",
+              "item": "5e2af22086f7746d3f3c33fa"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d484fe3654e76006657e0ac-2-8",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d484fe3654e76006657e0ac-2-9",
+              "item": "590a3cd386f77436f20848cb"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fe3654e76006657e0ac-2-0",
+              "level": 3,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "5d484fe3654e76006657e0ac-2-1",
+              "level": 2,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d484fe3654e76006657e0ac-2-12",
+              "level": 1,
+              "station": "5d484fe3654e76006657e0ac"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Combat",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0.1
+            }
+          ],
+          "constructionTime": 86400,
+          "description": "hideout_area_12_stage_3_description",
+          "id": "5d484fe3654e76006657e0ac-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-3-0",
+              "item": "62a0a0bb621468534a797ad5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d484fe3654e76006657e0ac-3-1",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fe3654e76006657e0ac-3-2",
+              "item": "590a3b0486f7743954552bdb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fe3654e76006657e0ac-3-3",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fe3654e76006657e0ac-3-4",
+              "item": "5c06782b86f77426df5407d2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fe3654e76006657e0ac-3-5",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d484fe3654e76006657e0ac-3-6",
+              "item": "59e36c6f86f774176c10a2a7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d484fe3654e76006657e0ac-3-7",
+              "item": "544fb5454bdc2df8738b456a"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d484fe3654e76006657e0ac-3-9",
+              "level": 2,
+              "station": "5d484fe3654e76006657e0ac"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_12_name",
+      "normalizedName": "shooting-range"
+    },
+    "5d494a0e5b56502f18c98a02": {
+      "areaType": 13,
+      "id": "5d494a0e5b56502f18c98a02",
+      "imageLink": "https://assets.tarkov.dev/station-library.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": 0.15
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Practical",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0.3
+            }
+          ],
+          "constructionTime": 194400,
+          "description": "hideout_area_13_stage_1_description",
+          "id": "5d494a0e5b56502f18c98a02-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 400000,
+              "id": "5d494a0e5b56502f18c98a02-1-1",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a0e5b56502f18c98a02-1-3",
+              "item": "573478bc24597738002c6175"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d494a0e5b56502f18c98a02-1-4",
+              "item": "573474f924597738002c6174"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "5d494a0e5b56502f18c98a02-1-5",
+              "item": "590c639286f774151567fa95"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a0e5b56502f18c98a02-1-6",
+              "item": "590c645c86f77412b01304d9"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a0e5b56502f18c98a02-1-7",
+              "item": "590c651286f7741e566b6461"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a0e5b56502f18c98a02-1-8",
+              "item": "62a09e73af34e73a266d932a"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [
+            {
+              "id": "5d494a0e5b56502f18c98a02-1-2",
+              "level": 5,
+              "skill": "HideoutManagement"
+            }
+          ],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a0e5b56502f18c98a02-1-0",
+              "level": 3,
+              "station": "5d484fd6654e76051d3cc791"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_13_name",
+      "normalizedName": "library"
+    },
+    "5d494a175b56502f18c98a04": {
+      "areaType": 14,
+      "id": "5d494a175b56502f18c98a04",
+      "imageLink": "https://assets.tarkov.dev/station-scav-case.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 288000,
+          "description": "hideout_area_14_stage_1_description",
+          "id": "5d494a175b56502f18c98a04-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d494a175b56502f18c98a04-1-1",
+              "item": "59e3639286f7741777737013"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 6,
+              "id": "5d494a175b56502f18c98a04-1-2",
+              "item": "5d235a5986f77443f6329bc6"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 8,
+              "id": "5d494a175b56502f18c98a04-1-3",
+              "item": "5734758f24597738025ee253"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 4,
+              "id": "5d494a175b56502f18c98a04-1-4",
+              "item": "59faf7ca86f7740dbe19f6c2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d494a175b56502f18c98a04-1-5",
+              "item": "5d1b376e86f774252519444e"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d494a175b56502f18c98a04-1-6",
+              "item": "5b7c710788a4506dec015957"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a175b56502f18c98a04-1-7",
+              "item": "5bc9bc53d4351e00367fbcee"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a175b56502f18c98a04-1-0",
+              "level": 2,
+              "station": "5d484fdf654e7600691aadf8"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_14_name",
+      "normalizedName": "scav-case"
+    },
+    "5d494a205b56502f18c98a06": {
+      "areaType": 15,
+      "id": "5d494a205b56502f18c98a06",
+      "imageLink": "https://assets.tarkov.dev/station-illumination.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 0,
+          "description": "hideout_area_15_stage_1_description",
+          "id": "5d494a205b56502f18c98a06-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10000,
+              "id": "5d494a205b56502f18c98a06-1-0",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d494a205b56502f18c98a06-1-1",
+              "item": "56742c284bdc2d98058b456d"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 0,
+          "description": "hideout_area_15_stage_2_description",
+          "id": "5d494a205b56502f18c98a06-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 14,
+              "id": "5d494a205b56502f18c98a06-2-0",
+              "item": "5d1b392c86f77425243e98fe"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a205b56502f18c98a06-2-1",
+              "item": "5c06779c86f77426e00dd782"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a205b56502f18c98a06-2-2",
+              "level": 1,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d494a205b56502f18c98a06-2-3",
+              "level": 1,
+              "station": "5d494a205b56502f18c98a06"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 21600,
+          "description": "hideout_area_15_stage_3_description",
+          "id": "5d494a205b56502f18c98a06-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 50000,
+              "id": "5d494a205b56502f18c98a06-3-3",
+              "item": "5449016a4bdc2d6f028b456f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 7,
+              "id": "5d494a205b56502f18c98a06-3-4",
+              "item": "5c06782b86f77426df5407d2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 12,
+              "id": "5d494a205b56502f18c98a06-3-5",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 12,
+              "id": "5d494a205b56502f18c98a06-3-6",
+              "item": "590a3cd386f77436f20848cb"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a205b56502f18c98a06-3-0",
+              "level": 2,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d494a205b56502f18c98a06-3-1",
+              "level": 1,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "5d494a205b56502f18c98a06-3-2",
+              "level": 2,
+              "station": "5d494a205b56502f18c98a06"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_15_name",
+      "normalizedName": "illumination"
+    },
+    "5d494a295b56502f18c98a08": {
+      "areaType": 16,
+      "id": "5d494a295b56502f18c98a08",
+      "imageLink": "https://assets.tarkov.dev/station-hall-of-fame.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Combat",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0
+            }
+          ],
+          "constructionTime": 43207,
+          "description": "hideout_area_16_stage_1_description",
+          "id": "5d494a295b56502f18c98a08-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-1-2",
+              "item": "5d1b31ce86f7742523398394"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-1-3",
+              "item": "5e2af47786f7746d404f3aaa"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-1-4",
+              "item": "59e3658a86f7741776641ac4"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-1-5",
+              "item": "5d1b392c86f77425243e98fe"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-1-6",
+              "item": "590c31c586f774245e3141b2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-1-7",
+              "item": "5734795124597738002c6176"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a295b56502f18c98a08-1-0",
+              "level": 6,
+              "station": "637b39f02e873739ec490215"
+            },
+            {
+              "id": "5d494a295b56502f18c98a08-1-1",
+              "level": 2,
+              "station": "5d494a205b56502f18c98a06"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Combat",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0
+            }
+          ],
+          "constructionTime": 64800,
+          "description": "hideout_area_16_stage_2_description",
+          "id": "5d494a295b56502f18c98a08-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-2-0",
+              "item": "590c639286f774151567fa95"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-2-1",
+              "item": "5af04b6486f774195a3ebb49"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-2-2",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-2-3",
+              "item": "5bc9bc53d4351e00367fbcee"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a295b56502f18c98a08-2-4",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d494a295b56502f18c98a08-2-5",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 3,
+              "id": "5d494a295b56502f18c98a08-2-6",
+              "item": "57347c1124597737fb1379e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-2-7",
+              "item": "590c346786f77423e50ed342"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a295b56502f18c98a08-2-9",
+              "level": 1,
+              "station": "5d494a295b56502f18c98a08"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Combat",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0
+            }
+          ],
+          "constructionTime": 86400,
+          "description": "hideout_area_16_stage_3_description",
+          "id": "5d494a295b56502f18c98a08-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-3-0",
+              "item": "62a0a0bb621468534a797ad5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-3-1",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a295b56502f18c98a08-3-2",
+              "item": "59e3639286f7741777737013"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a295b56502f18c98a08-3-3",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d494a295b56502f18c98a08-3-4",
+              "item": "5e2af29386f7746d4159f077"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d494a295b56502f18c98a08-3-5",
+              "item": "57347cd0245977445a2d6ff1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a295b56502f18c98a08-3-6",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a295b56502f18c98a08-3-7",
+              "item": "59e36c6f86f774176c10a2a7"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a295b56502f18c98a08-3-8",
+              "level": 2,
+              "station": "5d494a295b56502f18c98a08"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_16_name",
+      "normalizedName": "hall-of-fame"
+    },
+    "5d494a315b56502f18c98a0a": {
+      "areaType": 17,
+      "id": "5d494a315b56502f18c98a0a",
+      "imageLink": "https://assets.tarkov.dev/station-air-filtering-unit.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": false,
+              "production": true,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0.4
+            },
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "5d1b2f3f86f774252167a52c"
+              ],
+              "type": "AdditionalSlots",
+              "value": 3
+            }
+          ],
+          "constructionTime": 172800,
+          "description": "hideout_area_17_stage_1_description",
+          "id": "5d494a315b56502f18c98a0a-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 25000,
+              "id": "5d494a315b56502f18c98a0a-1-2",
+              "item": "5696686a4bdc2da3298b456a"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a315b56502f18c98a0a-1-3",
+              "item": "5d0378d486f77420421a5ff4"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 5,
+              "id": "5d494a315b56502f18c98a0a-1-4",
+              "item": "590c595c86f7747884343ad7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a315b56502f18c98a0a-1-5",
+              "item": "619cbf476b8a1b37a54eebf8"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a315b56502f18c98a0a-1-0",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d494a315b56502f18c98a0a-1-1",
+              "level": 3,
+              "station": "5d473c1e081959000e530190"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_17_name",
+      "normalizedName": "air-filtering-unit"
+    },
+    "5d494a385b56502f18c98a0c": {
+      "areaType": 18,
+      "id": "5d494a385b56502f18c98a0c",
+      "imageLink": "https://assets.tarkov.dev/station-solar-power.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": -0.5
+            }
+          ],
+          "constructionTime": 259200,
+          "description": "hideout_area_18_stage_1_description",
+          "id": "5d494a385b56502f18c98a0c-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 25000,
+              "id": "5d494a385b56502f18c98a0c-1-2",
+              "item": "569668774bdc2da2298b4568"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a385b56502f18c98a0c-1-3",
+              "item": "5d0375ff86f774186372f685"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 6,
+              "id": "5d494a385b56502f18c98a0c-1-4",
+              "item": "5d03775b86f774203e7e0c4b"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a385b56502f18c98a0c-1-5",
+              "item": "5d0378d486f77420421a5ff4"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "5d494a385b56502f18c98a0c-1-6",
+              "item": "5d1b304286f774253763a528"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "5d494a385b56502f18c98a0c-1-7",
+              "item": "6389c85357baa773a825b356"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a385b56502f18c98a0c-1-0",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            },
+            {
+              "id": "5d494a385b56502f18c98a0c-1-1",
+              "level": 3,
+              "station": "5d484fda654e7600681d9315"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_18_name",
+      "normalizedName": "solar-power"
+    },
+    "5d494a3f5b56502f18c98a0e": {
+      "areaType": 19,
+      "id": "5d494a3f5b56502f18c98a0e",
+      "imageLink": "https://assets.tarkov.dev/station-booze-generator.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 172800,
+          "description": "hideout_area_19_stage_1_description",
+          "id": "5d494a3f5b56502f18c98a0e-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a3f5b56502f18c98a0e-1-2",
+              "item": "5d1b39a386f774252339976f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d494a3f5b56502f18c98a0e-1-3",
+              "item": "5d1b32c186f774252167a530"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 2,
+              "id": "5d494a3f5b56502f18c98a0e-1-4",
+              "item": "5d1b327086f7742525194449"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a3f5b56502f18c98a0e-1-5",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "5d494a3f5b56502f18c98a0e-1-6",
+              "item": "619cbfccbedcde2f5b3f7bdd"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a3f5b56502f18c98a0e-1-7",
+              "item": "5d1c774f86f7746d6620f8db"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a3f5b56502f18c98a0e-1-8",
+              "item": "61bf7b6302b3924be92fa8c3"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a3f5b56502f18c98a0e-1-0",
+              "level": 3,
+              "station": "5d484fc8654e760065037abf"
+            },
+            {
+              "id": "5d494a3f5b56502f18c98a0e-1-1",
+              "level": 3,
+              "station": "5d484fd1654e76006732bf2e"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_19_name",
+      "normalizedName": "booze-generator"
+    },
+    "5d494a445b56502f18c98a10": {
+      "areaType": 20,
+      "id": "5d494a445b56502f18c98a10",
+      "imageLink": "https://assets.tarkov.dev/station-bitcoin-farm.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "57347ca924597744596b4e71"
+              ],
+              "type": "AdditionalSlots",
+              "value": 10
+            }
+          ],
+          "constructionTime": 122400,
+          "description": "hideout_area_20_stage_1_description",
+          "id": "5d494a445b56502f18c98a10-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a445b56502f18c98a10-1-1",
+              "item": "5734779624597737e04bf329"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-1-2",
+              "item": "57347c2e24597744902c94a1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a445b56502f18c98a10-1-3",
+              "item": "59e36c6f86f774176c10a2a7"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d494a445b56502f18c98a10-1-4",
+              "item": "5c05300686f7746dce784e5d"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-1-5",
+              "item": "57347cd0245977445a2d6ff1"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a445b56502f18c98a10-1-0",
+              "level": 2,
+              "station": "5d484fdf654e7600691aadf8"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "57347ca924597744596b4e71"
+              ],
+              "type": "AdditionalSlots",
+              "value": 15
+            }
+          ],
+          "constructionTime": 180000,
+          "description": "hideout_area_20_stage_2_description",
+          "id": "5d494a445b56502f18c98a10-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a445b56502f18c98a10-2-2",
+              "item": "5734779624597737e04bf329"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-2-3",
+              "item": "57347c2e24597744902c94a1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 15,
+              "id": "5d494a445b56502f18c98a10-2-4",
+              "item": "590a3b0486f7743954552bdb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-2-5",
+              "item": "5d1b313086f77425227d1678"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "5d494a445b56502f18c98a10-2-6",
+              "item": "5d0378d486f77420421a5ff4"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a445b56502f18c98a10-2-0",
+              "level": 1,
+              "station": "5d494a445b56502f18c98a10"
+            },
+            {
+              "id": "5d494a445b56502f18c98a10-2-1",
+              "level": 3,
+              "station": "5d3b396e33c48f02b81cd9f3"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "57347ca924597744596b4e71"
+              ],
+              "type": "AdditionalSlots",
+              "value": 25
+            }
+          ],
+          "constructionTime": 381600,
+          "description": "hideout_area_20_stage_3_description",
+          "id": "5d494a445b56502f18c98a10-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 25,
+              "id": "5d494a445b56502f18c98a10-3-3",
+              "item": "5734779624597737e04bf329"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "5d494a445b56502f18c98a10-3-4",
+              "item": "5d1b39a386f774252339976f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-3-5",
+              "item": "5d1b2fa286f77425227d1674"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "5d494a445b56502f18c98a10-3-6",
+              "item": "5d1b327086f7742525194449"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "5d494a445b56502f18c98a10-3-7",
+              "item": "5d03794386f77420415576f5"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "5d494a445b56502f18c98a10-3-0",
+              "level": 2,
+              "station": "5d494a445b56502f18c98a10"
+            },
+            {
+              "id": "5d494a445b56502f18c98a10-3-1",
+              "level": 1,
+              "station": "5d494a385b56502f18c98a0c"
+            },
+            {
+              "id": "5d494a445b56502f18c98a10-3-2",
+              "level": 3,
+              "station": "5d484fc8654e760065037abf"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_20_name",
+      "normalizedName": "bitcoin-farm"
+    },
+    "6377a9b9a93bde8fa30eb79a": {
+      "areaType": 23,
+      "id": "6377a9b9a93bde8fa30eb79a",
+      "imageLink": "https://assets.tarkov.dev/station-gym.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 14400,
+          "description": "hideout_area_23_stage_1_description",
+          "id": "6377a9b9a93bde8fa30eb79a-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "6377a9b9a93bde8fa30eb79a-1-1",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "6377a9b9a93bde8fa30eb79a-1-2",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "6377a9b9a93bde8fa30eb79a-1-3",
+              "item": "5d40419286f774318526545f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "6377a9b9a93bde8fa30eb79a-1-4",
+              "item": "57347c77245977448d35f6e2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "6377a9b9a93bde8fa30eb79a-1-5",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "6377a9b9a93bde8fa30eb79a-1-6",
+              "item": "590c5bbd86f774785762df04"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "6377a9b9a93bde8fa30eb79a-1-7",
+              "item": "5734795124597738002c6176"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "6377a9b9a93bde8fa30eb79a-1-0",
+              "level": 6,
+              "station": "637b39f02e873739ec490215"
+            },
+            {
+              "id": "6377a9b9a93bde8fa30eb79a-1-8",
+              "level": 2,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "6377a9b9a93bde8fa30eb79a-1-9",
+              "level": 2,
+              "station": "5d473c1e081959000e530190"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_23_name",
+      "normalizedName": "gym"
+    },
+    "637b39f02e873739ec490215": {
+      "areaType": 22,
+      "id": "637b39f02e873739ec490215",
+      "imageLink": "https://assets.tarkov.dev/station-defective-wall.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 0,
+          "description": "hideout_area_22_stage_1_description",
+          "id": "637b39f02e873739ec490215-1",
+          "itemRequirements": [],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-1-0",
+              "level": 1,
+              "station": "5d484fcd654e7668ec2ec322"
+            },
+            {
+              "id": "637b39f02e873739ec490215-1-1",
+              "level": 1,
+              "station": "5d484fc8654e760065037abf"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": 0.05
+            },
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": -0.03
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": -0.03
+            }
+          ],
+          "constructionTime": 43200,
+          "description": "hideout_area_22_stage_2_description",
+          "id": "637b39f02e873739ec490215-2",
+          "itemRequirements": [],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-2-0",
+              "level": 1,
+              "station": "637b39f02e873739ec490215"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": 0.05
+            },
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": -0.03
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": -0.03
+            }
+          ],
+          "constructionTime": 86400,
+          "description": "hideout_area_22_stage_3_description",
+          "id": "637b39f02e873739ec490215-3",
+          "itemRequirements": [],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-3-0",
+              "level": 2,
+              "station": "637b39f02e873739ec490215"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": 0.05
+            },
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": -0.03
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": -0.03
+            }
+          ],
+          "constructionTime": 10800,
+          "description": "hideout_area_22_stage_4_description",
+          "id": "637b39f02e873739ec490215-4",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-4-0",
+              "item": "63a0b208f444d32d6f03ea1e"
+            }
+          ],
+          "level": 4,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-4-1",
+              "level": 3,
+              "station": "637b39f02e873739ec490215"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": 0.05
+            },
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": -0.05
+            },
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": -0.03
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": -0.03
+            }
+          ],
+          "constructionTime": 10800,
+          "description": "hideout_area_22_stage_5_description",
+          "id": "637b39f02e873739ec490215-5",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-5-0",
+              "item": "5d40419286f774318526545f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-5-1",
+              "item": "590c2e1186f77425357b6124"
+            }
+          ],
+          "level": 5,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-5-2",
+              "level": 4,
+              "station": "637b39f02e873739ec490215"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [
+            {
+              "name": "hideout_FuelConsumption",
+              "passive": true,
+              "production": false,
+              "type": "FuelConsumption",
+              "value": -0.2
+            },
+            {
+              "name": "hideout_EnergyRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "EnergyRegeneration",
+              "value": 0.2
+            },
+            {
+              "name": "hideout_HealthRegeneration",
+              "passive": true,
+              "production": false,
+              "type": "HealthRegeneration",
+              "value": 0.2
+            },
+            {
+              "name": "hideout_ExperienceRate",
+              "passive": true,
+              "production": false,
+              "type": "ExperienceRate",
+              "value": 0.12
+            },
+            {
+              "name": "hideout_SkillGroupLevelingBoost",
+              "passive": true,
+              "production": false,
+              "skill": "Physical",
+              "type": "SkillGroupLevelingBoost",
+              "value": 0.12
+            }
+          ],
+          "constructionTime": 43200,
+          "description": "hideout_area_22_stage_6_description",
+          "id": "637b39f02e873739ec490215-6",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "637b39f02e873739ec490215-6-0",
+              "item": "59e35cbb86f7741778269d83"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-6-1",
+              "item": "57347c1124597737fb1379e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-6-2",
+              "item": "590c2e1186f77425357b6124"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-6-3",
+              "item": "5af04b6486f774195a3ebb49"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "637b39f02e873739ec490215-6-4",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "637b39f02e873739ec490215-6-5",
+              "item": "590c346786f77423e50ed342"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "637b39f02e873739ec490215-6-6",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 2,
+              "id": "637b39f02e873739ec490215-6-7",
+              "item": "5d1b392c86f77425243e98fe"
+            }
+          ],
+          "level": 6,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "637b39f02e873739ec490215-6-8",
+              "level": 5,
+              "station": "637b39f02e873739ec490215"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_22_name",
+      "normalizedName": "defective-wall"
+    },
+    "63db64cbf9963741dc0d741f": {
+      "areaType": 24,
+      "id": "63db64cbf9963741dc0d741f",
+      "imageLink": "https://assets.tarkov.dev/station-weapon-rack.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 43200,
+          "description": "hideout_area_24_stage_1_description",
+          "id": "63db64cbf9963741dc0d741f-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-1-0",
+              "item": "5d1b317c86f7742523398392"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-1-1",
+              "item": "5d40419286f774318526545f"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-1-2",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-1-3",
+              "item": "590c346786f77423e50ed342"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "63db64cbf9963741dc0d741f-1-4",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-1-5",
+              "item": "5734795124597738002c6176"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-1-6",
+              "item": "590c31c586f774245e3141b2"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "63db64cbf9963741dc0d741f-1-7",
+              "level": 3,
+              "station": "5d494a205b56502f18c98a06"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-1-9",
+              "level": 2,
+              "station": "5d484fc0654e76006657e0ab"
+            }
+          ],
+          "traderRequirements": [
+            {
+              "compareMethod": ">=",
+              "id": "63db64cbf9963741dc0d741f-1-8",
+              "requirementType": "level",
+              "trader": "5a7c2eca46aef81a7ca2145d",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 64800,
+          "description": "hideout_area_24_stage_2_description",
+          "id": "63db64cbf9963741dc0d741f-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-2-0",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-2-1",
+              "item": "62a0a0bb621468534a797ad5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-2-2",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-2-3",
+              "item": "59e35ef086f7741777737012"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-2-4",
+              "item": "57347c1124597737fb1379e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-2-5",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-2-6",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-2-7",
+              "item": "5d1c819a86f774771b0acd6c"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "63db64cbf9963741dc0d741f-2-9",
+              "level": 2,
+              "station": "5d484fe3654e76006657e0ac"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-2-10",
+              "level": 2,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-2-11",
+              "level": 3,
+              "station": "5d484fc0654e76006657e0ab"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-2-12",
+              "level": 1,
+              "station": "63db64cbf9963741dc0d741f"
+            }
+          ],
+          "traderRequirements": []
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 86400,
+          "description": "hideout_area_24_stage_3_description",
+          "id": "63db64cbf9963741dc0d741f-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-3-0",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "63db64cbf9963741dc0d741f-3-1",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "63db64cbf9963741dc0d741f-3-2",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-3-3",
+              "item": "5e2af29386f7746d4159f077"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "63db64cbf9963741dc0d741f-3-4",
+              "item": "5c06779c86f77426e00dd782"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "63db64cbf9963741dc0d741f-3-5",
+              "item": "590c35a486f774273531c822"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-3-6",
+              "item": "590c639286f774151567fa95"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "63db64cbf9963741dc0d741f-3-7",
+              "item": "5bc9b355d4351e6d1509862a"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "63db64cbf9963741dc0d741f-3-8",
+              "level": 3,
+              "station": "5d484fe3654e76006657e0ac"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-3-9",
+              "level": 3,
+              "station": "5d484fda654e7600681d9315"
+            },
+            {
+              "id": "63db64cbf9963741dc0d741f-3-10",
+              "level": 2,
+              "station": "63db64cbf9963741dc0d741f"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_24_name",
+      "normalizedName": "weapon-rack"
+    },
+    "65e5bb1713227bb7690cea0a": {
+      "areaType": 26,
+      "id": "65e5bb1713227bb7690cea0a",
+      "imageLink": "https://assets.tarkov.dev/station-gear-rack.png",
+      "levels": [
+        {
+          "bonuses": [],
+          "constructionTime": 21600,
+          "description": "hideout_area_26_stage_1_description",
+          "id": "65e5bb1713227bb7690cea0a-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-1-4",
+              "item": "544fb5454bdc2df8738b456a"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "65e5bb1713227bb7690cea0a-1-5",
+              "item": "5e2af47786f7746d404f3aaa"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-1-6",
+              "item": "61bf83814088ec1a363d7097"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "65e5bb1713227bb7690cea0a-1-7",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "65e5bb1713227bb7690cea0a-1-8",
+              "item": "57347c5b245977448d35f6e1"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-1-9",
+              "item": "62a0a098de7ac8199358053b"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-1-10",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 300000,
+              "id": "65e5bb1713227bb7690cea0a-1-11",
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "65e5bb1713227bb7690cea0a-1-0",
+              "level": 6,
+              "station": "637b39f02e873739ec490215"
+            },
+            {
+              "id": "65e5bb1713227bb7690cea0a-1-2",
+              "level": 2,
+              "station": "5d494a205b56502f18c98a06"
+            }
+          ],
+          "traderRequirements": [
+            {
+              "compareMethod": ">=",
+              "id": "65e5bb1713227bb7690cea0a-1-3",
+              "requirementType": "level",
+              "trader": "5ac3b934156ae10c4430e83c",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 43200,
+          "description": "hideout_area_26_stage_2_description",
+          "id": "65e5bb1713227bb7690cea0a-2",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-2-2",
+              "item": "590c311186f77424d1667482"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "65e5bb1713227bb7690cea0a-2-3",
+              "item": "5e2af4d286f7746d4159f07a"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 12,
+              "id": "65e5bb1713227bb7690cea0a-2-4",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 8,
+              "id": "65e5bb1713227bb7690cea0a-2-5",
+              "item": "590c31c586f774245e3141b2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "65e5bb1713227bb7690cea0a-2-6",
+              "item": "590c35a486f774273531c822"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 5,
+              "id": "65e5bb1713227bb7690cea0a-2-7",
+              "item": "57347c1124597737fb1379e3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-2-8",
+              "item": "59e35de086f7741778269d84"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 800000,
+              "id": "65e5bb1713227bb7690cea0a-2-9",
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          ],
+          "level": 2,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "65e5bb1713227bb7690cea0a-2-0",
+              "level": 1,
+              "station": "5d494a295b56502f18c98a08"
+            },
+            {
+              "id": "65e5bb1713227bb7690cea0a-2-10",
+              "level": 1,
+              "station": "65e5bb1713227bb7690cea0a"
+            }
+          ],
+          "traderRequirements": [
+            {
+              "compareMethod": ">=",
+              "id": "65e5bb1713227bb7690cea0a-2-1",
+              "requirementType": "level",
+              "trader": "5ac3b934156ae10c4430e83c",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "bonuses": [],
+          "constructionTime": 86400,
+          "description": "hideout_area_26_stage_3_description",
+          "id": "65e5bb1713227bb7690cea0a-3",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-3-2",
+              "item": "60391afc25aff57af81f7085"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-3-3",
+              "item": "62a0a0bb621468534a797ad5"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "65e5bb1713227bb7690cea0a-3-4",
+              "item": "590a3cd386f77436f20848cb"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "65e5bb1713227bb7690cea0a-3-5",
+              "item": "5e2af29386f7746d4159f077"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 15,
+              "id": "65e5bb1713227bb7690cea0a-3-6",
+              "item": "61bf7b6302b3924be92fa8c3"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 10,
+              "id": "65e5bb1713227bb7690cea0a-3-7",
+              "item": "5e2af41e86f774755a234b67"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "65e5bb1713227bb7690cea0a-3-8",
+              "item": "591094e086f7747caa7bb2ef"
+            },
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1200000,
+              "id": "65e5bb1713227bb7690cea0a-3-9",
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          ],
+          "level": 3,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "65e5bb1713227bb7690cea0a-3-0",
+              "level": 2,
+              "station": "5d494a295b56502f18c98a08"
+            },
+            {
+              "id": "65e5bb1713227bb7690cea0a-3-10",
+              "level": 2,
+              "station": "65e5bb1713227bb7690cea0a"
+            }
+          ],
+          "traderRequirements": [
+            {
+              "compareMethod": ">=",
+              "id": "65e5bb1713227bb7690cea0a-3-1",
+              "requirementType": "level",
+              "trader": "5ac3b934156ae10c4430e83c",
+              "value": 4
+            }
+          ]
+        }
+      ],
+      "name": "hideout_area_26_name",
+      "normalizedName": "gear-rack"
+    },
+    "667298e75ea6b4493c08f266": {
+      "areaType": 27,
+      "id": "667298e75ea6b4493c08f266",
+      "imageLink": "https://assets.tarkov.dev/station-cultist-circle.png",
+      "levels": [
+        {
+          "bonuses": [
+            {
+              "name": "hideout_AdditionalSlots",
+              "passive": true,
+              "production": false,
+              "slotItems": [
+                "64d0b40fbe2eed70e254e2d4"
+              ],
+              "type": "AdditionalSlots",
+              "value": 1
+            }
+          ],
+          "constructionTime": 3600,
+          "description": "hideout_area_27_stage_1_description",
+          "id": "667298e75ea6b4493c08f266-1",
+          "itemRequirements": [
+            {
+              "attributes": {
+                "foundInRaid": false
+              },
+              "count": 1,
+              "id": "667298e75ea6b4493c08f266-1-0",
+              "item": "5b4391a586f7745321235ab2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "667298e75ea6b4493c08f266-1-2",
+              "item": "590c2c9c86f774245b1f03f2"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "667298e75ea6b4493c08f266-1-3",
+              "item": "5e2af37686f774755a234b65"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 3,
+              "id": "667298e75ea6b4493c08f266-1-4",
+              "item": "62a09ee4cf4a99369e262453"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 5,
+              "id": "667298e75ea6b4493c08f266-1-5",
+              "item": "5d1b392c86f77425243e98fe"
+            },
+            {
+              "attributes": {
+                "foundInRaid": true
+              },
+              "count": 1,
+              "id": "667298e75ea6b4493c08f266-1-6",
+              "item": "59e3596386f774176c10a2a2"
+            }
+          ],
+          "level": 1,
+          "skillRequirements": [],
+          "stationLevelRequirements": [
+            {
+              "id": "667298e75ea6b4493c08f266-1-1",
+              "level": 1,
+              "station": "5d484fb3654e7600681d9314"
+            }
+          ],
+          "traderRequirements": []
+        }
+      ],
+      "name": "hideout_area_27_name",
+      "normalizedName": "cultist-circle"
+    }
+  },
+  "translations": [
+    "$.data.*.name",
+    "$.data.*.levels[*].description",
+    "$.data.*.levels[*].skillRequirements[*].skill",
+    "$.data.*.levels[*].bonuses[*].name",
+    "$.data.*.levels[*].bonuses[*].skill"
+  ]
+}

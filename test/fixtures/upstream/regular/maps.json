@@ -1,0 +1,3094 @@
+{
+  "data": {
+    "goonReports": [
+      {
+        "map": "56f40101d2720b2a4d8b45d6",
+        "timestamp": "1795561918000"
+      }
+    ],
+    "lootContainers": {
+      "578f8778245977358849a9b5": {
+        "id": "578f8778245977358849a9b5",
+        "name": "578f8778245977358849a9b5 Name",
+        "normalizedName": "jacket"
+      },
+      "578f8782245977354405a1e3": {
+        "id": "578f8782245977354405a1e3",
+        "name": "578f8782245977354405a1e3 Name",
+        "normalizedName": "safe"
+      },
+      "578f879c24597735401e6bc6": {
+        "id": "578f879c24597735401e6bc6",
+        "name": "578f879c24597735401e6bc6 Name",
+        "normalizedName": "cash-register"
+      },
+      "578f87a3245977356274f2cb": {
+        "id": "578f87a3245977356274f2cb",
+        "name": "578f87a3245977356274f2cb Name",
+        "normalizedName": "duffle-bag"
+      },
+      "578f87ad245977356274f2cc": {
+        "id": "578f87ad245977356274f2cc",
+        "name": "578f87ad245977356274f2cc Name",
+        "normalizedName": "wooden-crate"
+      },
+      "578f87b7245977356274f2cd": {
+        "id": "578f87b7245977356274f2cd",
+        "name": "578f87b7245977356274f2cd Name",
+        "normalizedName": "drawer"
+      },
+      "5909d24f86f77466f56e6855": {
+        "id": "5909d24f86f77466f56e6855",
+        "name": "5909d24f86f77466f56e6855 Name",
+        "normalizedName": "medbag"
+      },
+      "5909d36d86f774660f0bb900": {
+        "id": "5909d36d86f774660f0bb900",
+        "name": "5909d36d86f774660f0bb900 Name",
+        "normalizedName": "grenade-box"
+      },
+      "5909d45286f77465a8136dc6": {
+        "id": "5909d45286f77465a8136dc6",
+        "name": "5909d45286f77465a8136dc6 Name",
+        "normalizedName": "wooden-ammo-box"
+      },
+      "5909d4c186f7746ad34e805a": {
+        "id": "5909d4c186f7746ad34e805a",
+        "name": "5909d4c186f7746ad34e805a Name",
+        "normalizedName": "medcase"
+      },
+      "5909d50c86f774659e6aaebe": {
+        "id": "5909d50c86f774659e6aaebe",
+        "name": "5909d50c86f774659e6aaebe Name",
+        "normalizedName": "toolbox"
+      },
+      "5909d5ef86f77467974efbd8": {
+        "id": "5909d5ef86f77467974efbd8",
+        "name": "5909d5ef86f77467974efbd8 Name",
+        "normalizedName": "weapon-box"
+      },
+      "5909d76c86f77471e53d2adf": {
+        "id": "5909d76c86f77471e53d2adf",
+        "name": "5909d76c86f77471e53d2adf Name",
+        "normalizedName": "weapon-box"
+      },
+      "5909d7cf86f77470ee57d75a": {
+        "id": "5909d7cf86f77470ee57d75a",
+        "name": "5909d7cf86f77470ee57d75a Name",
+        "normalizedName": "weapon-box"
+      },
+      "5909d89086f77472591234a0": {
+        "id": "5909d89086f77472591234a0",
+        "name": "5909d89086f77472591234a0 Name",
+        "normalizedName": "weapon-box"
+      },
+      "5909e4b686f7747f5b744fa4": {
+        "id": "5909e4b686f7747f5b744fa4",
+        "name": "5909e4b686f7747f5b744fa4 Name",
+        "normalizedName": "dead-scav"
+      },
+      "59139c2186f77411564f8e42": {
+        "id": "59139c2186f77411564f8e42",
+        "name": "59139c2186f77411564f8e42 Name",
+        "normalizedName": "pc-block"
+      },
+      "5914944186f774189e5e76c2": {
+        "id": "5914944186f774189e5e76c2",
+        "name": "5914944186f774189e5e76c2 Name",
+        "normalizedName": "jacket"
+      },
+      "5937ef2b86f77408a47244b3": {
+        "id": "5937ef2b86f77408a47244b3",
+        "name": "5937ef2b86f77408a47244b3 Name",
+        "normalizedName": "jacket"
+      },
+      "59387ac686f77401442ddd61": {
+        "id": "59387ac686f77401442ddd61",
+        "name": "59387ac686f77401442ddd61 Name",
+        "normalizedName": "jacket"
+      },
+      "5c052cea86f7746b2101e8d8": {
+        "id": "5c052cea86f7746b2101e8d8",
+        "name": "5c052cea86f7746b2101e8d8 Name",
+        "normalizedName": "plastic-suitcase"
+      },
+      "5d07b91b86f7745a077a9432": {
+        "id": "5d07b91b86f7745a077a9432",
+        "name": "ShturmanStash",
+        "normalizedName": "shturmans-stash"
+      },
+      "5d6d2b5486f774785c2ba8ea": {
+        "id": "5d6d2b5486f774785c2ba8ea",
+        "name": "5d6d2b5486f774785c2ba8ea Name",
+        "normalizedName": "ground-cache"
+      },
+      "5d6d2bb386f774785b07a77a": {
+        "id": "5d6d2bb386f774785b07a77a",
+        "name": "5d6d2bb386f774785b07a77a Name",
+        "normalizedName": "buried-barrel-cache"
+      },
+      "5d6fd13186f77424ad2a8c69": {
+        "id": "5d6fd13186f77424ad2a8c69",
+        "name": "5d6fd13186f77424ad2a8c69 Name",
+        "normalizedName": "ration-supply-crate"
+      },
+      "5d6fd45b86f774317075ed43": {
+        "id": "5d6fd45b86f774317075ed43",
+        "name": "5d6fd45b86f774317075ed43 Name",
+        "normalizedName": "technical-supply-crate"
+      },
+      "5d6fe50986f77449d97f7463": {
+        "id": "5d6fe50986f77449d97f7463",
+        "name": "5d6fe50986f77449d97f7463 Name",
+        "normalizedName": "medical-supply-crate"
+      },
+      "61aa1e9a32a4743c3453d2cf": {
+        "id": "61aa1e9a32a4743c3453d2cf",
+        "name": "61aa1e9a32a4743c3453d2cf Name",
+        "normalizedName": "duffle-bag"
+      },
+      "61aa1ead84ea0800645777fd": {
+        "id": "61aa1ead84ea0800645777fd",
+        "name": "61aa1ead84ea0800645777fd Name",
+        "normalizedName": "medbag"
+      },
+      "64d116f41a9c6143a956127d": {
+        "id": "64d116f41a9c6143a956127d",
+        "name": "64d116f41a9c6143a956127d Name",
+        "normalizedName": "bank-cash-register"
+      },
+      "64d11702dd0cd96ab82c3280": {
+        "id": "64d11702dd0cd96ab82c3280",
+        "name": "64d11702dd0cd96ab82c3280 Name",
+        "normalizedName": "bank-safe"
+      },
+      "6582e6bb0c3b9823fe6d1840": {
+        "id": "6582e6bb0c3b9823fe6d1840",
+        "name": "6582e6bb0c3b9823fe6d1840 Name",
+        "normalizedName": "scav-body"
+      },
+      "6582e6c6edf14c4c6023adf2": {
+        "id": "6582e6c6edf14c4c6023adf2",
+        "name": "6582e6c6edf14c4c6023adf2 Name",
+        "normalizedName": "lab-technician-body"
+      },
+      "6582e6d7b14c3f72eb071420": {
+        "id": "6582e6d7b14c3f72eb071420",
+        "name": "6582e6d7b14c3f72eb071420 Name",
+        "normalizedName": "pmc-body"
+      },
+      "658420d8085fea07e674cdb6": {
+        "id": "658420d8085fea07e674cdb6",
+        "name": "658420d8085fea07e674cdb6 Name",
+        "normalizedName": "civilian-body"
+      },
+      "66acff0a1d8e1083b303f5af": {
+        "id": "66acff0a1d8e1083b303f5af",
+        "name": "66acff0a1d8e1083b303f5af Name",
+        "normalizedName": "bank-safe"
+      },
+      "67adf4a95247ac91530fcec7": {
+        "id": "67adf4a95247ac91530fcec7",
+        "name": "67adf4a95247ac91530fcec7 Name",
+        "normalizedName": "jacket"
+      },
+      "67adf4b81c58bd68b2002fec": {
+        "id": "67adf4b81c58bd68b2002fec",
+        "name": "67adf4b81c58bd68b2002fec Name",
+        "normalizedName": "wooden-ammo-box"
+      },
+      "67adf4db515e3dd542077a1d": {
+        "id": "67adf4db515e3dd542077a1d",
+        "name": "67adf4db515e3dd542077a1d Name",
+        "normalizedName": "wooden-crate"
+      },
+      "67adf4eb110ba15da90c6413": {
+        "id": "67adf4eb110ba15da90c6413",
+        "name": "67adf4eb110ba15da90c6413 Name",
+        "normalizedName": "grenade-box"
+      },
+      "67adf54d1c58bd68b2002ff0": {
+        "id": "67adf54d1c58bd68b2002ff0",
+        "name": "67adf54d1c58bd68b2002ff0 Name",
+        "normalizedName": "toolbox"
+      },
+      "67adf5752fc5ee84020a9940": {
+        "id": "67adf5752fc5ee84020a9940",
+        "name": "67adf5752fc5ee84020a9940 Name",
+        "normalizedName": "dead-scav"
+      },
+      "67adf5f7adc1f43b0702b826": {
+        "id": "67adf5f7adc1f43b0702b826",
+        "name": "67adf5f7adc1f43b0702b826 Name",
+        "normalizedName": "technical-supply-crate"
+      }
+    },
+    "maps": {
+      "55f2d3fd4bdc2d5f408b4567": {
+        "accessKeys": [],
+        "accessKeysMinPlayerLevel": 0,
+        "bosses": [
+          {
+            "escorts": [],
+            "mob": "bossTagilla",
+            "spawnChance": 0.35,
+            "spawnLocations": [
+              {
+                "chance": 1,
+                "name": "BotZone",
+                "positions": [
+                  {
+                    "x": 31.813,
+                    "y": 0.175249279,
+                    "z": 21.202
+                  },
+                  {
+                    "x": 15.249,
+                    "y": 4.550001,
+                    "z": 41.209
+                  },
+                  {
+                    "x": 15,
+                    "y": 0.09888601,
+                    "z": 3.79
+                  }
+                ],
+                "spawnKey": "BotZone"
+              }
+            ],
+            "spawnTime": -1,
+            "spawnTimeRandom": false,
+            "spawnTrigger": null,
+            "supports": []
+          }
+        ],
+        "btrStops": [],
+        "coordinateToCardinalRotation": 90,
+        "description": "55f2d3fd4bdc2d5f408b4567 Description",
+        "enemies": [
+          "scavs",
+          "bossTagilla"
+        ],
+        "extracts": [
+          {
+            "bottom": 0.22,
+            "faction": "pmc",
+            "id": "4b93f765fc6e0b6379679b3c827074d4e57ff680",
+            "name": "Gate m",
+            "outline": [
+              {
+                "x": -13.95,
+                "y": 0.22,
+                "z": -66.57
+              },
+              {
+                "x": -20.52,
+                "y": 0.22,
+                "z": -66.92
+              },
+              {
+                "x": -21.1,
+                "y": 0.22,
+                "z": -55.97
+              },
+              {
+                "x": -14.53,
+                "y": 0.22,
+                "z": -55.62
+              }
+            ],
+            "position": {
+              "x": -17.53,
+              "y": 1.99,
+              "z": -61.27
+            },
+            "switch": false,
+            "switches": [],
+            "top": 3.76
+          },
+          {
+            "bottom": -5.66,
+            "faction": "pmc",
+            "id": "f261d229a5b13a3292a4a49dced2a4949dfc342b",
+            "name": "Cellars",
+            "outline": [
+              {
+                "x": 77.91,
+                "y": -5.66,
+                "z": -31.89
+              },
+              {
+                "x": 70.2,
+                "y": -5.66,
+                "z": -32.3
+              },
+              {
+                "x": 69.87,
+                "y": -5.66,
+                "z": -26.28
+              },
+              {
+                "x": 77.59,
+                "y": -5.66,
+                "z": -25.87
+              }
+            ],
+            "position": {
+              "x": 73.89,
+              "y": -3.29,
+              "z": -29.08
+            },
+            "switch": false,
+            "switches": [],
+            "top": -0.92
+          },
+          {
+            "bottom": 0.14,
+            "faction": "scav",
+            "id": "f16ce849a9d153a8813b6bf6a049d530f1cc44c2",
+            "name": "Gate 3",
+            "outline": [
+              {
+                "x": 55.15,
+                "y": 0.14,
+                "z": 55.41
+              },
+              {
+                "x": 55.15,
+                "y": 0.14,
+                "z": 66.33
+              },
+              {
+                "x": 62.26,
+                "y": 0.14,
+                "z": 66.33
+              },
+              {
+                "x": 62.26,
+                "y": 0.14,
+                "z": 55.41
+              }
+            ],
+            "position": {
+              "x": 58.71,
+              "y": 1.59,
+              "z": 60.87
+            },
+            "switch": false,
+            "switches": [],
+            "top": 3.04
+          },
+          {
+            "bottom": -0.33,
+            "faction": "pmc",
+            "id": "f16ce849a9d153a8813b6bf6a049d530f1cc44c2",
+            "name": "Gate 3",
+            "outline": [
+              {
+                "x": 54.88,
+                "y": -0.33,
+                "z": 57.84
+              },
+              {
+                "x": 54.88,
+                "y": -0.33,
+                "z": 68.76
+              },
+              {
+                "x": 61.99,
+                "y": -0.33,
+                "z": 68.76
+              },
+              {
+                "x": 61.99,
+                "y": -0.33,
+                "z": 57.84
+              }
+            ],
+            "position": {
+              "x": 58.43,
+              "y": 3.17,
+              "z": 63.3
+            },
+            "switch": false,
+            "switches": [],
+            "top": 6.67
+          },
+          {
+            "bottom": -3.11,
+            "faction": "pmc",
+            "id": "51efd2aabf8b603f7a5d54327aa3d8a94e22af6b",
+            "name": "factory_secret_ark",
+            "outline": [
+              {
+                "x": 46.03,
+                "y": -3.11,
+                "z": -30.36
+              },
+              {
+                "x": 46.03,
+                "y": -3.11,
+                "z": -27.36
+              },
+              {
+                "x": 50.03,
+                "y": -3.11,
+                "z": -27.36
+              },
+              {
+                "x": 50.03,
+                "y": -3.11,
+                "z": -30.36
+              }
+            ],
+            "position": {
+              "x": 48.03,
+              "y": -1.61,
+              "z": -28.86
+            },
+            "switch": false,
+            "switches": [],
+            "top": -0.11,
+            "transferItem": {
+              "count": 1,
+              "item": "675aaaf674a7619a5304c233"
+            }
+          },
+          {
+            "bottom": -0.41,
+            "faction": "pmc",
+            "id": "b1e817c36812ebf2a8b1ac141ca88449a0b0469c",
+            "name": "Gate_o",
+            "outline": [
+              {
+                "x": 27.34,
+                "y": -0.41,
+                "z": 63.64
+              },
+              {
+                "x": 20.77,
+                "y": -0.41,
+                "z": 63.29
+              },
+              {
+                "x": 20.19,
+                "y": -0.41,
+                "z": 74.24
+              },
+              {
+                "x": 26.76,
+                "y": -0.41,
+                "z": 74.59
+              }
+            ],
+            "position": {
+              "x": 23.76,
+              "y": 1.36,
+              "z": 68.94
+            },
+            "switch": false,
+            "switches": [],
+            "top": 3.13
+          },
+          {
+            "bottom": -2.65,
+            "faction": "scav",
+            "id": "29b887a73725274d657c8a5366614b9b900387e2",
+            "name": "Camera Bunker Door",
+            "outline": [
+              {
+                "x": -12.18,
+                "y": -2.65,
+                "z": 37.72
+              },
+              {
+                "x": -18.98,
+                "y": -2.65,
+                "z": 37.36
+              },
+              {
+                "x": -19.25,
+                "y": -2.65,
+                "z": 42.49
+              },
+              {
+                "x": -12.45,
+                "y": -2.65,
+                "z": 42.86
+              }
+            ],
+            "position": {
+              "x": -15.72,
+              "y": -1.65,
+              "z": 40.11
+            },
+            "switch": false,
+            "switches": [],
+            "top": -0.65
+          },
+          {
+            "bottom": 0.09,
+            "faction": "pmc",
+            "id": "f3494ee4a96ff19ab2946746e7e15ba0d12871dc",
+            "name": "Gate 2",
+            "outline": [
+              {
+                "x": 41.78,
+                "y": 0.09,
+                "z": -55.66
+              },
+              {
+                "x": 41.78,
+                "y": 0.09,
+                "z": -51.3
+              },
+              {
+                "x": 48,
+                "y": 0.09,
+                "z": -51.3
+              },
+              {
+                "x": 48,
+                "y": 0.09,
+                "z": -55.66
+              }
+            ],
+            "position": {
+              "x": 44.89,
+              "y": 0.59,
+              "z": -53.48
+            },
+            "switch": false,
+            "switches": [],
+            "top": 1.09
+          },
+          {
+            "bottom": 8.23,
+            "faction": "scav",
+            "id": "1733510cd360e7a13af356612afad7214aae64e4",
+            "name": "Office Window",
+            "outline": [
+              {
+                "x": 19.8,
+                "y": 8.23,
+                "z": 38.59
+              },
+              {
+                "x": 16.01,
+                "y": 8.23,
+                "z": 38.39
+              },
+              {
+                "x": 15.86,
+                "y": 8.23,
+                "z": 41.18
+              },
+              {
+                "x": 19.66,
+                "y": 8.23,
+                "z": 41.38
+              }
+            ],
+            "position": {
+              "x": 17.83,
+              "y": 8.73,
+              "z": 39.89
+            },
+            "switch": false,
+            "switches": [],
+            "top": 9.23
+          },
+          {
+            "bottom": 1.31,
+            "faction": "pmc",
+            "id": "99c2f21880da0baf75d431a5f45b462fde2f79b1",
+            "name": "Gate 0",
+            "outline": [
+              {
+                "x": -58.27,
+                "y": 1.31,
+                "z": 53.01
+              },
+              {
+                "x": -68.73,
+                "y": 1.31,
+                "z": 52.45
+              },
+              {
+                "x": -69.07,
+                "y": 1.31,
+                "z": 58.75
+              },
+              {
+                "x": -58.6,
+                "y": 1.31,
+                "z": 59.31
+              }
+            ],
+            "position": {
+              "x": -63.67,
+              "y": 2.85,
+              "z": 55.88
+            },
+            "switch": false,
+            "switches": [],
+            "top": 4.4
+          }
+        ],
+        "hazards": [],
+        "id": "55f2d3fd4bdc2d5f408b4567",
+        "locks": [
+          {
+            "id": "2170d1b52aa6d61ee5d3a8f65183be4e0750e873",
+            "key": "5448ba0b4bdc2d02308b456c",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": -19.08,
+              "y": 1.45,
+              "z": -48.57
+            }
+          },
+          {
+            "id": "d6cacb05b05ce59b1c3a9026fc890eea3be7a63a",
+            "key": "5448ba0b4bdc2d02308b456c",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 66.83,
+              "y": -1.61,
+              "z": -29.32
+            }
+          },
+          {
+            "id": "aa4ebab35c8835370066d0956af284162fa29ea3",
+            "key": "5448ba0b4bdc2d02308b456c",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 29.12,
+              "y": 9.08,
+              "z": 36.52
+            }
+          },
+          {
+            "id": "0b8dbbc9604c2f03ae8bff8a5e0a8e62d2e3d7c5",
+            "key": "66acd6702b17692df20144c0",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": -20.43,
+              "y": -1.52,
+              "z": 44.06
+            }
+          }
+        ],
+        "lootContainers": [
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 27.38,
+              "y": 1.9004,
+              "z": 40.118
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 24.0689869,
+              "y": 1.99,
+              "z": 43.6235428
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 25.745,
+              "y": 7.181,
+              "z": -3.355
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 29.98,
+              "y": 1.412,
+              "z": -11.9814
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 32.57467,
+              "y": 0.537,
+              "z": 19.205
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 34.2401733,
+              "y": 0.2590493,
+              "z": -31.2014141
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 25.7777634,
+              "y": 0.443659961,
+              "z": -33.3156548
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 33.2248154,
+              "y": 3.675,
+              "z": -17.6760368
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 32.453,
+              "y": 2.181,
+              "z": 44.999
+            }
+          },
+          {
+            "lootContainer": "578f87a3245977356274f2cb",
+            "position": {
+              "x": 33.03629,
+              "y": 1.723,
+              "z": 61.1793137
+            }
+          }
+        ],
+        "lootLoose": [
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa",
+              "6759e19a8367ee2b0c0f4b92",
+              "675a06b84ff23436160d802f",
+              "675a0eacf905bde03d0f8253",
+              "6759e6c39422e1708e0e9b81",
+              "675a1c129422e1708e0e9baa",
+              "675a1a244ff23436160d8033",
+              "675a1af21474133a0d0bb216",
+              "675a0fbbb98bf391510bafcd",
+              "6759e61067c8eb5cd10352f1"
+            ],
+            "position": {
+              "x": 23.079667333333333,
+              "y": 9.120800000000001,
+              "z": 37.91400133333334
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": -18.8478,
+              "y": -2.2738776,
+              "z": 47.0187
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": -1.2723,
+              "y": -2.4658,
+              "z": 49.039
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": -21.322,
+              "y": 3.0497,
+              "z": 29.466
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": 73.7141,
+              "y": 0.6362,
+              "z": -34.4129
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": 55.6944,
+              "y": 0.7581,
+              "z": 24.5496
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": 28.791,
+              "y": 8.819,
+              "z": 36.963
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": 13.3017,
+              "y": 1.1859,
+              "z": 42.8089
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa",
+              "6a31824878450ec91c0ea1ae",
+              "5d1b385e86f774252167b98a"
+            ],
+            "position": {
+              "x": 27.088334333333336,
+              "y": 1.7617666666666665,
+              "z": 41.015334
+            }
+          },
+          {
+            "items": [
+              "6a3181f178450ec91c0ea1aa"
+            ],
+            "position": {
+              "x": 26.0868,
+              "y": 3.7923913,
+              "z": -18.8761
+            }
+          }
+        ],
+        "maxPlayerLevel": 100,
+        "minPlayerLevel": 0,
+        "name": "55f2d3fd4bdc2d5f408b4567 Name",
+        "nameId": "factory4_day",
+        "normalizedName": "factory",
+        "players": "7-8",
+        "raidDuration": 20,
+        "scenePath": "maps/factory_day_preset.bundle",
+        "spawns": [
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": -45.3968,
+              "y": 0.2904,
+              "z": 5.5814
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "0246436c-7d69-4036-999d-ebcb956970b5"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 11.22,
+              "y": 0.04,
+              "z": -42.1099968
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "05e75eb3-eb43-46c6-94d3-59e1e9ba4435"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 42.433,
+              "y": -2.639,
+              "z": -8.306
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "0a8181f7-c8f0-4db1-8eb2-932dfb3545f3"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 56.864,
+              "y": 0.261,
+              "z": 52.568
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "0a92f51c-52b4-4e76-b839-f7ce82f2b36b"
+          },
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": -20.756,
+              "y": 0.0596600622,
+              "z": 22.769
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "BotZone"
+          },
+          {
+            "categories": [
+              "all"
+            ],
+            "position": {
+              "x": 31.813,
+              "y": 0.175249279,
+              "z": 21.202
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "BotZone"
+          },
+          {
+            "categories": [
+              "player",
+              "botpmc"
+            ],
+            "position": {
+              "x": 18.133,
+              "y": -2.64999962,
+              "z": -19.516
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "BotZone"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": -43.8128,
+              "y": 0.2904,
+              "z": 6.7404
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "120a0777-e825-4de7-a855-c3eaa8eba46b"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 12.595,
+              "y": 0.04,
+              "z": -42.522
+            },
+            "sides": [
+              "all"
+            ],
+            "zoneName": "13883982-2ab8-4dd5-a9b4-45e2c6d8e1cc"
+          },
+          {
+            "categories": [
+              "player",
+              "botpmc"
+            ],
+            "position": {
+              "x": 57.7,
+              "y": 0.283074319,
+              "z": 53.413
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "BotZone"
+          }
+        ],
+        "stationaryWeapons": [],
+        "switches": [],
+        "transits": [
+          {
+            "bottom": 0.78,
+            "description": "FAC_TRANSIT_12_DESC",
+            "id": "12",
+            "map": "5704e3c2d2720bac5b8b4567",
+            "outline": [
+              {
+                "x": 28.56,
+                "y": 0.78,
+                "z": 56.98
+              },
+              {
+                "x": 28.56,
+                "y": 0.87,
+                "z": 63.5
+              },
+              {
+                "x": 20.15,
+                "y": 0.87,
+                "z": 63.5
+              },
+              {
+                "x": 20.15,
+                "y": 0.78,
+                "z": 56.98
+              }
+            ],
+            "position": {
+              "x": 24.36,
+              "y": 2.24,
+              "z": 60.22
+            },
+            "top": 3.7
+          },
+          {
+            "bottom": -0.42,
+            "description": "FAC_TRANSIT_13_DESC",
+            "id": "13",
+            "map": "56f40101d2720b2a4d8b45d6",
+            "outline": [
+              {
+                "x": 9.82,
+                "y": -0.42,
+                "z": -52.68
+              },
+              {
+                "x": 9.82,
+                "y": -0.42,
+                "z": -46.55
+              },
+              {
+                "x": 24.85,
+                "y": -0.42,
+                "z": -46.55
+              },
+              {
+                "x": 24.85,
+                "y": -0.42,
+                "z": -52.68
+              }
+            ],
+            "position": {
+              "x": 17.34,
+              "y": 0.58,
+              "z": -49.62
+            },
+            "top": 1.58
+          },
+          {
+            "bottom": -4.09,
+            "conditions": "FAC_TRANSIT_14_COND",
+            "description": "FAC_TRANSIT_14_DESC",
+            "id": "14",
+            "map": "6a294a5b5eb5f9a1700417b7",
+            "outline": [
+              {
+                "x": -30.01,
+                "y": -4.09,
+                "z": -44.51
+              },
+              {
+                "x": -30.01,
+                "y": -4.09,
+                "z": -40.99
+              },
+              {
+                "x": -24,
+                "y": -4.09,
+                "z": -40.99
+              },
+              {
+                "x": -24,
+                "y": -4.09,
+                "z": -44.51
+              }
+            ],
+            "position": {
+              "x": -27.01,
+              "y": -3.09,
+              "z": -42.75
+            },
+            "top": -2.09
+          }
+        ],
+        "wiki": "https://escapefromtarkov.fandom.com/wiki/Factory"
+      },
+      "56f40101d2720b2a4d8b45d6": {
+        "accessKeys": [],
+        "accessKeysMinPlayerLevel": 0,
+        "artillery": {
+          "zones": [
+            {
+              "botom": -3,
+              "id": "13",
+              "outline": [
+                {
+                  "x": 36.5,
+                  "y": 2,
+                  "z": -48.5
+                },
+                {
+                  "x": 261.5,
+                  "y": 2,
+                  "z": -48.5
+                },
+                {
+                  "x": 261.5,
+                  "y": 2,
+                  "z": -195.5
+                },
+                {
+                  "x": 36.5,
+                  "y": 2,
+                  "z": -195.5
+                }
+              ],
+              "position": {
+                "x": 149,
+                "y": 2,
+                "z": -122
+              },
+              "size": {
+                "x": 225,
+                "y": 10,
+                "z": 147
+              },
+              "top": 7
+            },
+            {
+              "botom": -2,
+              "id": "14",
+              "outline": [
+                {
+                  "x": 128.5,
+                  "y": 3,
+                  "z": 214.5
+                },
+                {
+                  "x": 275.5,
+                  "y": 3,
+                  "z": 214.5
+                },
+                {
+                  "x": 275.5,
+                  "y": 3,
+                  "z": 67.5
+                },
+                {
+                  "x": 128.5,
+                  "y": 3,
+                  "z": 67.5
+                }
+              ],
+              "position": {
+                "x": 202,
+                "y": 3,
+                "z": 141
+              },
+              "size": {
+                "x": 147,
+                "y": 10,
+                "z": 147
+              },
+              "top": 8
+            }
+          ]
+        },
+        "bosses": [
+          {
+            "escorts": [
+              {
+                "amount": [
+                  {
+                    "chance": 0.25,
+                    "count": 2
+                  },
+                  {
+                    "chance": 0.25,
+                    "count": 3
+                  },
+                  {
+                    "chance": 0.5,
+                    "count": 4
+                  }
+                ],
+                "mob": "followerBully"
+              }
+            ],
+            "mob": "bossBully",
+            "spawnChance": 0.6,
+            "spawnLocations": [
+              {
+                "chance": 0.33,
+                "name": "ZoneDormitory",
+                "positions": [],
+                "spawnKey": "ZoneDormitory"
+              },
+              {
+                "chance": 0.33,
+                "name": "ZoneGasStation",
+                "positions": [],
+                "spawnKey": "ZoneGasStation"
+              },
+              {
+                "chance": 0.33,
+                "name": "ZoneScavBase",
+                "positions": [
+                  {
+                    "x": 125.176292,
+                    "y": 1.32224035,
+                    "z": -146.1392
+                  },
+                  {
+                    "x": 103.16629,
+                    "y": 1.21224034,
+                    "z": -114.619217
+                  },
+                  {
+                    "x": 105.846291,
+                    "y": 1.21224034,
+                    "z": -114.139206
+                  },
+                  {
+                    "x": 77.77829,
+                    "y": 1.43224025,
+                    "z": -108.103226
+                  },
+                  {
+                    "x": 41.7462921,
+                    "y": 1.23424029,
+                    "z": -143.6092
+                  }
+                ],
+                "spawnKey": "ZoneScavBase"
+              }
+            ],
+            "spawnTime": -1,
+            "spawnTimeRandom": false,
+            "spawnTrigger": null,
+            "supports": []
+          },
+          {
+            "escorts": [
+              {
+                "amount": [
+                  {
+                    "chance": 1,
+                    "count": 1
+                  }
+                ],
+                "mob": "followerBigPipe"
+              },
+              {
+                "amount": [
+                  {
+                    "chance": 1,
+                    "count": 1
+                  }
+                ],
+                "mob": "followerBirdEye"
+              }
+            ],
+            "mob": "bossKnight",
+            "spawnChance": 0.2,
+            "spawnLocations": [
+              {
+                "chance": 1,
+                "name": "ZoneScavBase",
+                "positions": [
+                  {
+                    "x": 125.176292,
+                    "y": 1.32224035,
+                    "z": -146.1392
+                  },
+                  {
+                    "x": 103.16629,
+                    "y": 1.21224034,
+                    "z": -114.619217
+                  },
+                  {
+                    "x": 105.846291,
+                    "y": 1.21224034,
+                    "z": -114.139206
+                  },
+                  {
+                    "x": 77.77829,
+                    "y": 1.43224025,
+                    "z": -108.103226
+                  },
+                  {
+                    "x": 41.7462921,
+                    "y": 1.23424029,
+                    "z": -143.6092
+                  }
+                ],
+                "spawnKey": "ZoneScavBase"
+              }
+            ],
+            "spawnTime": -1,
+            "spawnTimeRandom": true,
+            "spawnTrigger": null,
+            "supports": []
+          },
+          {
+            "escorts": [],
+            "mob": "bossPartisan",
+            "spawnChance": 0.25,
+            "spawnLocations": [],
+            "spawnTime": 900,
+            "spawnTimeRandom": false,
+            "spawnTrigger": null,
+            "supports": []
+          },
+          {
+            "escorts": [
+              {
+                "amount": [
+                  {
+                    "chance": 1,
+                    "count": 4
+                  }
+                ],
+                "mob": "sectantWarrior"
+              }
+            ],
+            "mob": "sectantPriest",
+            "spawnChance": 0.2,
+            "spawnLocations": [
+              {
+                "chance": 1,
+                "name": "ZoneScavBase",
+                "positions": [
+                  {
+                    "x": 125.176292,
+                    "y": 1.32224035,
+                    "z": -146.1392
+                  },
+                  {
+                    "x": 103.16629,
+                    "y": 1.21224034,
+                    "z": -114.619217
+                  },
+                  {
+                    "x": 105.846291,
+                    "y": 1.21224034,
+                    "z": -114.139206
+                  },
+                  {
+                    "x": 77.77829,
+                    "y": 1.43224025,
+                    "z": -108.103226
+                  },
+                  {
+                    "x": 41.7462921,
+                    "y": 1.23424029,
+                    "z": -143.6092
+                  }
+                ],
+                "spawnKey": "ZoneScavBase"
+              }
+            ],
+            "spawnTime": -1,
+            "spawnTimeRandom": false,
+            "spawnTrigger": null,
+            "supports": []
+          }
+        ],
+        "btrStops": [],
+        "coordinateToCardinalRotation": 180,
+        "description": "56f40101d2720b2a4d8b45d6 Description",
+        "enemies": [
+          "scavs",
+          "bossBully",
+          "followerBully",
+          "bossKnight",
+          "followerBigPipe",
+          "followerBirdEye",
+          "bossPartisan",
+          "sectantPriest",
+          "sectantWarrior"
+        ],
+        "extracts": [
+          {
+            "bottom": -4.04,
+            "faction": "scav",
+            "id": "d2cefbb74bd24ffc53a1a3a148069483c5fae6cb",
+            "name": "ex_customs_scav_gasstation",
+            "outline": [
+              {
+                "x": 314.2,
+                "y": -4.04,
+                "z": -178.39
+              },
+              {
+                "x": 314.2,
+                "y": -4.04,
+                "z": -171.5
+              },
+              {
+                "x": 307.23,
+                "y": -4.04,
+                "z": -171.5
+              },
+              {
+                "x": 307.23,
+                "y": -4.04,
+                "z": -178.39
+              }
+            ],
+            "position": {
+              "x": 310.71,
+              "y": -1.63,
+              "z": -174.95
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 0.77
+          },
+          {
+            "bottom": 0.84,
+            "faction": "pmc",
+            "id": "f367bab752ed8474989104613d1151e9434f2bd4",
+            "name": "ex_customs_pmc_rail_milbase",
+            "outline": [
+              {
+                "x": 498.52,
+                "y": 0.84,
+                "z": 213.24
+              },
+              {
+                "x": 498.52,
+                "y": 0.84,
+                "z": 229.54
+              },
+              {
+                "x": 479.59,
+                "y": 0.84,
+                "z": 229.54
+              },
+              {
+                "x": 479.59,
+                "y": 0.84,
+                "z": 213.24
+              }
+            ],
+            "position": {
+              "x": 489.06,
+              "y": 3.83,
+              "z": 221.39
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 6.82
+          },
+          {
+            "bottom": -0.68,
+            "faction": "pmc",
+            "id": "ab12c1f902a669fb0c940820e8cc40d7131e3208",
+            "name": "ex_customs_pmc_crossroads",
+            "outline": [
+              {
+                "x": -325.04,
+                "y": -0.68,
+                "z": -95.82
+              },
+              {
+                "x": -325.04,
+                "y": -0.68,
+                "z": -76.96
+              },
+              {
+                "x": -347.62,
+                "y": -0.68,
+                "z": -76.96
+              },
+              {
+                "x": -347.62,
+                "y": -0.68,
+                "z": -95.82
+              }
+            ],
+            "position": {
+              "x": -336.33,
+              "y": 2.19,
+              "z": -86.39
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 5.06
+          },
+          {
+            "bottom": 0.15,
+            "faction": "scav",
+            "id": "92e7412193276c1044299b51d930440cdab835e4",
+            "name": "ex_customs_scav_admin",
+            "outline": [
+              {
+                "x": 676.17,
+                "y": 0.15,
+                "z": -66.03
+              },
+              {
+                "x": 676.17,
+                "y": 0.15,
+                "z": -44.64
+              },
+              {
+                "x": 653.24,
+                "y": 0.15,
+                "z": -44.64
+              },
+              {
+                "x": 653.24,
+                "y": 0.15,
+                "z": -66.03
+              }
+            ],
+            "position": {
+              "x": 664.71,
+              "y": 2.88,
+              "z": -55.33
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 5.61
+          },
+          {
+            "bottom": -2.11,
+            "faction": "scav",
+            "id": "1e7baccc265b49195aead2e783779cbca83d73f3",
+            "name": "Old Road Gate",
+            "outline": [
+              {
+                "x": 188.51,
+                "y": -2.11,
+                "z": 207.19
+              },
+              {
+                "x": 188.51,
+                "y": -2.11,
+                "z": 220.83
+              },
+              {
+                "x": 175.03,
+                "y": -2.11,
+                "z": 220.83
+              },
+              {
+                "x": 175.03,
+                "y": -2.11,
+                "z": 207.19
+              }
+            ],
+            "position": {
+              "x": 181.77,
+              "y": 1.5,
+              "z": 214.01
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 5.11
+          },
+          {
+            "bottom": -1.75,
+            "faction": "pmc",
+            "id": "aa56e9228b8452533873eeffa11b587007f49429",
+            "name": "RUAF Roadblock",
+            "outline": [
+              {
+                "x": 0.95,
+                "y": -1.75,
+                "z": -146.92
+              },
+              {
+                "x": 0.95,
+                "y": -1.75,
+                "z": -129.98
+              },
+              {
+                "x": -21.45,
+                "y": -1.75,
+                "z": -129.98
+              },
+              {
+                "x": -21.45,
+                "y": -1.75,
+                "z": -146.92
+              }
+            ],
+            "position": {
+              "x": -10.25,
+              "y": 1.92,
+              "z": -138.45
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 5.59
+          },
+          {
+            "bottom": -0.76,
+            "faction": "scav",
+            "id": "ad8fc418508df45199927afc5ea8c981337ecd64",
+            "name": "RUAF Roadblock_scav",
+            "outline": [
+              {
+                "x": 3.21,
+                "y": -0.76,
+                "z": -148.37
+              },
+              {
+                "x": 3.21,
+                "y": -0.76,
+                "z": -129.12
+              },
+              {
+                "x": -22.08,
+                "y": -0.76,
+                "z": -129.12
+              },
+              {
+                "x": -22.08,
+                "y": -0.76,
+                "z": -148.37
+              }
+            ],
+            "position": {
+              "x": -9.44,
+              "y": 1.65,
+              "z": -138.74
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 4.05
+          },
+          {
+            "bottom": -2.85,
+            "faction": "scav",
+            "id": "6eee3e566de0b079cd76f204d297ba954b301e8c",
+            "name": "Sniper Roadblock",
+            "outline": [
+              {
+                "x": 23.08,
+                "y": -2.85,
+                "z": 120.03
+              },
+              {
+                "x": 23.08,
+                "y": -2.85,
+                "z": 132.55
+              },
+              {
+                "x": 7.08,
+                "y": -2.85,
+                "z": 132.55
+              },
+              {
+                "x": 7.08,
+                "y": -2.85,
+                "z": 120.03
+              }
+            ],
+            "position": {
+              "x": 15.08,
+              "y": 0.14,
+              "z": 126.29
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 3.13
+          },
+          {
+            "bottom": 1.31,
+            "faction": "scav",
+            "id": "c9e36de4f1b9f73f4698b5ba46135a1e0aafb434",
+            "name": "Factory Shacks",
+            "outline": [
+              {
+                "x": 213.99,
+                "y": 1.31,
+                "z": -2.2
+              },
+              {
+                "x": 213.99,
+                "y": 1.31,
+                "z": 8.82
+              },
+              {
+                "x": 197.19,
+                "y": 1.31,
+                "z": 8.82
+              },
+              {
+                "x": 197.19,
+                "y": 1.31,
+                "z": -2.2
+              }
+            ],
+            "position": {
+              "x": 205.59,
+              "y": 3.72,
+              "z": 3.31
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 6.12
+          },
+          {
+            "bottom": -2.67,
+            "faction": "pmc",
+            "id": "fed921b46204418ef8fa0174468c6886e91325c4",
+            "name": "ex_customs_pmc_auto",
+            "outline": [
+              {
+                "x": 177.48,
+                "y": -2.52,
+                "z": 212.39
+              },
+              {
+                "x": 180.47,
+                "y": -2.4,
+                "z": 216.95
+              },
+              {
+                "x": 184.63,
+                "y": -2.55,
+                "z": 214.24
+              },
+              {
+                "x": 181.64,
+                "y": -2.67,
+                "z": 209.67
+              }
+            ],
+            "position": {
+              "x": 181.08,
+              "y": -0.71,
+              "z": 213.25
+            },
+            "switch": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "switches": [
+              "ae4bdfc1fc5b30100701158b56ae4d20840e0550"
+            ],
+            "top": 1.25,
+            "transferItem": {
+              "count": 20000,
+              "item": "5449016a4bdc2d6f028b456f"
+            }
+          }
+        ],
+        "hazards": [
+          {
+            "bottom": -24.67,
+            "hazardType": "minefield",
+            "id": "88799448229f18bcfeed646acf9ff6e5770b9440",
+            "name": "DamageType_Landmine",
+            "outline": [
+              {
+                "x": 25.85,
+                "y": -8.6,
+                "z": 141.78
+              },
+              {
+                "x": 34.32,
+                "y": -8.6,
+                "z": 236.57
+              },
+              {
+                "x": 76.35,
+                "y": -8.6,
+                "z": 232.82
+              },
+              {
+                "x": 67.88,
+                "y": -8.6,
+                "z": 138.03
+              }
+            ],
+            "position": {
+              "x": 51.1,
+              "y": -8.6,
+              "z": 187.3
+            },
+            "top": 7.46
+          },
+          {
+            "bottom": -24.67,
+            "hazardType": "minefield",
+            "id": "b6679735b72fc64edf37b1bad4016f1a3307cc2f",
+            "name": "DamageType_Landmine",
+            "outline": [
+              {
+                "x": 23.83,
+                "y": -8.6,
+                "z": 358.96
+              },
+              {
+                "x": 6.32,
+                "y": -8.6,
+                "z": 130.94
+              },
+              {
+                "x": -59.37,
+                "y": -8.6,
+                "z": 135.98
+              },
+              {
+                "x": -41.85,
+                "y": -8.6,
+                "z": 364.01
+              }
+            ],
+            "position": {
+              "x": -17.77,
+              "y": -8.6,
+              "z": 247.47
+            },
+            "top": 7.46
+          },
+          {
+            "bottom": 0.18,
+            "hazardType": "sniper",
+            "id": "b3537b8fbe79ff55f31157b0abde3d8199c6ed88",
+            "name": "ScavRole/Marksman",
+            "outline": [
+              {
+                "x": 139.58,
+                "y": 10.48,
+                "z": -283.81
+              },
+              {
+                "x": 103.74,
+                "y": 10.48,
+                "z": -254.66
+              },
+              {
+                "x": 139.04,
+                "y": 10.48,
+                "z": -211.25
+              },
+              {
+                "x": 174.89,
+                "y": 10.48,
+                "z": -240.39
+              }
+            ],
+            "position": {
+              "x": 139.31,
+              "y": 10.48,
+              "z": -247.53
+            },
+            "top": 20.78
+          },
+          {
+            "bottom": -1.4,
+            "hazardType": "sniper",
+            "id": "6a5a4a1e1201c727f50ade0493c89ff0079a9d68",
+            "name": "ScavRole/Marksman",
+            "outline": [
+              {
+                "x": 172.43,
+                "y": 10.9,
+                "z": -238.81
+              },
+              {
+                "x": 214.24,
+                "y": 10.9,
+                "z": -272.02
+              },
+              {
+                "x": 162.44,
+                "y": 10.9,
+                "z": -337.25
+              },
+              {
+                "x": 120.62,
+                "y": 10.9,
+                "z": -304.04
+              }
+            ],
+            "position": {
+              "x": 167.43,
+              "y": 10.9,
+              "z": -288.03
+            },
+            "top": 23.2
+          },
+          {
+            "bottom": -1.1,
+            "hazardType": "sniper",
+            "id": "3b67f364ada602da42193d21ac7d48a8a3e5b601",
+            "name": "ScavRole/Marksman",
+            "outline": [
+              {
+                "x": 202.05,
+                "y": 9.2,
+                "z": -327.96
+              },
+              {
+                "x": 182.17,
+                "y": 9.2,
+                "z": -312.8
+              },
+              {
+                "x": 215.91,
+                "y": 9.2,
+                "z": -268.52
+              },
+              {
+                "x": 235.8,
+                "y": 9.2,
+                "z": -283.67
+              }
+            ],
+            "position": {
+              "x": 208.98,
+              "y": 9.2,
+              "z": -298.24
+            },
+            "top": 19.5
+          }
+        ],
+        "id": "56f40101d2720b2a4d8b45d6",
+        "locks": [
+          {
+            "id": "9ef15ff05d0b7c943f2f03b8a2e3c319dca93a88",
+            "key": "5913915886f774123603c392",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 577.73,
+              "y": 0.79,
+              "z": 4.09
+            }
+          },
+          {
+            "id": "ac6f514a0278d5279572e801d676aa61c5d74d33",
+            "key": "5913877a86f774432f15d444",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 415.41,
+              "y": 2.22,
+              "z": 35.65
+            }
+          },
+          {
+            "id": "c5afa10762b14c8f5be441c99f9f780a1db19510",
+            "key": "5780d0652459777df90dcb74",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 415.78,
+              "y": 2.22,
+              "z": 38.56
+            }
+          },
+          {
+            "id": "5b8a75bed7602777004c5516c7b8da6d47803e65",
+            "key": "5938603e86f77435642354f4",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 230.64,
+              "y": 3.87,
+              "z": 138.67
+            }
+          },
+          {
+            "id": "64bf7ab785937b96d36497f0f441e349f86b2c04",
+            "key": "591382d986f774465a6413a7",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 227.88,
+              "y": 0.91,
+              "z": 135.61
+            }
+          },
+          {
+            "id": "2fe5bd9e01ebe8d075e8fbe864afb435edb277d2",
+            "key": "59136e1e86f774432f15d133",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 231.09,
+              "y": 0.91,
+              "z": 159.44
+            }
+          },
+          {
+            "id": "eeaedc32e0494a147d63ea94d5853e7d08f29fc9",
+            "key": "591383f186f7744a4c5edcf3",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 230.1,
+              "y": 0.9,
+              "z": 134.91
+            }
+          },
+          {
+            "id": "8704276c597deea822ffc2a2335d23dab552c0d3",
+            "key": "59387a4986f77401cc236e62",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 233.55,
+              "y": 0.9,
+              "z": 159.7
+            }
+          },
+          {
+            "id": "2c5202a8da538ed02b368e23b36263a724c1728d",
+            "key": "59136a4486f774447a1ed172",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 225.52,
+              "y": 0.91,
+              "z": 138.37
+            }
+          },
+          {
+            "id": "e60adc24780cb77eb94f85f90e4f31e710cfa01b",
+            "key": "5780cf692459777de4559321",
+            "lockType": "door",
+            "needsPower": false,
+            "position": {
+              "x": 179.28,
+              "y": 6.83,
+              "z": 174.81
+            }
+          }
+        ],
+        "lootContainers": [
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 69.88612,
+              "y": 2.9385,
+              "z": -59.1464081
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 49.7913666,
+              "y": 1.39549971,
+              "z": -50.65628
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 64.29202,
+              "y": 3.69999981,
+              "z": -49.42067
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 46.5319366,
+              "y": 1.5454998,
+              "z": -61.9069176
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 36.0279236,
+              "y": 1.6085,
+              "z": -71.2320251
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 63.7798,
+              "y": 9.2675,
+              "z": -61.51901
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 65.6196747,
+              "y": 8.467278,
+              "z": -69.30444
+            }
+          },
+          {
+            "lootContainer": "5909d50c86f774659e6aaebe",
+            "position": {
+              "x": 58.96483,
+              "y": 4.6815,
+              "z": -65.42645
+            }
+          },
+          {
+            "lootContainer": "578f87ad245977356274f2cc",
+            "position": {
+              "x": 52.3645477,
+              "y": 5.673,
+              "z": -45.96205
+            }
+          },
+          {
+            "lootContainer": "578f87ad245977356274f2cc",
+            "position": {
+              "x": 45.5917664,
+              "y": 4.92,
+              "z": -49.7581024
+            }
+          }
+        ],
+        "lootLoose": [
+          {
+            "items": [
+              "6937edb912d456a817083e82",
+              "590de7e986f7741b096e5f32",
+              "5c1267ee86f77416ec610f72",
+              "59faff1d86f7746c51718c9c",
+              "6a4ce086b5644e9f0a08d08a",
+              "62a091170b9d3c46de5b6cf2",
+              "59e3647686f774176a362507",
+              "59faf7ca86f7740dbe19f6c2",
+              "69f9d547b98cc4120608692a",
+              "66b37ea4c5d72b0277488439"
+            ],
+            "position": {
+              "x": 182.85243333333332,
+              "y": 4.2650023,
+              "z": 162.10965666666667
+            }
+          },
+          {
+            "items": [
+              "5d1b376e86f774252519444e"
+            ],
+            "position": {
+              "x": 181.70853,
+              "y": 3.5655023999999997,
+              "z": 166.06545
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827",
+              "544fb3f34bdc2d03748b456a",
+              "66507eabf5ddb0818b085b68",
+              "5c12613b86f7743bbe2c3f76"
+            ],
+            "position": {
+              "x": 77.66485625,
+              "y": 5.5409876,
+              "z": -154.242205
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827",
+              "675a0eacf905bde03d0f8253",
+              "6759e7a44ff23436160d7ff5",
+              "6759e61067c8eb5cd10352f1",
+              "675a1e502eac6c76e104ea1e",
+              "68f25ad7103c5d9d4f02392e",
+              "675a1c129422e1708e0e9baa",
+              "675a125caf26c56ee109072a",
+              "68f25a45b2b53abd200b954d",
+              "675a06b84ff23436160d802f"
+            ],
+            "position": {
+              "x": -204.00900000000001,
+              "y": 7.8488871,
+              "z": -109.54463333333335
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827"
+            ],
+            "position": {
+              "x": -205.275,
+              "y": 2.5129,
+              "z": -32.772
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827",
+              "590c37d286f77443be3d7827",
+              "62a0a124de7ac81993580542",
+              "590c651286f7741e566b6461",
+              "590c621186f774138d11ea29",
+              "62a09e974f842e1bd12da3f0",
+              "5c12613b86f7743bbe2c3f76",
+              "61bf7c024770ee6f9c6b8b53",
+              "590c645c86f77412b01304d9",
+              "69f9d60b5de6674f08060f2a"
+            ],
+            "position": {
+              "x": 89.977345,
+              "y": 8.3399,
+              "z": -53.9604865
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827"
+            ],
+            "position": {
+              "x": 203.43005,
+              "y": 2.5127,
+              "z": -121.90015
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827",
+              "5938504186f7740991483f30",
+              "544fb3f34bdc2d03748b456a",
+              "5734758f24597738025ee253",
+              "5af0561e86f7745f5f3ad6ac",
+              "5e2aedd986f7746d404f3aa4",
+              "5d80c93086f7744036212b41"
+            ],
+            "position": {
+              "x": 464.05381166666666,
+              "y": 3.4802630000000003,
+              "z": -62.961494166666675
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827"
+            ],
+            "position": {
+              "x": 64.258,
+              "y": 2.3764,
+              "z": -106.896
+            }
+          },
+          {
+            "items": [
+              "6a31807f17005505b70d5827",
+              "590c639286f774151567fa95",
+              "590c392f86f77444754deb29"
+            ],
+            "position": {
+              "x": 68.3255,
+              "y": 8.81485,
+              "z": -63.543
+            }
+          }
+        ],
+        "maxPlayerLevel": 100,
+        "minPlayerLevel": 0,
+        "name": "56f40101d2720b2a4d8b45d6 Name",
+        "nameId": "bigmap",
+        "normalizedName": "customs",
+        "players": "10-12",
+        "raidDuration": 35,
+        "scenePath": "maps/customs_preset.bundle",
+        "spawns": [
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": 569.0529,
+              "y": 1.46199012,
+              "z": -54.5297432
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneFactorySide"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 571.41,
+              "y": 1.49,
+              "z": -53.4799957
+            },
+            "sides": [
+              "pmc"
+            ],
+            "zoneName": "0327c5d1-cc7f-432f-92dc-f95fb4719f1b"
+          },
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": -319.650024,
+              "y": 1.01148736,
+              "z": -185.94
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneCustoms"
+          },
+          {
+            "categories": [
+              "player",
+              "botpmc"
+            ],
+            "position": {
+              "x": 363.140869,
+              "y": 1.32006574,
+              "z": -109.224533
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneCustoms"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": 584.06,
+              "y": 9.66,
+              "z": 146.22
+            },
+            "sides": [
+              "pmc"
+            ],
+            "zoneName": "06305c94-bdc3-4355-b2df-4b9060f54ed2"
+          },
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": 188.06,
+              "y": 1.289891,
+              "z": -1.38000488
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneCrossRoad"
+          },
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": 60.68301,
+              "y": 4.448909,
+              "z": -67.65
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneTankSquare"
+          },
+          {
+            "categories": [
+              "player",
+              "bot"
+            ],
+            "position": {
+              "x": 29.8222656,
+              "y": 1.11054,
+              "z": -29.4749985
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneBrige"
+          },
+          {
+            "categories": [
+              "player"
+            ],
+            "position": {
+              "x": -220.212,
+              "y": 1.0710001,
+              "z": -141.936
+            },
+            "sides": [
+              "pmc"
+            ],
+            "zoneName": "0a780428-48e0-4268-9ef8-0a7f999cc632"
+          },
+          {
+            "categories": [
+              "player",
+              "bot",
+              "boss"
+            ],
+            "position": {
+              "x": 181.1043,
+              "y": -0.1127597,
+              "z": 178.053787
+            },
+            "sides": [
+              "scav"
+            ],
+            "zoneName": "ZoneCrossRoad"
+          }
+        ],
+        "stationaryWeapons": [
+          {
+            "position": {
+              "x": 188.57,
+              "y": 8.49,
+              "z": -111.26
+            },
+            "stationaryWeapon": "5cdeb229d7f00c000e7ce174"
+          },
+          {
+            "position": {
+              "x": 67.7,
+              "y": 8,
+              "z": -12.77
+            },
+            "stationaryWeapon": "5cdeb229d7f00c000e7ce174"
+          },
+          {
+            "position": {
+              "x": 193.25,
+              "y": 8.76,
+              "z": -132.86
+            },
+            "stationaryWeapon": "5cdeb229d7f00c000e7ce174"
+          },
+          {
+            "position": {
+              "x": 192.51,
+              "y": 8.6,
+              "z": -100.2
+            },
+            "stationaryWeapon": "5d52cc5ba4b9367408500062"
+          }
+        ],
+        "switches": [
+          {
+            "activatedBy": false,
+            "activates": [],
+            "bottom": 2.314589,
+            "door": null,
+            "id": "ae4bdfc1fc5b30100701158b56ae4d20840e0550",
+            "name": "switch_custom_DesignStuff_00034_reserve_electric_switcher_lever",
+            "outline": [
+              {
+                "x": 352.024261,
+                "y": 2.61458874,
+                "z": -40.82954
+              },
+              {
+                "x": 352.419647,
+                "y": 2.61458874,
+                "z": -40.89015
+              },
+              {
+                "x": 352.4736,
+                "y": 2.61458874,
+                "z": -40.5381775
+              },
+              {
+                "x": 352.078217,
+                "y": 2.61458874,
+                "z": -40.47757
+              }
+            ],
+            "position": {
+              "x": 352.230316,
+              "y": 2.61458874,
+              "z": -40.8052826
+            },
+            "size": {
+              "x": 0.4,
+              "y": 0.356082767,
+              "z": 0.6
+            },
+            "switchType": "Open",
+            "top": 2.914589
+          }
+        ],
+        "transits": [
+          {
+            "bottom": 0.26,
+            "description": "tr_customs_reserve_DESC",
+            "id": "9",
+            "map": "5704e5fad2720bc05b8b4567",
+            "outline": [
+              {
+                "x": 639.89,
+                "y": 0.26,
+                "z": 122.77
+              },
+              {
+                "x": 640.5,
+                "y": 0.26,
+                "z": 129.12
+              },
+              {
+                "x": 661.4,
+                "y": 0.26,
+                "z": 127.1
+              },
+              {
+                "x": 660.79,
+                "y": 0.26,
+                "z": 120.76
+              }
+            ],
+            "position": {
+              "x": 650.64,
+              "y": 1.59,
+              "z": 124.94
+            },
+            "top": 2.92
+          },
+          {
+            "bottom": 0.98,
+            "description": "tr_customs_factory_DESC",
+            "id": "10",
+            "map": "55f2d3fd4bdc2d5f408b4567",
+            "outline": [
+              {
+                "x": 347.62,
+                "y": 0.98,
+                "z": -194.55
+              },
+              {
+                "x": 346.48,
+                "y": 0.98,
+                "z": -188.28
+              },
+              {
+                "x": 361,
+                "y": 0.98,
+                "z": -185.65
+              },
+              {
+                "x": 362.14,
+                "y": 0.98,
+                "z": -191.92
+              }
+            ],
+            "position": {
+              "x": 354.31,
+              "y": 2.31,
+              "z": -190.1
+            },
+            "top": 3.64
+          },
+          {
+            "bottom": 0.78,
+            "description": "tr_customs_interchange_DESC",
+            "id": "11",
+            "map": "5714dbc024597771384a510d",
+            "outline": [
+              {
+                "x": -338.53,
+                "y": 0.78,
+                "z": -221.34
+              },
+              {
+                "x": -338.45,
+                "y": 0.78,
+                "z": -202.53
+              },
+              {
+                "x": -329.9,
+                "y": 0.78,
+                "z": -202.56
+              },
+              {
+                "x": -329.98,
+                "y": 0.78,
+                "z": -221.37
+              }
+            ],
+            "position": {
+              "x": -334.22,
+              "y": 2.11,
+              "z": -211.95
+            },
+            "top": 3.44
+          },
+          {
+            "bottom": -2.48,
+            "description": "tr_customs_shoreline_DESC",
+            "id": "42",
+            "map": "5704e554d2720bac5b8b456e",
+            "outline": [
+              {
+                "x": 18.87,
+                "y": -2.48,
+                "z": 133.33
+              },
+              {
+                "x": 19.79,
+                "y": -2.48,
+                "z": 146.11
+              },
+              {
+                "x": 23.02,
+                "y": -2.48,
+                "z": 145.88
+              },
+              {
+                "x": 22.09,
+                "y": -2.48,
+                "z": 133.1
+              }
+            ],
+            "position": {
+              "x": 20.94,
+              "y": -0.33,
+              "z": 139.61
+            },
+            "top": 1.82
+          }
+        ],
+        "wiki": "https://escapefromtarkov.fandom.com/wiki/Customs"
+      }
+    },
+    "mobs": {
+      "ExUsec": {
+        "equipment": [
+          {
+            "attributes": {
+              "slot": "FirstPrimaryWeapon"
+            },
+            "contains": [
+              {
+                "attributes": {
+                  "parentItemId": "618428466ef05c2ce828f218",
+                  "slotNameId": "mod_pistol_grip"
+                },
+                "count": 1,
+                "item": "571659bb2459771fb2755a12"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618428466ef05c2ce828f218",
+                  "slotNameId": "mod_magazine"
+                },
+                "count": 1,
+                "item": "61840d85568c120fdd2962a5"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "61840d85568c120fdd2962a5",
+                  "slotNameId": "cartridges"
+                },
+                "count": 1,
+                "item": "59e6920f86f77411d82aa167"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618428466ef05c2ce828f218",
+                  "slotNameId": "mod_reciever"
+                },
+                "count": 1,
+                "item": "618426d96c780c1e710c9b9f"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618426d96c780c1e710c9b9f",
+                  "slotNameId": "mod_barrel"
+                },
+                "count": 1,
+                "item": "6183fd911cb55961fa0fdce9"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "6183fd911cb55961fa0fdce9",
+                  "slotNameId": "mod_muzzle"
+                },
+                "count": 1,
+                "item": "618407a850224f204c1da549"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "6183fd911cb55961fa0fdce9",
+                  "slotNameId": "mod_sight_front"
+                },
+                "count": 1,
+                "item": "61816fcad92c473c770215cc"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618426d96c780c1e710c9b9f",
+                  "slotNameId": "mod_sight_rear"
+                },
+                "count": 1,
+                "item": "61817865d3a39d50044c13a4"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618426d96c780c1e710c9b9f",
+                  "slotNameId": "mod_mount_000"
+                },
+                "count": 1,
+                "item": "61816df1d3a39d50044c139e"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "618426d96c780c1e710c9b9f",
+                  "slotNameId": "mod_mount_001"
+                },
+                "count": 1,
+                "item": "61816dfa6ef05c2ce828f1ad"
+              }
+            ],
+            "count": 1,
+            "item": "618428466ef05c2ce828f218"
+          },
+          {
+            "attributes": {
+              "slot": "Holster"
+            },
+            "contains": [
+              {
+                "attributes": {
+                  "parentItemId": "5cadc190ae921500103bb3b6",
+                  "slotNameId": "mod_barrel"
+                },
+                "count": 1,
+                "item": "5cadc1c6ae9215000f2775a4"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc1c6ae9215000f2775a4",
+                  "slotNameId": "mod_muzzle"
+                },
+                "count": 1,
+                "item": "5cadc390ae921500126a77f1"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc190ae921500103bb3b6",
+                  "slotNameId": "mod_pistol_grip"
+                },
+                "count": 1,
+                "item": "5cadc431ae921500113bb8d5"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc190ae921500103bb3b6",
+                  "slotNameId": "mod_reciever"
+                },
+                "count": 1,
+                "item": "5cadc55cae921500103bb3be"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc55cae921500103bb3be",
+                  "slotNameId": "mod_sight_rear"
+                },
+                "count": 1,
+                "item": "5cadd940ae9215051e1c2316"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc55cae921500103bb3be",
+                  "slotNameId": "mod_sight_front"
+                },
+                "count": 1,
+                "item": "5cadd919ae921500126a77f3"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc190ae921500103bb3b6",
+                  "slotNameId": "mod_magazine"
+                },
+                "count": 1,
+                "item": "5cadc2e0ae9215051e1c21e7"
+              },
+              {
+                "attributes": {
+                  "parentItemId": "5cadc2e0ae9215051e1c21e7",
+                  "slotNameId": "cartridges"
+                },
+                "count": 1,
+                "item": "64b7bbb74b75259c590fa897"
+              }
+            ],
+            "count": 1,
+            "item": "5cadc190ae921500103bb3b6"
+          },
+          {
+            "attributes": {
+              "slot": "pocket1"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "5cadc2e0ae9215051e1c21e7"
+          },
+          {
+            "attributes": {
+              "slot": "cartridges"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "64b7bbb74b75259c590fa897"
+          },
+          {
+            "attributes": {
+              "slot": "pocket2"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "5cadc2e0ae9215051e1c21e7"
+          },
+          {
+            "attributes": {
+              "slot": "cartridges"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "64b7bbb74b75259c590fa897"
+          },
+          {
+            "attributes": {
+              "slot": "pocket3"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "5cadc2e0ae9215051e1c21e7"
+          },
+          {
+            "attributes": {
+              "slot": "cartridges"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "64b7bbb74b75259c590fa897"
+          },
+          {
+            "attributes": {
+              "slot": "pocket4"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "58d3db5386f77426186285a0"
+          },
+          {
+            "attributes": {
+              "slot": "TacticalVest"
+            },
+            "contains": [],
+            "count": 1,
+            "item": "64be7095047e826eae02b0c1"
+          }
+        ],
+        "health": [
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/Chest",
+            "id": "Chest",
+            "max": 180
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/Head",
+            "id": "Head",
+            "max": 35
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/LeftArm",
+            "id": "LeftArm",
+            "max": 105
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/LeftLeg",
+            "id": "LeftLeg",
+            "max": 110
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/RightArm",
+            "id": "RightArm",
+            "max": 105
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/RightLeg",
+            "id": "RightLeg",
+            "max": 110
+          },
+          {
+            "bodyPart": "QuestCondition/Elimination/Kill/BodyPart/Stomach",
+            "id": "Stomach",
+            "max": 130
+          }
+        ],
+        "id": "ExUsec",
+        "imagePortraitLink": "https://assets.tarkov.dev/rogue-portrait.webp",
+        "imagePosterLink": "https://assets.tarkov.dev/rogue-poster.webp",
+        "items": [
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 98.58
+            },
+            "id": "60098ad7c2240c0fe85c570a"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 36.43
+            },
+            "id": "60098af40accd37ef2175f27"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 18.13
+            },
+            "id": "619256e5f8af2c1a4e1f5d92"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 12.14
+            },
+            "id": "544fb3f34bdc2d03748b456a"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 8.23
+            },
+            "id": "66265d7be65f224b2e17c6aa"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 5.14
+            },
+            "id": "544fb37f4bdc2dee738b4567"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 4.25
+            },
+            "id": "66dae7cbeb28f0f96809f325"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 4.19
+            },
+            "id": "5696686a4bdc2da3298b456a"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 2.81
+            },
+            "id": "62a0a124de7ac81993580542"
+          },
+          {
+            "attributes": {
+              "difficulty": "normal",
+              "prevalence": 2.8
+            },
+            "id": "590c37d286f77443be3d7827"
+          }
+        ],
+        "name": "ExUsec",
+        "normalizedName": "rogue"
+      },
+      "exUsecFree": {
+        "equipment": [],
+        "id": "exUsecFree",
+        "imagePortraitLink": "https://assets.tarkov.dev/rogue-portrait.webp",
+        "imagePosterLink": "https://assets.tarkov.dev/rogue-poster.webp",
+        "items": [],
+        "name": "exUsecFree",
+        "normalizedName": "rogue"
+      }
+    },
+    "stationaryWeapons": {
+      "5cdeb229d7f00c000e7ce174": {
+        "id": "5cdeb229d7f00c000e7ce174",
+        "name": "5cdeb229d7f00c000e7ce174 Name",
+        "normalizedName": "nsv-utyos-127x108-heavy-machine-gun",
+        "shortName": "5cdeb229d7f00c000e7ce174 ShortName"
+      },
+      "5d52cc5ba4b9367408500062": {
+        "id": "5d52cc5ba4b9367408500062",
+        "name": "5d52cc5ba4b9367408500062 Name",
+        "normalizedName": "ags-30-30x29mm-automatic-grenade-launcher",
+        "shortName": "5d52cc5ba4b9367408500062 ShortName"
+      }
+    }
+  },
+  "translations": [
+    "$.data.maps.*.name",
+    "$.data.maps.*.description",
+    "$.data.maps.*.enemies[*]",
+    "$.data.maps.*.bosses[*].spawnLocations[*].name",
+    "$.data.maps.*.extracts[*].name",
+    "$.data.maps.*.hazards[*].name",
+    "$.data.maps.*.switches[*].name",
+    "$.data.maps.*.transits[*].description",
+    "$.data.maps.*.btrStops[*].name",
+    "$.data.mobs.*.name",
+    "$.data.mobs.*.health[*].bodyPart",
+    "$.data.lootContainers.*.name",
+    "$.data.stationaryWeapons.*.name",
+    "$.data.stationaryWeapons.*.shortName"
+  ]
+}

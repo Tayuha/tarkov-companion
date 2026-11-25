@@ -1,0 +1,93 @@
+{
+  "byteBudget": 2000000,
+  "capturedAt": "2026-11-25T18:22:15.457Z",
+  "files": {
+    "items.json": {
+      "bytes": 24365,
+      "dictionarySource": "https://json.tarkov.dev/pvp-season/items_en",
+      "entries": null,
+      "etag": "W/\"5823ca63da201dcd0ee6de992941628b\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Wed, 25 Nov 2026 18:21:18 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": 3,
+      "role": "dataset",
+      "sha256": "19535f0f24332962f2af7e5807a6956cba8428085b01da5d568d5fb6cd5e6d2d",
+      "source": "https://json.tarkov.dev/pvp-season/items",
+      "translations": 17,
+      "unresolvedPointers": [
+        "$.data.armorMaterial.*.name",
+        "$.data.fleaMarket.*.name",
+        "$.data.items.*.properties.armorSlots[*].armorType",
+        "$.data.items.*.properties.armorSlots[*].name",
+        "$.data.items.*.properties.armorSlots[*].zones[*]",
+        "$.data.items.*.properties.armorType",
+        "$.data.items.*.properties.content[*]",
+        "$.data.items.*.properties.stimEffects[*].type",
+        "$.data.items.*.properties.zones[*]"
+      ]
+    },
+    "items_en.json": {
+      "bytes": 1913,
+      "dictionarySource": "items.json",
+      "entries": 32,
+      "etag": "W/\"24b385a6657332e8df8b0b848dd96f94\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Tue, 24 Nov 2026 18:26:48 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": null,
+      "role": "dictionary",
+      "sha256": "6bb989244ce7cd46b8fe9b2cc262a2e281d3ecea22b035347d5b7eddf6edb6bf",
+      "source": "https://json.tarkov.dev/pvp-season/items_en",
+      "translations": 0,
+      "unresolvedPointers": []
+    },
+    "season.json": {
+      "bytes": 5843,
+      "dictionarySource": "https://json.tarkov.dev/pvp-season/season_en",
+      "entries": null,
+      "etag": "W/\"ca19aea48aec8184d55c84afbdd4881f\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Tue, 06 Oct 2026 15:00:32 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": 1,
+      "role": "dataset",
+      "sha256": "8ffd2f46da6a5dd12ece21bda8f616a555d08fbf9d8bf30eed9d3ed3ce0bb0ef",
+      "source": "https://json.tarkov.dev/pvp-season/season",
+      "translations": 3,
+      "unresolvedPointers": []
+    },
+    "season_en.json": {
+      "bytes": 2674,
+      "dictionarySource": "season.json",
+      "entries": 33,
+      "etag": "W/\"b7503c973c01545cecb9f7cfe8bbff5e\"",
+      "failedPointers": [],
+      "fetchedAt": "2026-11-25T18:22:15.457Z",
+      "lastModified": "Mon, 16 Nov 2026 19:00:07 GMT",
+      "missingKeys": [],
+      "points": null,
+      "records": null,
+      "role": "dictionary",
+      "sha256": "db590340cf0980f3a77837148155dec3c1dd7d68df5ffdce24abb40de46b035f",
+      "source": "https://json.tarkov.dev/pvp-season/season_en",
+      "translations": 0,
+      "unresolvedPointers": []
+    }
+  },
+  "fixtureSet": "pvp-season",
+  "generatedBy": "pipeline/src/scripts/capture-fixtures.ts",
+  "schemaVersion": 1,
+  "skipped": [],
+  "sourceBaseUrl": "https://json.tarkov.dev",
+  "totals": {
+    "bytes": 34795,
+    "files": 4
+  }
+}

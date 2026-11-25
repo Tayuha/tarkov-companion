@@ -61,6 +61,20 @@ describe("fetchDataset", () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it("exposes the unresolved payload, dictionary and pointers for fixture capture", async () => {
+    const { fetchImpl } = mockFetch((url) =>
+      jsonResponse(url.endsWith("_en") ? dictionary() : basePayload()),
+    );
+
+    const result = await fetchDataset({ mode: "regular", dataset: "traders", baseUrl: BASE, fetchImpl });
+
+    expect((result.rawData as Record<string, { name: string }>)[PRAPOR]?.name).toBe(
+      `${PRAPOR} Nickname`,
+    );
+    expect(result.dictionary[`${PRAPOR} Nickname`]).toBe("Prapor");
+    expect(result.translations).toEqual(["$.data.*.name", "$.data.*.description"]);
+  });
+
   it("retries a retryable status before succeeding", async () => {
     let attempts = 0;
     const { fetchImpl } = mockFetch((url) => {
