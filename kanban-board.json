@@ -401,6 +401,27 @@
       "createdAt": 1795630277636,
       "updatedAt": 1795631014762,
       "archived": false
+    },
+    {
+      "id": "task_impl_2_3",
+      "title": "T2.3 Zod schemas for upstream datasets",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: zod schemas for items, tasks, traders, hideout, crafts, barters, maps, status, season, price history and dictionaries; tolerant of unknown fields but failing on missing or retyped known fields; mutation tests per dataset; registry test that every fixture is validated; offline validate:fixtures CLI; task 2.3 checked.",
+      "sessionID": "ses_dec0a0ce5ffeaJuDXfHPDKkC0U",
+      "createdAt": 1795631224402,
+      "updatedAt": 1795631224402,
+      "archived": false
     }
   ]
 }
