@@ -1,18 +1,76 @@
-# Data bundles (draft)
+# Data bundles
 
-> Draft for OpenSpec task 2.5. Task 2.10 finalizes the published contract
-> (manifest fields, checksums, schema versions). This document defines the
-> normalized record shape the bundle writer will serialize.
+> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest).
+> Task 2.8 adds publication and task 2.10 finalizes the public contract. This
+> document already describes the exact bytes and manifest fields the writer
+> produces; treat changes here as a contract change.
 
 The pipeline turns each validated, localized upstream dataset into **JSONL**:
 one JSON object per line, one record kind per line. The app ingests the records
 into its own SQLite schema; it never interprets raw `json.tarkov.dev` payloads.
 
+## Bundle layout
+
+```
+dist/bundles/
+  regular/
+    manifest.json
+    barters.jsonl.zst
+    crafts.jsonl.zst
+    hideout.jsonl.zst
+    items.jsonl.zst
+    maps.jsonl.zst
+    tasks.jsonl.zst
+    traders.jsonl.zst
+  pve/
+    manifest.json
+    items.jsonl.zst
+  pvp-season/
+    manifest.json
+    items.jsonl.zst
+```
+
+- One directory per game mode. A client fetches only the mode it needs.
+- `manifest.json` `path` values are file names relative to the manifest's own
+  directory (`items.jsonl.zst`), so the client concatenates its bundle base URL
+  with the path.
+- The design sketch in `design.md` (D2) showed one root `manifest.json` plus
+  `bundles/<mode>/…`. The writer keeps a manifest **inside each mode directory**
+  instead: the mode is part of the bundle identity, and a client downloads a
+  single self-describing document for its active mode. Publication maps this
+  layout to release assets under `bundles/<mode>/`.
+- `pvp-season/season` has a fixture and an upstream schema but no normalizer, so
+  it is not part of a bundle yet. Only datasets in `pipeline/src/normalize/`
+  can appear in a bundle.
+- Files are written through a temporary file plus rename; the manifest is
+  written last, so a reader never sees a manifest pointing at a half-written
+  dataset. Stale `*.jsonl.zst` files from an earlier build in the same mode
+  directory are removed.
+
+## Compression
+
+The writer uses **zstd** from Node's built-in `node:zlib` (`zstdCompressSync`),
+so there is no native or WASM dependency and no build step. This requires
+**Node 24 or newer**; `pipeline/package.json` declares `"engines": { "node":
+">=24" }`.
+
+| Setting | Value | Why |
+|---|---|---|
+| Compression level | `3` | Matches the measured budget (items + maps + tasks ≈ 1.98 MB) and keeps decompression cheap on low-end devices. |
+| Worker threads | `0` (single-threaded) | Multi-threaded frames depend on job splitting; single-thread output is stable. |
+| Frame checksum | off | The manifest carries a SHA-256 over the whole compressed frame. |
+| Frame magic | `28 b5 2f fd` | Standard zstd frame; any zstd decoder can read it. |
+
+Each dataset file is the zstd frame of the exact UTF-8 JSONL bytes documented
+below (sorted records, canonical keys, one trailing newline). The manifest
+`sha256` is computed over the **compressed** frame, exactly the bytes a client
+downloads; `uncompressedBytes` describes the JSONL payload.
+
 ## File rules
 
-- One dataset per file: `<mode>/<dataset>.jsonl` (`regular`, `pve`,
-  `pvp-season`). Datasets: `items`, `tasks`, `traders`, `hideout`, `crafts`,
-  `barters`, `maps`.
+- One dataset per file: `<mode>/<dataset>.jsonl.zst`, holding the JSONL below
+  inside a zstd frame. Modes: `regular`, `pve`, `pvp-season`. Datasets:
+  `items`, `tasks`, `traders`, `hideout`, `crafts`, `barters`, `maps`.
 - Every line is a JSON object with a `kind` discriminator and a non-empty
   string `id`. `kind` + `id` is unique within a dataset.
 - Records are sorted by `kind`, then `id`, using UTF-16 code-unit order.
@@ -25,6 +83,105 @@ into its own SQLite schema; it never interprets raw `json.tarkov.dev` payloads.
 - Unknown upstream fields are dropped rather than passed through. The
   normalizer counts them per dataset (`droppedFields`, `droppedFieldPaths`) so
   a contract change is visible in the build log.
+
+## Manifest
+
+One `manifest.json` per mode, written as canonical JSON (object keys sorted
+recursively, no insignificant whitespace) with a single trailing newline.
+
+```json
+{
+  "bundleSchemaVersion": 1,
+  "datasets": [
+    {
+      "compressedBytes": 41622,
+      "dataset": "items",
+      "path": "items.jsonl.zst",
+      "records": 577,
+      "schemaVersion": 1,
+      "sha256": "bc330ec05ae34e3d1beb935c5913918ddca1890bb593fab5f1d758c01dbeaf8e",
+      "source": {
+        "etag": "W/\"3b74e92edb6baea8f6f4703e995ffaad\"",
+        "fetchedAt": "2026-11-25T18:22:15.457Z",
+        "lastModified": "Wed, 25 Nov 2026 18:20:24 GMT",
+        "url": "https://json.tarkov.dev/regular/items"
+      },
+      "uncompressedBytes": 281549
+    }
+  ],
+  "generatedAt": "2026-11-25T20:00:00.000Z",
+  "manifestVersion": 1,
+  "minAppSchemaVersion": 1,
+  "mode": "regular",
+  "skipped": [],
+  "source": {
+    "baseUrl": "https://json.tarkov.dev",
+    "capturedAt": "2026-11-25T18:22:15.457Z"
+  },
+  "totals": {
+    "compressedBytes": 133008,
+    "datasets": 7,
+    "records": 1064,
+    "uncompressedBytes": 890950
+  }
+}
+```
+
+The `datasets` array is abridged to one entry; `totals` describe the full
+regular fixture bundle (all seven datasets).
+
+| Field | Meaning |
+|---|---|
+| `manifestVersion` | Version of this manifest document (`1`). Bump for a shape change to the manifest itself. |
+| `bundleSchemaVersion` | Version of the bundle layout/contract as a whole (`1`). A client refuses a bundle whose value is newer than it supports. |
+| `minAppSchemaVersion` | Oldest app data-schema version that can ingest every dataset here; currently the maximum of the per-dataset `schemaVersion` values. A client whose supported data schema is lower must update the app instead of applying the bundle. A newer-than-supported `bundleSchemaVersion` is refused the same way. |
+| `mode` | `regular`, `pve`, or `pvp-season`. |
+| `generatedAt` | Wall-clock timestamp of this build. **Intentionally not reproducible**; it is the only manifest field that may differ between two builds of identical data. |
+| `source.baseUrl` | Upstream base URL the fixtures were captured from. |
+| `source.capturedAt` | When the upstream fixture set was captured (`fetchedAt` of the fixture manifest). |
+| `datasets[]` | Present datasets, sorted by `dataset`. |
+| `datasets[].dataset` | Dataset name, e.g. `items`. |
+| `datasets[].path` | File name relative to the manifest directory. |
+| `datasets[].schemaVersion` | Record schema version of that dataset (`1` today). Each dataset can be versioned independently. |
+| `datasets[].sha256` | Lowercase hex SHA-256 of the compressed `.jsonl.zst` file. |
+| `datasets[].compressedBytes` | Exact size of the file on disk. |
+| `datasets[].uncompressedBytes` | Size of the JSONL payload before compression. |
+| `datasets[].records` | Number of JSONL lines (one bundle record per line). |
+| `datasets[].source.url`, `.lastModified`, `.etag`, `.fetchedAt` | Upstream source timestamp(s) and validators recorded in the fixture manifest for this dataset; `null` when unavailable. |
+| `totals` | Sums across `datasets[]`; `records` is the sum of per-dataset line counts. |
+| `skipped[]` | Datasets not written in this build, sorted by `dataset`, each with `reason: "not-supplied"`. No file exists for them; a client must keep its existing rows. |
+
+## Missing and empty datasets
+
+- **Missing** (the caller supplied no records for a dataset): the writer skips
+  it, writes no file, and lists it under `skipped` with reason `not-supplied`.
+  This is normal for the trimmed `pve` and `pvp-season` fixture sets, which only
+  carry the three item markers.
+- **Empty** (a dataset is explicitly supplied with zero records): the build
+  **fails**. Publishing an empty JSONL file would make the client delete all
+  rows for that dataset, and upstream emptiness is far more likely a bug than
+  truth. Callers that really mean "empty" must omit the dataset instead.
+- A mode with no datasets at all still yields a valid manifest with `totals`
+  zeroed; the CLI refuses to build such a mode because it almost certainly
+  means fixture discovery failed.
+
+## Determinism guarantees
+
+Given the same normalized records and the same zstd compressor version:
+
+- Dataset files are byte-identical, so their SHA-256 checksums are identical.
+- Record order in the caller's array does not matter: the writer sorts by
+  `kind` then `id` before serializing, exactly as the normalizer does.
+- Manifest datasets and `skipped` entries are sorted; manifest keys are
+  canonical; the newline ending is fixed.
+- With the same `generatedAt`, the whole manifest is byte-identical. The CLI
+  uses the wall clock, so two real builds differ only in `generatedAt`.
+- Stale dataset files are removed from the mode directory, so a rebuild cannot
+  leave an unreferenced artifact behind.
+
+`npm test` proves this offline by building the regular fixture set twice,
+decompressing every file back to the committed normalized goldens, and
+comparing bytes and checksums.
 
 ## Field conventions
 
@@ -170,9 +327,39 @@ model. Every other dataset drops zero fields.
 cd pipeline
 npm run normalize -- --all                 # dist/normalized/<dataset>.jsonl
 npm run normalize -- --dataset items --out /tmp/normalized
-npm test                                   # golden + invariant suite
+
+npm run bundle                             # regular -> dist/bundles/regular/
+npm run bundle -- --mode pve               # one mode
+npm run bundle -- --all                    # every mode with fixtures
+npm run bundle -- --mode regular --out /tmp/bundles
+
+npm test                                   # golden, bundle and invariant suite
 ```
 
-The CLI localizes and validates each committed fixture offline, normalizes it,
-writes the JSONL, and prints per-kind counts, output bytes, dropped-field
-counts and fallbacks.
+`npm run normalize` localizes and validates each committed fixture offline,
+normalizes it, and writes the plain JSONL with per-kind counts, output bytes,
+dropped-field counts and fallbacks. `npm run bundle` runs the same load path and
+then writes the zstd files and manifest, printing records, uncompressed and
+compressed bytes, compression ratio, a checksum prefix, skipped datasets and
+the manifest path.
+
+To confirm determinism locally, build twice and compare the checksums:
+
+```bash
+cd pipeline
+npm run bundle -- --mode regular --out /tmp/bundle-a
+npm run bundle -- --mode regular --out /tmp/bundle-b
+jq -S '.datasets' /tmp/bundle-a/regular/manifest.json > /tmp/a.json
+jq -S '.datasets' /tmp/bundle-b/regular/manifest.json > /tmp/b.json
+diff /tmp/a.json /tmp/b.json
+```
+
+The `datasets` arrays must be identical (including every `sha256`); only
+`generatedAt` changes between runs.
+
+Tests cover the writer offline: the regular fixture set is rebuilt twice and
+must produce identical compressed bytes and checksums, every file is
+decompressed back to the committed normalized golden, the manifest is validated
+with Zod, records are counted, input order is reversed to prove order
+independence, and the `pve`/`pvp-season` marker bundles and the
+missing/empty-dataset rules are exercised.

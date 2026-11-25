@@ -20,9 +20,15 @@ Implemented so far:
   fixture-validation CLI.
 - Deterministic normalization from the localized upstream shape to bundle JSONL records, with a dataset
   registry, per-kind counts, dropped-field stats, and golden-file tests.
+- Deterministic bundle writing: per-dataset `.jsonl.zst` files plus a canonical `manifest.json` with
+  SHA-256 checksums, sizes, schema versions and upstream source timestamps, offline from the committed
+  fixtures.
 
-Not implemented yet: bundle writing (zstd + manifest + checksums) and publication. Those are tracked in
-`openspec/changes/bootstrap-tarkov-companion/tasks.md`.
+Not implemented yet: publishing bundles to GitHub Releases and the scheduled sync workflow. Those are
+tracked in `openspec/changes/bootstrap-tarkov-companion/tasks.md`.
+
+Bundle writing uses zstd from `node:zlib`, so the pipeline requires **Node 24 or newer** (declared in
+`engines`); no native module or WASM dependency is involved.
 
 ## Usage
 
@@ -34,6 +40,10 @@ npm run build
 npm run validate:fixtures   # offline: parse every committed fixture through its schema
 npm run normalize -- --all  # offline: write dist/normalized/<dataset>.jsonl
 npm run normalize -- --dataset items --out /tmp/normalized
+npm run bundle               # offline: write dist/bundles/regular/
+npm run bundle -- --mode pve
+npm run bundle -- --all      # every mode with fixtures
+npm run bundle -- --mode regular --out /tmp/bundles
 
 # Inspect a dataset with real data
 npm run fetch -- --dataset traders --sample 3
@@ -132,6 +142,53 @@ pipeline/src/normalize/
 
 The full contract is in [`../docs/data-bundles.md`](../docs/data-bundles.md). Goldens for every dataset
 live in `test/fixtures/normalized/` and are compared byte for byte by `npm test`.
+
+## Bundling
+
+```
+pipeline/src/bundle/
+  manifest.ts   version constants, Zod manifest schema, canonical serializer
+  zstd.ts       deterministic zstd wrapper (built-in node:zlib)
+  writer.ts     buildBundle() (no I/O) and writeBundle() (atomic files)
+  index.ts      public exports
+pipeline/src/fixtures/bundle-set.ts   fixtures -> normalized bundle input
+pipeline/src/cli/bundle.ts            npm run bundle
+```
+
+Output layout (relative to `--out`, default `dist/bundles`):
+
+```
+<out>/<mode>/manifest.json
+<out>/<mode>/<dataset>.jsonl.zst
+```
+
+**Compression.** zstd comes from Node's built-in `node:zlib` (`zstdCompressSync`): no native module, no
+WASM, no build step. The writer pins **level 3**, a single worker thread and no frame checksum, so the
+frame depends only on the input and the compressor version. Node 24+ is required (see `engines`).
+
+**Manifest.** Canonical JSON with sorted keys and a trailing newline. It carries `manifestVersion`,
+`bundleSchemaVersion`, `minAppSchemaVersion`, `mode`, `generatedAt`, per-mode source info and, per
+dataset: `dataset`, relative `path`, `schemaVersion`, `sha256` of the compressed file,
+`compressedBytes`, `uncompressedBytes`, `records`, and the upstream `source` (`url`, `lastModified`,
+`etag`, `fetchedAt`). Datasets the caller did not supply appear under `skipped` with reason
+`not-supplied`. `minAppSchemaVersion` is the oldest app data schema that can ingest every dataset; a
+client below it must update. Field-by-field detail: [`../docs/data-bundles.md`](../docs/data-bundles.md#manifest).
+
+**Determinism.** Records are sorted by `kind` then `id`, keys are canonical, and files are compressed
+with fixed parameters. The same input therefore yields byte-identical `.jsonl.zst` files and identical
+SHA-256 checksums, independent of the order of the caller's record arrays. `generatedAt` is the only
+non-deterministic manifest field; `npm test` rebuilds the regular fixture set twice and compares dataset
+bytes and checksums, not the timestamp.
+
+**Missing vs empty.** A dataset absent from the input is skipped and recorded under `skipped` (normal
+for the trimmed `pve`/`pvp-season` fixture sets, which only carry item markers). A dataset explicitly
+supplied with zero records **fails the build**, because an empty file would erase the client's rows.
+The writer removes stale `*.jsonl.zst` files from the mode directory and writes the manifest last, each
+through a temporary file plus rename.
+
+`npm run bundle -- --all` prints per-dataset records, uncompressed and compressed bytes, compression
+ratio and a checksum prefix, plus the manifest path.
+
 
 ## Localization contract
 

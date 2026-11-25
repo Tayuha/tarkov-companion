@@ -16,7 +16,7 @@
 - [x] 2.3 Define Zod schemas for each upstream dataset (items, tasks, traders, hideout, crafts, barters, maps) from the captured fixtures, verified by schema tests that accept recorded payloads and reject mutated payloads
 - [x] 2.4 Extend the upstream fetcher with ETag/Last-Modified conditional requests and per-dataset checksum caching, verified by unit tests for 200, 304, 429, and 500 responses
 - [x] 2.5 Implement normalization from the localized upstream shape to the bundle JSONL shape (stable keys, resolved references, price fields, objective types), verified by golden-file tests comparing normalized output for the fixtures
-- [ ] 2.6 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
+- [x] 2.6 Implement the bundle writer producing `manifest.json` and per-dataset `.jsonl.zst` files with SHA-256 checksums, sizes, schema versions, and source timestamps, verified by a test that rebuilds the same fixture twice and produces identical checksums
 - [ ] 2.7 Implement dataset version comparison so unchanged upstream content publishes nothing, verified by a test where the second run over identical input emits no bundle and exits successfully
 - [ ] 2.8 Implement bundle publication to GitHub Releases with an idempotent upload and a stable `latest` manifest pointer, verified by a dry-run mode test and one manual run against a test release
 - [ ] 2.9 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release

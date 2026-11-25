@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Normalizes json.tarkov.dev data into versioned bundles for the Tarkov Companion app",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -15,6 +15,7 @@
     "fetch": "tsx src/cli/fetch.ts",
     "fixtures": "tsx src/scripts/capture-fixtures.ts",
     "normalize": "tsx src/cli/normalize.ts",
+    "bundle": "tsx src/cli/bundle.ts",
     "validate:fixtures": "tsx src/cli/validate-fixtures.ts"
   },
   "devDependencies": {
