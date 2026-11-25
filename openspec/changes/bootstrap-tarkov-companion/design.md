@@ -197,7 +197,10 @@ justifies it.
 
 - Catalog query with filters: p95 under 50 ms on the reference machine.
 - First interactive frame with an existing dataset: under 1.5 s cold start.
-- Initial bundle download target: under 10 MB compressed for one game mode, including maps.
+- Initial bundle download target: under 10 MB compressed for one game mode, including maps. Measured
+  2026-11-25: raw items + maps + tasks total 27.7 MB, compressing to **1.98 MB at zstd -3** (items 1.17,
+  maps 0.60, tasks 0.21), so the budget has roughly 5x headroom. Ingest time remains unmeasured until the
+  client database exists.
 - Memory ceiling during ingestion: bounded streaming, no full-dataset JSON parse in memory.
 
 Row rendering is virtualized; images load lazily through a disk-backed cache with a fixed size budget.

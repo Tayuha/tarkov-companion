@@ -171,9 +171,9 @@
         "tag_data",
         "tag_planning"
       ],
-      "notes": "Throwaway script: fetch /regular/items + /regular/tasks, normalize to JSONL, compress with zstd, measure size and ingest time into SQLite. Success criteria: items bundle under 10 MB compressed and ingest under 10 s on a mid-range machine; document measured numbers in design.md.",
+      "notes": "Size half measured 2026-11-25: raw items+maps+tasks = 27.7 MB, zstd -3 = 1.98 MB (items 1.17, maps 0.60, tasks 0.21), so the 10 MB budget has ~5x headroom. Remaining: measure SQLite ingest time with the full localized dataset once the Flutter/drift layer exists; do not change the budget before then.",
       "createdAt": 1764082800000,
-      "updatedAt": 1795626664847,
+      "updatedAt": 1795631992415,
       "archived": false
     },
     {
@@ -421,6 +421,27 @@
       "sessionID": "ses_dec0a0ce5ffeaJuDXfHPDKkC0U",
       "createdAt": 1795631224402,
       "updatedAt": 1795631933222,
+      "archived": false
+    },
+    {
+      "id": "task_impl_2_4",
+      "title": "T2.4 Conditional fetch and dataset checksums",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: If-None-Match / If-Modified-Since per dataset and dictionary, explicit 304 outcome, SHA-256 content checksum with changed flag, file-backed cache store with in-memory test double, offline tests for 200/304/429/500, call sites updated, task 2.4 checked.",
+      "sessionID": "ses_debfe5fa6ffeS7SVlc0I6Q0KoX",
+      "createdAt": 1795631992415,
+      "updatedAt": 1795631992415,
       "archived": false
     }
   ]
