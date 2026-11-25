@@ -464,6 +464,27 @@
       "createdAt": 1795632452691,
       "updatedAt": 1795633340775,
       "archived": false
+    },
+    {
+      "id": "task_impl_2_6",
+      "title": "T2.6 Deterministic zstd bundle writer",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: per-mode manifest and .jsonl.zst datasets, fixed compression level, SHA-256 + compressed/uncompressed sizes + record counts + source timestamps, canonical manifest JSON, offline bundle CLI, two identical builds produce identical dataset bytes and checksums, task 2.6 checked.",
+      "sessionID": "ses_debe2f492ffearfEQWeOWDHkNU",
+      "createdAt": 1795633787042,
+      "updatedAt": 1795633787042,
+      "archived": false
     }
   ]
 }
