@@ -497,6 +497,576 @@ class DatasetStatesCompanion extends UpdateCompanion<DatasetState> {
   }
 }
 
+class $RemoteManifestsTable extends RemoteManifests
+    with TableInfo<$RemoteManifestsTable, RemoteManifestRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RemoteManifestsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _modeMeta = const VerificationMeta('mode');
+  @override
+  late final GeneratedColumn<String> mode = GeneratedColumn<String>(
+    'mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _etagMeta = const VerificationMeta('etag');
+  @override
+  late final GeneratedColumn<String> etag = GeneratedColumn<String>(
+    'etag',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<String> lastModified = GeneratedColumn<String>(
+    'lastModified',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manifestJsonMeta = const VerificationMeta(
+    'manifestJson',
+  );
+  @override
+  late final GeneratedColumn<String> manifestJson = GeneratedColumn<String>(
+    'manifestJson',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _manifestGeneratedAtMeta =
+      const VerificationMeta('manifestGeneratedAt');
+  @override
+  late final GeneratedColumn<String> manifestGeneratedAt =
+      GeneratedColumn<String>(
+        'manifestGeneratedAt',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _lastCheckedAtMeta = const VerificationMeta(
+    'lastCheckedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastCheckedAt =
+      GeneratedColumn<DateTime>(
+        'lastCheckedAt',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _lastChangedAtMeta = const VerificationMeta(
+    'lastChangedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastChangedAt =
+      GeneratedColumn<DateTime>(
+        'lastChangedAt',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _contentHashMeta = const VerificationMeta(
+    'contentHash',
+  );
+  @override
+  late final GeneratedColumn<String> contentHash = GeneratedColumn<String>(
+    'contentHash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    mode,
+    etag,
+    lastModified,
+    manifestJson,
+    manifestGeneratedAt,
+    lastCheckedAt,
+    lastChangedAt,
+    contentHash,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'remoteManifest';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RemoteManifestRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('mode')) {
+      context.handle(
+        _modeMeta,
+        mode.isAcceptableOrUnknown(data['mode']!, _modeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_modeMeta);
+    }
+    if (data.containsKey('etag')) {
+      context.handle(
+        _etagMeta,
+        etag.isAcceptableOrUnknown(data['etag']!, _etagMeta),
+      );
+    }
+    if (data.containsKey('lastModified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['lastModified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('manifestJson')) {
+      context.handle(
+        _manifestJsonMeta,
+        manifestJson.isAcceptableOrUnknown(
+          data['manifestJson']!,
+          _manifestJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_manifestJsonMeta);
+    }
+    if (data.containsKey('manifestGeneratedAt')) {
+      context.handle(
+        _manifestGeneratedAtMeta,
+        manifestGeneratedAt.isAcceptableOrUnknown(
+          data['manifestGeneratedAt']!,
+          _manifestGeneratedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lastCheckedAt')) {
+      context.handle(
+        _lastCheckedAtMeta,
+        lastCheckedAt.isAcceptableOrUnknown(
+          data['lastCheckedAt']!,
+          _lastCheckedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastCheckedAtMeta);
+    }
+    if (data.containsKey('lastChangedAt')) {
+      context.handle(
+        _lastChangedAtMeta,
+        lastChangedAt.isAcceptableOrUnknown(
+          data['lastChangedAt']!,
+          _lastChangedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contentHash')) {
+      context.handle(
+        _contentHashMeta,
+        contentHash.isAcceptableOrUnknown(
+          data['contentHash']!,
+          _contentHashMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_contentHashMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mode};
+  @override
+  RemoteManifestRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RemoteManifestRecord(
+      mode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mode'],
+      )!,
+      etag: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}etag'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lastModified'],
+      ),
+      manifestJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manifestJson'],
+      )!,
+      manifestGeneratedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manifestGeneratedAt'],
+      ),
+      lastCheckedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}lastCheckedAt'],
+      )!,
+      lastChangedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}lastChangedAt'],
+      ),
+      contentHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contentHash'],
+      )!,
+    );
+  }
+
+  @override
+  $RemoteManifestsTable createAlias(String alias) {
+    return $RemoteManifestsTable(attachedDatabase, alias);
+  }
+}
+
+class RemoteManifestRecord extends DataClass
+    implements Insertable<RemoteManifestRecord> {
+  /// Game mode: `regular`, `pve` or `pvp-season`.
+  final String mode;
+
+  /// HTTP `ETag` from the last successful fetch, when the response had one.
+  final String? etag;
+
+  /// HTTP `Last-Modified` from the last successful fetch, when present.
+  final String? lastModified;
+
+  /// The raw manifest document exactly as received (a UTF-8 JSON object).
+  final String manifestJson;
+
+  /// The manifest's `generatedAt`, verbatim, as a diagnostic.
+  final String? manifestGeneratedAt;
+
+  /// When this client last asked the server about this mode's manifest.
+  final DateTime lastCheckedAt;
+
+  /// When the manifest body last changed, or `null` before the first change.
+  final DateTime? lastChangedAt;
+
+  /// Lowercase hex SHA-256 of the raw manifest bytes.
+  final String contentHash;
+  const RemoteManifestRecord({
+    required this.mode,
+    this.etag,
+    this.lastModified,
+    required this.manifestJson,
+    this.manifestGeneratedAt,
+    required this.lastCheckedAt,
+    this.lastChangedAt,
+    required this.contentHash,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['mode'] = Variable<String>(mode);
+    if (!nullToAbsent || etag != null) {
+      map['etag'] = Variable<String>(etag);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['lastModified'] = Variable<String>(lastModified);
+    }
+    map['manifestJson'] = Variable<String>(manifestJson);
+    if (!nullToAbsent || manifestGeneratedAt != null) {
+      map['manifestGeneratedAt'] = Variable<String>(manifestGeneratedAt);
+    }
+    map['lastCheckedAt'] = Variable<DateTime>(lastCheckedAt);
+    if (!nullToAbsent || lastChangedAt != null) {
+      map['lastChangedAt'] = Variable<DateTime>(lastChangedAt);
+    }
+    map['contentHash'] = Variable<String>(contentHash);
+    return map;
+  }
+
+  RemoteManifestsCompanion toCompanion(bool nullToAbsent) {
+    return RemoteManifestsCompanion(
+      mode: Value(mode),
+      etag: etag == null && nullToAbsent ? const Value.absent() : Value(etag),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
+      manifestJson: Value(manifestJson),
+      manifestGeneratedAt: manifestGeneratedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manifestGeneratedAt),
+      lastCheckedAt: Value(lastCheckedAt),
+      lastChangedAt: lastChangedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastChangedAt),
+      contentHash: Value(contentHash),
+    );
+  }
+
+  factory RemoteManifestRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RemoteManifestRecord(
+      mode: serializer.fromJson<String>(json['mode']),
+      etag: serializer.fromJson<String?>(json['etag']),
+      lastModified: serializer.fromJson<String?>(json['lastModified']),
+      manifestJson: serializer.fromJson<String>(json['manifestJson']),
+      manifestGeneratedAt: serializer.fromJson<String?>(
+        json['manifestGeneratedAt'],
+      ),
+      lastCheckedAt: serializer.fromJson<DateTime>(json['lastCheckedAt']),
+      lastChangedAt: serializer.fromJson<DateTime?>(json['lastChangedAt']),
+      contentHash: serializer.fromJson<String>(json['contentHash']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'mode': serializer.toJson<String>(mode),
+      'etag': serializer.toJson<String?>(etag),
+      'lastModified': serializer.toJson<String?>(lastModified),
+      'manifestJson': serializer.toJson<String>(manifestJson),
+      'manifestGeneratedAt': serializer.toJson<String?>(manifestGeneratedAt),
+      'lastCheckedAt': serializer.toJson<DateTime>(lastCheckedAt),
+      'lastChangedAt': serializer.toJson<DateTime?>(lastChangedAt),
+      'contentHash': serializer.toJson<String>(contentHash),
+    };
+  }
+
+  RemoteManifestRecord copyWith({
+    String? mode,
+    Value<String?> etag = const Value.absent(),
+    Value<String?> lastModified = const Value.absent(),
+    String? manifestJson,
+    Value<String?> manifestGeneratedAt = const Value.absent(),
+    DateTime? lastCheckedAt,
+    Value<DateTime?> lastChangedAt = const Value.absent(),
+    String? contentHash,
+  }) => RemoteManifestRecord(
+    mode: mode ?? this.mode,
+    etag: etag.present ? etag.value : this.etag,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
+    manifestJson: manifestJson ?? this.manifestJson,
+    manifestGeneratedAt: manifestGeneratedAt.present
+        ? manifestGeneratedAt.value
+        : this.manifestGeneratedAt,
+    lastCheckedAt: lastCheckedAt ?? this.lastCheckedAt,
+    lastChangedAt: lastChangedAt.present
+        ? lastChangedAt.value
+        : this.lastChangedAt,
+    contentHash: contentHash ?? this.contentHash,
+  );
+  RemoteManifestRecord copyWithCompanion(RemoteManifestsCompanion data) {
+    return RemoteManifestRecord(
+      mode: data.mode.present ? data.mode.value : this.mode,
+      etag: data.etag.present ? data.etag.value : this.etag,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
+      manifestJson: data.manifestJson.present
+          ? data.manifestJson.value
+          : this.manifestJson,
+      manifestGeneratedAt: data.manifestGeneratedAt.present
+          ? data.manifestGeneratedAt.value
+          : this.manifestGeneratedAt,
+      lastCheckedAt: data.lastCheckedAt.present
+          ? data.lastCheckedAt.value
+          : this.lastCheckedAt,
+      lastChangedAt: data.lastChangedAt.present
+          ? data.lastChangedAt.value
+          : this.lastChangedAt,
+      contentHash: data.contentHash.present
+          ? data.contentHash.value
+          : this.contentHash,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RemoteManifestRecord(')
+          ..write('mode: $mode, ')
+          ..write('etag: $etag, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('manifestJson: $manifestJson, ')
+          ..write('manifestGeneratedAt: $manifestGeneratedAt, ')
+          ..write('lastCheckedAt: $lastCheckedAt, ')
+          ..write('lastChangedAt: $lastChangedAt, ')
+          ..write('contentHash: $contentHash')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    mode,
+    etag,
+    lastModified,
+    manifestJson,
+    manifestGeneratedAt,
+    lastCheckedAt,
+    lastChangedAt,
+    contentHash,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RemoteManifestRecord &&
+          other.mode == this.mode &&
+          other.etag == this.etag &&
+          other.lastModified == this.lastModified &&
+          other.manifestJson == this.manifestJson &&
+          other.manifestGeneratedAt == this.manifestGeneratedAt &&
+          other.lastCheckedAt == this.lastCheckedAt &&
+          other.lastChangedAt == this.lastChangedAt &&
+          other.contentHash == this.contentHash);
+}
+
+class RemoteManifestsCompanion extends UpdateCompanion<RemoteManifestRecord> {
+  final Value<String> mode;
+  final Value<String?> etag;
+  final Value<String?> lastModified;
+  final Value<String> manifestJson;
+  final Value<String?> manifestGeneratedAt;
+  final Value<DateTime> lastCheckedAt;
+  final Value<DateTime?> lastChangedAt;
+  final Value<String> contentHash;
+  final Value<int> rowid;
+  const RemoteManifestsCompanion({
+    this.mode = const Value.absent(),
+    this.etag = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.manifestJson = const Value.absent(),
+    this.manifestGeneratedAt = const Value.absent(),
+    this.lastCheckedAt = const Value.absent(),
+    this.lastChangedAt = const Value.absent(),
+    this.contentHash = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RemoteManifestsCompanion.insert({
+    required String mode,
+    this.etag = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    required String manifestJson,
+    this.manifestGeneratedAt = const Value.absent(),
+    required DateTime lastCheckedAt,
+    this.lastChangedAt = const Value.absent(),
+    required String contentHash,
+    this.rowid = const Value.absent(),
+  }) : mode = Value(mode),
+       manifestJson = Value(manifestJson),
+       lastCheckedAt = Value(lastCheckedAt),
+       contentHash = Value(contentHash);
+  static Insertable<RemoteManifestRecord> custom({
+    Expression<String>? mode,
+    Expression<String>? etag,
+    Expression<String>? lastModified,
+    Expression<String>? manifestJson,
+    Expression<String>? manifestGeneratedAt,
+    Expression<DateTime>? lastCheckedAt,
+    Expression<DateTime>? lastChangedAt,
+    Expression<String>? contentHash,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (mode != null) 'mode': mode,
+      if (etag != null) 'etag': etag,
+      if (lastModified != null) 'lastModified': lastModified,
+      if (manifestJson != null) 'manifestJson': manifestJson,
+      if (manifestGeneratedAt != null)
+        'manifestGeneratedAt': manifestGeneratedAt,
+      if (lastCheckedAt != null) 'lastCheckedAt': lastCheckedAt,
+      if (lastChangedAt != null) 'lastChangedAt': lastChangedAt,
+      if (contentHash != null) 'contentHash': contentHash,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RemoteManifestsCompanion copyWith({
+    Value<String>? mode,
+    Value<String?>? etag,
+    Value<String?>? lastModified,
+    Value<String>? manifestJson,
+    Value<String?>? manifestGeneratedAt,
+    Value<DateTime>? lastCheckedAt,
+    Value<DateTime?>? lastChangedAt,
+    Value<String>? contentHash,
+    Value<int>? rowid,
+  }) {
+    return RemoteManifestsCompanion(
+      mode: mode ?? this.mode,
+      etag: etag ?? this.etag,
+      lastModified: lastModified ?? this.lastModified,
+      manifestJson: manifestJson ?? this.manifestJson,
+      manifestGeneratedAt: manifestGeneratedAt ?? this.manifestGeneratedAt,
+      lastCheckedAt: lastCheckedAt ?? this.lastCheckedAt,
+      lastChangedAt: lastChangedAt ?? this.lastChangedAt,
+      contentHash: contentHash ?? this.contentHash,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (mode.present) {
+      map['mode'] = Variable<String>(mode.value);
+    }
+    if (etag.present) {
+      map['etag'] = Variable<String>(etag.value);
+    }
+    if (lastModified.present) {
+      map['lastModified'] = Variable<String>(lastModified.value);
+    }
+    if (manifestJson.present) {
+      map['manifestJson'] = Variable<String>(manifestJson.value);
+    }
+    if (manifestGeneratedAt.present) {
+      map['manifestGeneratedAt'] = Variable<String>(manifestGeneratedAt.value);
+    }
+    if (lastCheckedAt.present) {
+      map['lastCheckedAt'] = Variable<DateTime>(lastCheckedAt.value);
+    }
+    if (lastChangedAt.present) {
+      map['lastChangedAt'] = Variable<DateTime>(lastChangedAt.value);
+    }
+    if (contentHash.present) {
+      map['contentHash'] = Variable<String>(contentHash.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RemoteManifestsCompanion(')
+          ..write('mode: $mode, ')
+          ..write('etag: $etag, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('manifestJson: $manifestJson, ')
+          ..write('manifestGeneratedAt: $manifestGeneratedAt, ')
+          ..write('lastCheckedAt: $lastCheckedAt, ')
+          ..write('lastChangedAt: $lastChangedAt, ')
+          ..write('contentHash: $contentHash, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -5318,6 +5888,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DatasetStatesTable datasetStates = $DatasetStatesTable(this);
+  late final $RemoteManifestsTable remoteManifests = $RemoteManifestsTable(
+    this,
+  );
   late final $ItemsTable items = $ItemsTable(this);
   late final $TasksTable tasks = $TasksTable(this);
   late final $TaskObjectivesTable taskObjectives = $TaskObjectivesTable(this);
@@ -5396,6 +5969,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     datasetStates,
+    remoteManifests,
     items,
     tasks,
     taskObjectives,
@@ -5699,6 +6273,296 @@ typedef $$DatasetStatesTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $DatasetStatesTable, DatasetState>,
       ),
       DatasetState,
+      PrefetchHooks Function()
+    >;
+typedef $$RemoteManifestsTableCreateCompanionBuilder =
+    RemoteManifestsCompanion Function({
+      required String mode,
+      Value<String?> etag,
+      Value<String?> lastModified,
+      required String manifestJson,
+      Value<String?> manifestGeneratedAt,
+      required DateTime lastCheckedAt,
+      Value<DateTime?> lastChangedAt,
+      required String contentHash,
+      Value<int> rowid,
+    });
+typedef $$RemoteManifestsTableUpdateCompanionBuilder =
+    RemoteManifestsCompanion Function({
+      Value<String> mode,
+      Value<String?> etag,
+      Value<String?> lastModified,
+      Value<String> manifestJson,
+      Value<String?> manifestGeneratedAt,
+      Value<DateTime> lastCheckedAt,
+      Value<DateTime?> lastChangedAt,
+      Value<String> contentHash,
+      Value<int> rowid,
+    });
+
+class $$RemoteManifestsTableFilterComposer
+    extends Composer<_$AppDatabase, $RemoteManifestsTable> {
+  $$RemoteManifestsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get etag => $composableBuilder(
+    column: $table.etag,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manifestGeneratedAt => $composableBuilder(
+    column: $table.manifestGeneratedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastCheckedAt => $composableBuilder(
+    column: $table.lastCheckedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastChangedAt => $composableBuilder(
+    column: $table.lastChangedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RemoteManifestsTableOrderingComposer
+    extends Composer<_$AppDatabase, $RemoteManifestsTable> {
+  $$RemoteManifestsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get etag => $composableBuilder(
+    column: $table.etag,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manifestGeneratedAt => $composableBuilder(
+    column: $table.manifestGeneratedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastCheckedAt => $composableBuilder(
+    column: $table.lastCheckedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastChangedAt => $composableBuilder(
+    column: $table.lastChangedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RemoteManifestsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RemoteManifestsTable> {
+  $$RemoteManifestsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<String> get etag =>
+      $composableBuilder(column: $table.etag, builder: (column) => column);
+
+  GeneratedColumn<String> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get manifestGeneratedAt => $composableBuilder(
+    column: $table.manifestGeneratedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastCheckedAt => $composableBuilder(
+    column: $table.lastCheckedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastChangedAt => $composableBuilder(
+    column: $table.lastChangedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
+    builder: (column) => column,
+  );
+}
+
+class $$RemoteManifestsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RemoteManifestsTable,
+          RemoteManifestRecord,
+          $$RemoteManifestsTableFilterComposer,
+          $$RemoteManifestsTableOrderingComposer,
+          $$RemoteManifestsTableAnnotationComposer,
+          $$RemoteManifestsTableCreateCompanionBuilder,
+          $$RemoteManifestsTableUpdateCompanionBuilder,
+          (
+            RemoteManifestRecord,
+            BaseReferences<
+              _$AppDatabase,
+              $RemoteManifestsTable,
+              RemoteManifestRecord
+            >,
+          ),
+          RemoteManifestRecord,
+          PrefetchHooks Function()
+        > {
+  $$RemoteManifestsTableTableManager(
+    _$AppDatabase db,
+    $RemoteManifestsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RemoteManifestsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RemoteManifestsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RemoteManifestsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> mode = const Value.absent(),
+                Value<String?> etag = const Value.absent(),
+                Value<String?> lastModified = const Value.absent(),
+                Value<String> manifestJson = const Value.absent(),
+                Value<String?> manifestGeneratedAt = const Value.absent(),
+                Value<DateTime> lastCheckedAt = const Value.absent(),
+                Value<DateTime?> lastChangedAt = const Value.absent(),
+                Value<String> contentHash = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RemoteManifestsCompanion(
+                mode: mode,
+                etag: etag,
+                lastModified: lastModified,
+                manifestJson: manifestJson,
+                manifestGeneratedAt: manifestGeneratedAt,
+                lastCheckedAt: lastCheckedAt,
+                lastChangedAt: lastChangedAt,
+                contentHash: contentHash,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String mode,
+                Value<String?> etag = const Value.absent(),
+                Value<String?> lastModified = const Value.absent(),
+                required String manifestJson,
+                Value<String?> manifestGeneratedAt = const Value.absent(),
+                required DateTime lastCheckedAt,
+                Value<DateTime?> lastChangedAt = const Value.absent(),
+                required String contentHash,
+                Value<int> rowid = const Value.absent(),
+              }) => RemoteManifestsCompanion.insert(
+                mode: mode,
+                etag: etag,
+                lastModified: lastModified,
+                manifestJson: manifestJson,
+                manifestGeneratedAt: manifestGeneratedAt,
+                lastCheckedAt: lastCheckedAt,
+                lastChangedAt: lastChangedAt,
+                contentHash: contentHash,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RemoteManifestsTable, RemoteManifestRecord>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $RemoteManifestsTable,
+                    RemoteManifestRecord
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RemoteManifestsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RemoteManifestsTable,
+      RemoteManifestRecord,
+      $$RemoteManifestsTableFilterComposer,
+      $$RemoteManifestsTableOrderingComposer,
+      $$RemoteManifestsTableAnnotationComposer,
+      $$RemoteManifestsTableCreateCompanionBuilder,
+      $$RemoteManifestsTableUpdateCompanionBuilder,
+      (
+        RemoteManifestRecord,
+        BaseReferences<
+          _$AppDatabase,
+          $RemoteManifestsTable,
+          RemoteManifestRecord
+        >,
+      ),
+      RemoteManifestRecord,
       PrefetchHooks Function()
     >;
 typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
@@ -9038,6 +9902,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$DatasetStatesTableTableManager get datasetStates =>
       $$DatasetStatesTableTableManager(_db, _db.datasetStates);
+  $$RemoteManifestsTableTableManager get remoteManifests =>
+      $$RemoteManifestsTableTableManager(_db, _db.remoteManifests);
   $$ItemsTableTableManager get items =>
       $$ItemsTableTableManager(_db, _db.items);
   $$TasksTableTableManager get tasks =>

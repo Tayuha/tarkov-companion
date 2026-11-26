@@ -1,4 +1,4 @@
--- AppDatabase schema snapshot (schemaVersion 1).
+-- AppDatabase schema snapshot (schemaVersion 2).
 -- Regenerate: (cd app/packages/data && UPDATE_GOLDENS=1 dart test)
 -- FTS5 shadow tables (items_fts_data, _idx, _docsize,
 -- _config) are omitted; items_fts and its triggers are part
@@ -88,6 +88,9 @@ CREATE TABLE "profiles" ("id" TEXT NOT NULL, "gameMode" TEXT NOT NULL UNIQUE, "p
 
 table questProgress
 CREATE TABLE "questProgress" ("profileId" TEXT NOT NULL REFERENCES profiles (id) ON DELETE CASCADE, "questId" TEXT NOT NULL, "state" TEXT NOT NULL, "updatedAt" INTEGER NOT NULL, PRIMARY KEY ("profileId", "questId"));
+
+table remoteManifest
+CREATE TABLE "remoteManifest" ("mode" TEXT NOT NULL, "etag" TEXT NULL, "lastModified" TEXT NULL, "manifestJson" TEXT NOT NULL, "manifestGeneratedAt" TEXT NULL, "lastCheckedAt" INTEGER NOT NULL, "lastChangedAt" INTEGER NULL, "contentHash" TEXT NOT NULL, PRIMARY KEY ("mode"));
 
 table taskObjectives
 CREATE TABLE "taskObjectives" ("id" TEXT NOT NULL, "taskId" TEXT NOT NULL REFERENCES tasks (id) ON DELETE CASCADE, "type" TEXT NOT NULL, "description" TEXT NOT NULL DEFAULT '', "count" INTEGER NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));

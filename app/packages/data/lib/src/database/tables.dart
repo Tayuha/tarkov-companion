@@ -59,6 +59,53 @@ class DatasetStates extends Table {
   Set<Column<Object>> get primaryKey => {mode, dataset};
 }
 
+/// The last manifest seen for each game mode, used by the sync layer.
+///
+/// This is client-owned bookkeeping, like [DatasetStates], not ingested game
+/// data. It keeps the raw manifest body exactly as received so a `304 Not
+/// Modified` can return the cached document without a second request, plus the
+/// validators needed for the next conditional request (`ETag` and
+/// `Last-Modified`).
+///
+/// [contentHash] is the SHA-256 of the raw manifest bytes. It is what decides
+/// whether the document actually changed: a `200` with the same body but a new
+/// `ETag` updates the validators and [lastCheckedAt] without moving
+/// [lastChangedAt].
+@DataClassName('RemoteManifestRecord')
+class RemoteManifests extends Table {
+  @override
+  String get tableName => 'remoteManifest';
+
+  /// Game mode: `regular`, `pve` or `pvp-season`.
+  TextColumn get mode => text().named('mode')();
+
+  /// HTTP `ETag` from the last successful fetch, when the response had one.
+  TextColumn get etag => text().named('etag').nullable()();
+
+  /// HTTP `Last-Modified` from the last successful fetch, when present.
+  TextColumn get lastModified => text().named('lastModified').nullable()();
+
+  /// The raw manifest document exactly as received (a UTF-8 JSON object).
+  TextColumn get manifestJson => text().named('manifestJson')();
+
+  /// The manifest's `generatedAt`, verbatim, as a diagnostic.
+  TextColumn get manifestGeneratedAt =>
+      text().named('manifestGeneratedAt').nullable()();
+
+  /// When this client last asked the server about this mode's manifest.
+  DateTimeColumn get lastCheckedAt => dateTime().named('lastCheckedAt')();
+
+  /// When the manifest body last changed, or `null` before the first change.
+  DateTimeColumn get lastChangedAt =>
+      dateTime().named('lastChangedAt').nullable()();
+
+  /// Lowercase hex SHA-256 of the raw manifest bytes.
+  TextColumn get contentHash => text().named('contentHash')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {mode};
+}
+
 /// Catalog items, one row per `item` record.
 ///
 /// The item table is the only game-data table that the catalog queries

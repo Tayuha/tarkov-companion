@@ -36,7 +36,9 @@ AppDatabase _openFailingV2(String path) =>
     AppDatabase.atPath(path, targetSchemaVersion: 2, upgrade: _failingUpgrade);
 
 Future<void> _seedV1(String path, {String itemName = 'Colt M4A1'}) async {
-  final db = AppDatabase.atPath(path);
+  // The runner tests need a real v1 file, while the shipped factory now opens
+  // at v2; pin the version explicitly so these tests keep exercising v1 -> v2.
+  final db = AppDatabase.atPath(path, targetSchemaVersion: 1);
   await insertItem(db, id: 'item-m4a1', name: itemName);
   await insertProfile(db, now: DateTime.utc(2026, 11, 26, 12));
   await db
@@ -266,10 +268,10 @@ void main() {
       addTearDown(result.close);
 
       expect(result.fromVersion, 0);
-      expect(result.toVersion, 1);
+      expect(result.toVersion, 2);
       expect(result.backup, isNull);
       expect(backupDirectoryFor(path).existsSync(), isFalse);
-      expect(await readPragma(result.database, 'PRAGMA user_version'), 1);
+      expect(await readPragma(result.database, 'PRAGMA user_version'), 2);
     });
 
     test(

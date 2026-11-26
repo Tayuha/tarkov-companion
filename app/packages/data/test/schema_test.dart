@@ -11,6 +11,8 @@ import 'support/database_helpers.dart';
 const expectedTables = <String>{
   // Game data.
   'datasetState',
+  // Sync cache.
+  'remoteManifest',
   'items',
   'tasks',
   'taskObjectives',
@@ -121,7 +123,7 @@ void main() {
     test(
       'records the schema version and enables the expected pragmas',
       () async {
-        expect(await readPragma(db, 'PRAGMA user_version'), 1);
+        expect(await readPragma(db, 'PRAGMA user_version'), 2);
         expect(await readPragma(db, 'PRAGMA foreign_keys'), 1);
         expect(await readPragma(db, 'PRAGMA synchronous'), 1); // NORMAL
       },

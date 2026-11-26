@@ -151,10 +151,19 @@ The versions the client implements live in `BundleContract`:
 - `isCurrent` and `clearMode` support the “download only changed datasets” and future full-refresh
   flows.
 
-Manifest download, SHA-256 verification, zstd decompression and ingestion are task 4.x; this layer
-deliberately performs no I/O and no network access. The tests parse
-`packages/data/test/fixtures/manifest-regular.json`, a real `data-regular-latest` manifest trimmed to
-`items` and `tasks` (provenance in `packages/data/test/fixtures/README.md`), without fetching anything.
+Manifest fetching (task 4.1) is implemented in `src/sync/`:
+`ManifestFetcher` sends the stable per-mode URL with `If-None-Match` /
+`If-Modified-Since`, and `ManifestRepository` caches the raw document in
+`remoteManifest` with the last-check and last-change times. A `304` returns the
+cached manifest and downloads nothing. The flow, cache fields, result states and
+typed failures are documented in [`docs/client-sync.md`](../docs/client-sync.md).
+SHA-256 verification, zstd decompression and dataset ingestion remain task 4.2+.
+
+The remaining manifest work is pure data: the parser and compatibility check
+perform no I/O. The tests parse
+`packages/data/test/fixtures/manifest-regular.json`, a real
+`data-regular-latest` manifest trimmed to `items` and `tasks` (provenance in
+`packages/data/test/fixtures/README.md`), without fetching anything.
 
 Regenerate the drift code after changing a table (the generated file is committed; CI does not run
 codegen):

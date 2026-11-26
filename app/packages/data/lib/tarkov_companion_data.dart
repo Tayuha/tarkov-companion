@@ -26,3 +26,5 @@ export 'src/net/host_allowlist.dart';
 export 'src/net/http_errors.dart';
 export 'src/settings/app_settings.dart';
 export 'src/settings/settings_repository.dart';
+export 'src/sync/manifest_fetcher.dart';
+export 'src/sync/manifest_repository.dart';

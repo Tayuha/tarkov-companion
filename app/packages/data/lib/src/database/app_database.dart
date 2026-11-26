@@ -44,6 +44,7 @@ typedef DatabaseUpgrade = Future<void> Function(
   tables: [
     // Game data.
     DatasetStates,
+    RemoteManifests,
     Items,
     Tasks,
     TaskObjectives,
@@ -64,11 +65,14 @@ class AppDatabase extends _$AppDatabase {
   /// [targetSchemaVersion] defaults to the shipped schema. Tests (and a future
   /// release before it is generated) pass a higher version together with the
   /// [upgrade] step from the previous version.
-  AppDatabase(super.e, {this.targetSchemaVersion = 1, this.upgrade});
+  ///
+  /// When [upgrade] is `null`, the built-in forward migrations declared in
+  /// [_builtInUpgrade] run. Version 2 adds `remoteManifest` only.
+  AppDatabase(super.e, {this.targetSchemaVersion = 2, this.upgrade});
 
   /// An in-memory database, for tests and short-lived tools.
   factory AppDatabase.memory({
-    int targetSchemaVersion = 1,
+    int targetSchemaVersion = 2,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inMemory(),
@@ -79,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database at [path]; parent directories are created.
   factory AppDatabase.atPath(
     String path, {
-    int targetSchemaVersion = 1,
+    int targetSchemaVersion = 2,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.atPath(path),
@@ -90,7 +94,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database whose I/O runs on a background isolate.
   factory AppDatabase.inBackground(
     String path, {
-    int targetSchemaVersion = 1,
+    int targetSchemaVersion = 2,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inBackground(path),
@@ -115,16 +119,17 @@ class AppDatabase extends _$AppDatabase {
     // Version 1 is the initial schema: every table and index from
     // `tables.dart`, plus the FTS5 index and its triggers.
     //
+    // Version 2 adds `remoteManifest` and nothing else; v1 data is untouched.
     // Future versions add a `DatabaseUpgrade` callback from the constructor
-    // (or a fixed step table) while bumping `schemaVersion`. The runner in
-    // `migration_runner.dart` decides when an upgrade may run: it only does so
-    // after a verified backup exists.
+    // (or a step in `_builtInUpgrade`) while bumping `schemaVersion`. The
+    // runner in `migration_runner.dart` decides when an upgrade may run: it
+    // only does so after a verified backup exists.
     onCreate: (migrator) async {
       await migrator.createAll();
       await _createItemSearchSchema();
     },
     onUpgrade: (migrator, from, to) async {
-      final upgradeStep = upgrade;
+      final upgradeStep = upgrade ?? _builtInUpgrade(from, to);
       if (upgradeStep == null) {
         throw StateError(
           'No upgrade path from schema version $from to $to. '
@@ -156,5 +161,22 @@ class AppDatabase extends _$AppDatabase {
     for (final statement in itemSearchSchema) {
       await customStatement(statement);
     }
+  }
+
+  /// The forward migration for `from -> to`, or `null` when there is none.
+  DatabaseUpgrade? _builtInUpgrade(int from, int to) {
+    if (from == 1 && to == 2) {
+      return _upgradeV1ToV2;
+    }
+    return null;
+  }
+
+  /// Version 2: add the sync layer's `remoteManifest` cache.
+  ///
+  /// `migrator.createTable` reads the current table definition, so it always
+  /// produces exactly the v2 shape. No existing table, index or trigger is
+  /// altered, and no row is rewritten.
+  Future<void> _upgradeV1ToV2(Migrator migrator, int from, int to) async {
+    await migrator.createTable(remoteManifests);
   }
 }

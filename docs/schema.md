@@ -4,7 +4,7 @@ The app keeps everything it knows in one local SQLite database. There is no
 server: game data arrives as bundles (`docs/data-bundles.md`), player progress is
 created by the user and never leaves the device. The schema lives in
 `app/packages/data/lib/src/database/` and is versioned by
-`AppDatabase.schemaVersion` (currently **1**).
+`AppDatabase.schemaVersion` (currently **2**).
 
 - Tables: `lib/src/database/tables.dart` (drift table classes)
 - Search schema: `lib/src/database/fts.dart`
@@ -18,6 +18,7 @@ Design D4 splits the file in two halves that are written by different owners.
 | Half | Tables | Written by | Replacement |
 |---|---|---|---|
 | Game data | `datasetState`, `items`, `tasks`, `taskObjectives`, `traders`, `hideoutStations`, `crafts`, `barters`, `maps`, `priceHistory` | Bundle ingestion (task 4.x); `priceHistory` by the on-demand history cache | Whole-dataset `DELETE` + insert inside one transaction |
+| Sync cache | `remoteManifest` | `ManifestRepository` (task 4.1) | One row per mode, replaced on a changed manifest |
 | Player data | `profiles`, `questProgress`, `objectiveProgress`, `appSettings` | The user, through the app | Never touched by a dataset refresh |
 
 Game-data tables are keyed by upstream identifiers, keep the complete JSONL
@@ -76,6 +77,13 @@ Setting `journal_mode` needs a writable database. The read-only recovery handle
 (`RecoveryDatabase`) opens the file with a different SQLite connection and does
 not run this `beforeOpen`, otherwise SQLite refuses the pragma on a read-only
 file.
+
+## Schema history
+
+| Version | Change |
+|---|---|
+| 1 | Initial game-data, player-data and FTS5 schema. |
+| 2 | Adds `remoteManifest` for conditional manifest fetching (task 4.1). Existing tables, indexes, triggers and rows are untouched; the upgrade runs inside one transaction after a pre-migration backup. |
 
 ## Migrations, backups and recovery
 
