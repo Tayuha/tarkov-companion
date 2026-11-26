@@ -6,9 +6,11 @@
 An open-source, local-first companion app for **Escape from Tarkov**: browse every item, follow the
 flea market, and track quest progress — on your machine, offline, without an account.
 
-> **Status: planning.** The architecture and specifications live in
-> [`openspec/changes/bootstrap-tarkov-companion/`](openspec/changes/bootstrap-tarkov-companion/).
-> The application code is not written yet.
+> **Status: early Linux preview.** The data pipeline is live and the Linux client implements first-run
+> sync, the item catalog and item detail, the quest list and interactive quest detail, profiles, and
+> AppImage packaging. The Linux approval gate and the remaining backlog are tracked in
+> [`HANDOFF.md`](HANDOFF.md) and `kanban-board.json`. Windows and mobile are deferred until the Linux
+> build is approved.
 
 ## Why
 
