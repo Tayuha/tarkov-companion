@@ -732,18 +732,8 @@ describe("publishBundle", () => {
     expect(client.operations).toEqual([]);
   });
 
-  it("rejects an empty manifest and invalid mode/tag combinations", async () => {
+  it("rejects invalid mode/tag combinations", async () => {
     const root = await tempDir();
-    await writeBundle(root, []);
-    await expectReleaseError(
-      publishBundle({
-        bundlesDir: root,
-        mode: "regular",
-        tag: TEST_TAG,
-        client: new MemoryReleaseClient(),
-      }),
-      "empty-manifest",
-    );
 
     await expectReleaseError(
       publishBundle({

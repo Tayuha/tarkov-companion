@@ -10,6 +10,7 @@ import {
   DEFAULT_MAX_MISSING_KEYS,
   compressZstd,
   gateBundle,
+  BUNDLE_DATASETS,
   manifestSchema,
   type BundleManifest,
   type DatasetLocalizationMetrics,
@@ -73,12 +74,16 @@ function firstEntry(manifest: BundleManifest): BundleManifest["datasets"][number
 async function manifestWithSizes(sizes: readonly number[]): Promise<BundleManifest> {
   const loaded = await loadBundle(FIXTURE_DIR);
   const template = firstEntry(loaded.manifest);
-  const datasets = sizes.map((compressedBytes, index) => ({
-    ...template,
-    dataset: `synthetic-${String(index)}`,
-    path: `synthetic-${String(index)}.jsonl.zst`,
-    compressedBytes,
-  }));
+  const datasets = sizes.map((compressedBytes, index) => {
+    const name = BUNDLE_DATASETS[index];
+    if (name === undefined) throw new Error("too many synthetic datasets");
+    return {
+      ...template,
+      dataset: name,
+      path: `${name}.jsonl.zst`,
+      compressedBytes,
+    };
+  });
 
   return manifestSchema.parse({
     ...loaded.manifest,
