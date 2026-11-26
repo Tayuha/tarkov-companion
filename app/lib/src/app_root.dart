@@ -5,6 +5,7 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import 'app_session.dart';
+import 'home_shell.dart';
 
 /// Opens a session. Injected so widget tests can start from a fake session.
 typedef AppSessionOpener = Future<AppSession> Function();
@@ -96,7 +97,7 @@ class _AppRootState extends State<AppRoot> {
         },
       );
     }
-    return HomePlaceholder(
+    return HomeShell(
       catalog: session.catalog,
       quests: session.quests,
       activeProfileId: session.activeProfileId,
@@ -208,112 +209,6 @@ class _RecoveryScreen extends StatelessWidget {
                   'the release-readiness task.',
                   textAlign: TextAlign.center,
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Landing screen once data is available.
-///
-/// The catalog and quest list are reachable when a real database is open; the
-/// final navigation shell arrives in a later task.
-class HomePlaceholder extends StatelessWidget {
-  const HomePlaceholder({
-    super.key,
-    this.catalog,
-    this.quests,
-    this.activeProfileId,
-  });
-
-  /// Query facade for the catalog. Null in shell tests that build a session
-  /// without SQLite.
-  final CatalogRepository? catalog;
-
-  /// Query facade for the quest list. Null in shell tests without SQLite.
-  final QuestRepository? quests;
-
-  /// Profile whose progress supplies quest state badges.
-  final String? activeProfileId;
-
-  @override
-  Widget build(BuildContext context) {
-    final catalog = this.catalog;
-    final quests = this.quests;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Tarkov Companion')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionHeader(
-                  title: 'Game data is ready',
-                  subtitle:
-                      'The local dataset is installed. Everything here is '
-                      'served from the local database.',
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'This build opens without a network connection. The quest '
-                  'list and the full navigation shell arrive in later tasks.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                if (catalog != null || quests != null) ...[
-                  const SizedBox(height: 24),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      if (catalog != null)
-                        FilledButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => CatalogScreen(
-                                  repository: catalog,
-                                  onItemSelected: (id) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute<void>(
-                                        builder: (_) => ItemDetailScreen(
-                                          repository: catalog,
-                                          itemId: id,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.inventory_2_outlined),
-                          label: const Text('Browse items'),
-                        ),
-                      if (quests != null)
-                        FilledButton.tonalIcon(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => QuestListScreen(
-                                  repository: quests,
-                                  profileId: activeProfileId,
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.checklist_outlined),
-                          label: const Text('Quests'),
-                        ),
-                    ],
-                  ),
-                ],
               ],
             ),
           ),
