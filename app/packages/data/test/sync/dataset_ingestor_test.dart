@@ -152,6 +152,21 @@ void main() {
     expect(state.appliedAt.toUtc(), appliedAt);
   });
 
+  test('an ingested accented name is searchable without diacritics', () async {
+    final synthetic = writeSyntheticDataset(temporary, DatasetKind.items, [
+      '{"id":"item-accent","kind":"item","name":"Café Crème optic",'
+          '"shortName":"Café","normalizedName":"cafe-creme-optic"}',
+    ]);
+
+    await DatasetIngestor(db, clock: () => appliedAt).ingest(
+      mode: GameMode.regular,
+      dataset: synthetic.dataset,
+      compressedFile: synthetic.file,
+    );
+
+    expect(await searchItems(db, 'cafe'), ['item-accent']);
+  });
+
   test('a corrupt line rolls back the partial insert, the deletes and '
       'datasetState', () async {
     final directory = await bundleFixtureDirectory();
