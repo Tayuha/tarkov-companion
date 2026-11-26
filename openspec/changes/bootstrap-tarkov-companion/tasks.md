@@ -2,8 +2,8 @@
 
 ## 1. Project scaffolding
 
-- [ ] 1.1 Create the monorepo layout (`app/`, `pipeline/`, `docs/`, `test/fixtures/`) with a root README that explains each directory, verified by `tree -L 2` matching the documented layout
-- [ ] 1.2 Add MIT `LICENSE`, `NOTICE` with tarkov.dev attribution and trademark disclaimer, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`, verified by every file referenced from README resolving and `LICENSE` matching the OSI MIT text
+- [x] 1.1 Create the monorepo layout (`app/`, `pipeline/`, `docs/`, `test/fixtures/`) with a root README that explains each directory, verified by `tree -L 2` matching the documented layout
+- [x] 1.2 Add MIT `LICENSE`, `NOTICE` with tarkov.dev attribution and trademark disclaimer, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`, verified by every file referenced from README resolving and `LICENSE` matching the OSI MIT text
 - [ ] 1.3 Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters
 - [x] 1.4 Create the Flutter project in `app/` with Windows, Linux, and Android targets, verified by `flutter config` listing the desktop targets, `flutter analyze` and `flutter test` passing, and `flutter build linux --debug` succeeding locally; the Windows debug build is verified by task 1.6 CI on a `windows-latest` runner because the development host is Linux
 - [x] 1.5 Create the TypeScript pipeline in `pipeline/` with strict `tsconfig`, linting, and a `npm test` runner, verified by `npm run lint && npm test` passing with one placeholder test
@@ -38,8 +38,8 @@
 - [x] 4.1 Implement manifest fetching with ETag conditional requests and a last-check timestamp, verified by a test asserting a 304 response performs no dataset download
 - [x] 4.2 Implement dataset download with streaming, progress reporting, cancellation, and SHA-256 verification, verified by tests for a valid file, a corrupted file, and a cancelled mid-download
 - [x] 4.3 Implement streaming JSONL decompression and batched ingestion in a single transaction per dataset, verified by an integration test ingesting the item fixture and asserting row counts and applied version
-- [ ] 4.4 Implement ingestion failure rollback so a failed dataset leaves prior rows and version intact, verified by a test that injects a failure after partial insert and asserts rollback
-- [ ] 4.5 Implement FTS5 search indexing over item name, shortName, and normalizedName with diacritic folding, refreshed after items ingestion, verified by search tests including an accented name matched by an unaccented query
+- [x] 4.4 Implement ingestion failure rollback so a failed dataset leaves prior rows and version intact, verified by a test that injects a failure after partial insert and asserts rollback
+- [x] 4.5 Implement FTS5 search indexing over item name, shortName, and normalizedName with diacritic folding, refreshed after items ingestion, verified by search tests including an accented name matched by an unaccented query
 - [x] 4.6 Implement the background update scheduler honoring the auto-update preference, metered connections, and app foreground state, verified by fake-clock tests for each preference combination
 - [x] 4.7 Implement stale-data labelling based on the newest price observation, verified by tests at the threshold boundary showing fresh vs stale states
 - [ ] 4.8 Add an ingestion performance benchmark on the full item dataset asserting the 10 MB compressed and bounded-memory budgets, verified by the benchmark running in CI on the Windows runner
