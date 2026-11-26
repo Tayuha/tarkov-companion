@@ -1,7 +1,9 @@
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion/main.dart';
-import 'package:tarkov_companion/src/app_root.dart';
 import 'package:tarkov_companion/src/app_session.dart';
+import 'package:tarkov_companion/src/home_shell.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
@@ -84,6 +86,32 @@ AppSession _readySession({required bool hasData}) {
   );
 }
 
+/// A ready session over a memory database with one catalog row.
+Future<AppSession> _sessionWithItem() async {
+  final database = AppDatabase.memory();
+  await database.customSelect('SELECT 1').get();
+  await database.customStatement(
+    'INSERT INTO items ('
+    'id, name, shortName, normalizedName, payload'
+    ') VALUES (?, ?, ?, ?, ?)',
+    [
+      'item-rifle',
+      'Colt M4A1 5.56x45 assault rifle',
+      'M4A1',
+      'colt-m4a1-556x45-assault-rifle',
+      '{}',
+    ],
+  );
+  return AppSessionReady(
+    sync: _FakeSync(_preparation(complete: true)),
+    hasAppliedDatasets: true,
+    catalog: CatalogRepository(database),
+    quests: QuestRepository(database),
+    activeProfileId: 'profile-regular',
+    close: database.close,
+  );
+}
+
 void main() {
   testWidgets('no applied dataset shows the first-run gate, not a catalog', (
     tester,
@@ -101,10 +129,10 @@ void main() {
       find.textContaining('Download game data to get started'),
       findsOneWidget,
     );
-    expect(find.byType(HomePlaceholder), findsNothing);
+    expect(find.byType(HomeShell), findsNothing);
   });
 
-  testWidgets('an applied dataset opens the placeholder home without a gate', (
+  testWidgets('an applied dataset opens the navigation shell without a gate', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -113,8 +141,11 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.byType(HomePlaceholder), findsOneWidget);
+    expect(find.byType(HomeShell), findsOneWidget);
     expect(find.byKey(FirstRunKeys.estimate), findsNothing);
+    expect(find.byKey(const Key('home-navigation-rail')), findsOneWidget);
+    expect(find.byKey(const Key('home-rail-items-label')), findsOneWidget);
+    expect(find.byKey(const Key('home-rail-quests-label')), findsOneWidget);
   });
 
   testWidgets('the first frame is a local loading shell while the database '
@@ -129,11 +160,11 @@ void main() {
     );
 
     expect(find.text('Opening Tarkov Companion…'), findsOneWidget);
-    expect(find.byType(HomePlaceholder), findsNothing);
+    expect(find.byType(HomeShell), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 60));
     await tester.pump();
-    expect(find.byType(HomePlaceholder), findsOneWidget);
+    expect(find.byType(HomeShell), findsOneWidget);
   });
 
   testWidgets('a session failure offers a retry', (tester) async {
@@ -159,7 +190,28 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.byType(HomePlaceholder), findsOneWidget);
+    expect(find.byType(HomeShell), findsOneWidget);
     expect(attempts, 2);
   });
+
+  testWidgets(
+    'Escape returns from a pushed item detail through the navigator',
+    (tester) async {
+      await tester.pumpWidget(
+        TarkovCompanionApp(openSession: _sessionWithItem),
+      );
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('catalog-item-item-rifle')));
+      await tester.pumpAndSettle();
+      expect(find.byType(ItemDetailScreen), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ItemDetailScreen), findsNothing);
+      expect(find.byType(HomeShell), findsOneWidget);
+    },
+  );
 }
