@@ -1272,17 +1272,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 17,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement the availability engine deriving locked/available/in-progress/completed from prerequisites, level, and progress, verified by table-driven unit tests including chains of prerequisites and cycles in malformed data",
+      "notes": "Availability engine: locked/available/inProgress/completed, level/prerequisite reasons, cycle safety, available list. Part of the bundled quest-engine session.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795714499951,
+      "archived": false,
+      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
     {
       "id": "task_impl_6_4",
@@ -1293,16 +1294,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 18,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement the locked-reason model and its presentation on quests, verified by widget tests naming level, prerequisite quest, and trader loyalty reasons",
+      "notes": "Locked-reason model (level, missing prerequisite, malformed/cycle, trader loyalty advisory) exposed for the detail UI. Part of the bundled quest-engine session.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795714499951,
+      "archived": false,
+      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
     {
       "id": "task_impl_6_5",
@@ -1333,16 +1335,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 20,
+      "categoryID": "inprogress",
+      "position": 3,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement quest state transitions with immediate persistence and dependency recomputation, verified by integration tests for complete, revert, and unaffected-sibling cases",
+      "notes": "Quest state transitions (notStarted/inProgress/completed/failed), transactional persistence, revert recomputation and manual override. Part of the bundled session.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795714499951,
+      "archived": false,
+      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
     {
       "id": "task_impl_6_7",
@@ -1353,16 +1356,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 21,
+      "categoryID": "inprogress",
+      "position": 4,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement objective-level counters with derived quest completion and a confirmed manual override, verified by tests for partial progress, derived completion, and override without altering counts",
+      "notes": "Objective counters with validation, derived completion and a manual override that does not alter counts. Part of the bundled session.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795714499951,
+      "archived": false,
+      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
     {
       "id": "task_impl_6_8",
@@ -2047,6 +2051,27 @@
       "notes": "Discovered during T6.2: the quest filter bar accepts caller-supplied trader/map options because the query layer exposes ids only. Add a label query (traders and maps tables/gameRecords), feed the filter bar, and test the loaded labels.",
       "createdAt": 1795710691454,
       "updatedAt": 1795710691454,
+      "archived": false
+    },
+    {
+      "id": "task_impl_8_11",
+      "title": "T8.11 Persistent Items/Quests navigation shell",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "In progress in worktree t811-nav-shell. Replaces the button landing page with a rail/bottom bar, IndexedStack state preservation, catalog and quest tabs, item detail navigation, and a quest selection callback ready for T6.5. Plain Material.",
+      "sessionID": "ses_de713692fffejg6rtPzucQHER3",
+      "createdAt": 1795714499951,
+      "updatedAt": 1795714499951,
       "archived": false
     }
   ]
