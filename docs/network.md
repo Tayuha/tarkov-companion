@@ -47,13 +47,18 @@ client calls to prove it):
    silently sending them.
 3. **A host must be present and listed.** An empty host or a host outside the table raises
    `DisallowedHostException`. The check runs on the original URI and again on every redirect target.
-4. **GET only.** The client exposes `get`, `getText`, and `getBytes`; there is no API for other methods.
-5. **Bounded time and redirects.** Each send and each body read is limited by a timeout (30 s by
-   default); a redirect chain may follow at most 5 hops. Exceeding either limit raises a typed error.
-6. **Buffered, complete bodies.** A 2xx response exposes the status, lowercased headers, the complete
-   `bodyBytes` (`Uint8List`), and the final URI after redirects. A non-2xx final status raises
-   `HttpStatusException`, so a caller can distinguish `404` (missing manifest) from `304` (unchanged
-   manifest) and `5xx` (upstream outage).
+4. **GET only.** The client exposes `get`/`getText`/`getBytes` (buffered) and
+   `send` (streamed); there is no API for other methods.
+5. **Bounded time and redirects.** Each send and each buffered body read is limited by a timeout (30 s
+   by default); a redirect chain may follow at most 5 hops. A streamed body is read under the caller's
+   policy — `DatasetDownloader` applies the client's timeout as an idle read timeout. Exceeding either
+   limit raises a typed error.
+6. **Buffered or streamed bodies, never truncated.** `get` exposes the status, lowercased headers, the
+   complete `bodyBytes` (`Uint8List`), and the final URI after redirects. `send` exposes the same
+   status, headers and final URI with an unbuffered, single-subscription `Stream<List<int>>`; the
+   dataset downloader uses it so a multi-megabyte asset never has to fit in memory. A non-2xx final
+   status raises `HttpStatusException`, so a caller can distinguish `404` (missing manifest or asset)
+   from `304` (unchanged manifest) and `5xx` (upstream outage).
 
 ## Redirects
 
@@ -70,6 +75,9 @@ client calls to prove it):
   cases the request is rejected before the next request is sent.
 - At most 5 redirects are followed per call; the sixth response raises `TooManyRedirectsException`.
   A redirect status without a usable `Location` is a `HttpStatusException`.
+- The body of every redirect response is drained before the next hop is requested, so the connection is
+  released instead of carrying unread bytes. A final non-2xx body is drained the same way before
+  `HttpStatusException` is thrown.
 - Caller headers are reduced on a redirect to a safe, non-credential subset (`accept*`, `range`, and the
   `If-*` conditional headers). `Authorization` and `Cookie` are never forwarded to a redirect target.
   The conditional headers are kept so the sync layer can revalidate a manifest with `If-None-Match` after
@@ -137,5 +145,6 @@ dart run tool/check_architecture.dart
 The tests cover the exact allowlist contents; rejection with zero inner-client calls for a disallowed host, a
 lookalike or subdomain, an empty host, URL credentials, and plain HTTP; the user-agent and 2xx body; a
 `404`; timeouts; redirects to an allowed host; rejection of a disallowed redirect hop and of a
-protocol-relative redirect; the redirect limit; relative `Location` resolution; and an HTTPS-to-HTTP
-downgrade.
+protocol-relative redirect; the redirect limit; relative `Location` resolution; an HTTPS-to-HTTP
+downgrade; and the streaming `send` path (unbuffered body, allowlist pre-flight, redirect body drained
+before the next hop, non-2xx status error).

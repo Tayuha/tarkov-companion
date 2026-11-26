@@ -39,11 +39,43 @@ final class AllowlistedHttpResponse {
   String get bodyText => utf8.decode(bodyBytes);
 }
 
+/// A 2xx response whose body has not been read yet.
+///
+/// Returned by [AllowlistedHttpClient.send]. The body is a single-subscription
+/// stream: listen to it once, and cancel the subscription to abort the transfer
+/// (which closes the underlying connection). Nothing is buffered by the client,
+/// so a multi-megabyte dataset never has to fit in memory.
+final class AllowlistedStreamedResponse {
+  AllowlistedStreamedResponse({
+    required this.statusCode,
+    required Map<String, String> headers,
+    required this.body,
+    required this.finalUri,
+  }) : headers = Map.unmodifiable({
+         for (final entry in headers.entries)
+           entry.key.toLowerCase(): entry.value,
+       });
+
+  /// HTTP status code. Always in `200..299`; other statuses are thrown as
+  /// [HttpStatusException] by [AllowlistedHttpClient.send].
+  final int statusCode;
+
+  /// Response headers with lowercased names.
+  final Map<String, String> headers;
+
+  /// The response body. Single subscription; not buffered.
+  final Stream<List<int>> body;
+
+  /// The URI that produced [body] after following redirects.
+  final Uri finalUri;
+}
+
 /// An HTTP client that can only reach a documented host allowlist.
 ///
 /// The client is intentionally small: it exists to make the app's network
-/// surface auditable. It supports one operation, `GET`, and it enforces the
-/// policy before a request reaches the transport:
+/// surface auditable. It supports one operation, `GET` — [get] buffers the
+/// whole body, [send] streams it — and it enforces the policy before a request
+/// reaches the transport:
 ///
 /// * HTTPS only — plain HTTP is rejected, including as a redirect target;
 /// * no credentials embedded in the URI (`user:password@host`);
@@ -67,8 +99,10 @@ final class AllowlistedHttpResponse {
 /// `package:http`'s automatic redirect following is disabled on every request.
 /// The client reads `Location`, resolves it with [Uri.resolve] (so relative
 /// locations work), validates the result against the same rules, and only then
-/// sends the next request. A redirect to a host outside the allowlist or to
-/// plain HTTP is rejected **before** that request is sent. Caller headers are
+/// sends the next request. The redirect response body is drained first, so the
+/// connection is released before the next hop. A redirect to a host outside the
+/// allowlist or to plain HTTP is rejected **before** that request is sent.
+/// Caller headers are
 /// reduced to a safe, non-credential subset on redirect so an `Authorization`
 /// header is never forwarded to a CDN host; conditional headers such as
 /// `If-None-Match` are preserved for later manifest caching.
@@ -142,10 +176,16 @@ final class AllowlistedHttpClient {
   /// Maximum redirects one [get] may follow. Zero disallows redirects.
   final int maxRedirects;
 
-  /// Sends a `GET` request and returns a 2xx response.
+  /// Sends a `GET` request and returns a 2xx response whose body is streamed.
   ///
   /// [headers] are sent on the first request only; on redirect the subset in
-  /// [_redirectSafeHeaders] is forwarded. The body is fully buffered.
+  /// [_redirectSafeHeaders] is forwarded. Unlike [get], the body is not
+  /// buffered: the caller reads [AllowlistedStreamedResponse.body] once, and
+  /// cancelling that subscription aborts the transfer.
+  ///
+  /// A redirect response is drained before the next hop is requested, and a
+  /// final non-2xx response is drained before [HttpStatusException] is thrown,
+  /// so no connection is left with unread data.
   ///
   /// Throws:
   /// * [InsecureSchemeException] for a non-HTTPS URI or redirect;
@@ -153,8 +193,10 @@ final class AllowlistedHttpClient {
   /// * [DisallowedHostException] for an empty or unlisted host;
   /// * [TooManyRedirectsException] when the chain exceeds [maxRedirects];
   /// * [HttpStatusException] for a final non-2xx status;
-  /// * [HttpTimeoutException] when a send or body read exceeds [timeout].
-  Future<AllowlistedHttpResponse> get(
+  /// * [HttpTimeoutException] when the response headers do not arrive within
+  ///   [timeout]. Reading the body is the caller's responsibility; the
+  ///   downloader applies [timeout] as an idle read timeout.
+  Future<AllowlistedStreamedResponse> send(
     Uri uri, {
     Map<String, String>? headers,
   }) async {
@@ -164,16 +206,27 @@ final class AllowlistedHttpClient {
 
     while (true) {
       _ensureAllowed(currentUri);
-      final response = await _send(currentUri, requestHeaders);
+      final response = await _sendStreamed(currentUri, requestHeaders);
+      final responseHeaders = _lowercaseHeaders(response.headers);
 
       if (!_redirectStatuses.contains(response.statusCode)) {
         if (response.statusCode < 200 || response.statusCode >= 300) {
+          await _drain(response.stream, currentUri);
           throw HttpStatusException(response.statusCode, currentUri);
         }
-        return response;
+        return AllowlistedStreamedResponse(
+          statusCode: response.statusCode,
+          headers: responseHeaders,
+          body: response.stream,
+          finalUri: currentUri,
+        );
       }
 
-      final location = response.headers['location'];
+      final location = responseHeaders['location'];
+      // Drain before either following or failing, so the socket is released
+      // and the next hop does not share a connection with unread bytes.
+      await _drain(response.stream, currentUri);
+
       if (location == null || location.trim().isEmpty) {
         throw HttpStatusException(response.statusCode, currentUri);
       }
@@ -194,6 +247,41 @@ final class AllowlistedHttpClient {
       currentUri = nextUri;
       requestHeaders = _safeRedirectHeaders(headers);
     }
+  }
+
+  /// Sends a `GET` request and returns a 2xx response.
+  ///
+  /// [headers] are sent on the first request only; on redirect the subset in
+  /// [_redirectSafeHeaders] is forwarded. The body is fully buffered.
+  ///
+  /// Throws:
+  /// * [InsecureSchemeException] for a non-HTTPS URI or redirect;
+  /// * [UserInfoNotAllowedException] for a URI with embedded credentials;
+  /// * [DisallowedHostException] for an empty or unlisted host;
+  /// * [TooManyRedirectsException] when the chain exceeds [maxRedirects];
+  /// * [HttpStatusException] for a final non-2xx status;
+  /// * [HttpTimeoutException] when a send or body read exceeds [timeout].
+  Future<AllowlistedHttpResponse> get(
+    Uri uri, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await send(uri, headers: headers);
+
+    final Uint8List bodyBytes;
+    try {
+      bodyBytes = await http.ByteStream(response.body)
+          .toBytes()
+          .timeout(timeout);
+    } on TimeoutException {
+      throw HttpTimeoutException(response.finalUri, timeout);
+    }
+
+    return AllowlistedHttpResponse(
+      statusCode: response.statusCode,
+      headers: response.headers,
+      bodyBytes: bodyBytes,
+      finalUri: response.finalUri,
+    );
   }
 
   /// Sends a `GET` request and decodes a 2xx body as strict UTF-8.
@@ -226,7 +314,7 @@ final class AllowlistedHttpClient {
     }
   }
 
-  Future<AllowlistedHttpResponse> _send(
+  Future<http.StreamedResponse> _sendStreamed(
     Uri uri,
     Map<String, String>? callerHeaders,
   ) async {
@@ -247,26 +335,30 @@ final class AllowlistedHttpClient {
     request.headers['user-agent'] = userAgent;
     request.headers['accept-encoding'] = 'identity';
 
-    final http.StreamedResponse streamed;
     try {
-      streamed = await _inner.send(request).timeout(timeout);
+      return await _inner.send(request).timeout(timeout);
     } on TimeoutException {
       throw HttpTimeoutException(uri, timeout);
     }
+  }
 
-    final Uint8List bodyBytes;
+  /// Reads and discards a response body that will not be handed to the caller.
+  ///
+  /// A redirect or an error page is irrelevant to the caller, but leaving it
+  /// unread keeps a connection busy. The same [timeout] applies as to a
+  /// buffered body, so a stalled transfer still fails instead of hanging.
+  Future<void> _drain(Stream<List<int>> body, Uri uri) async {
     try {
-      bodyBytes = await streamed.stream.toBytes().timeout(timeout);
+      await body.drain<void>().timeout(timeout);
     } on TimeoutException {
       throw HttpTimeoutException(uri, timeout);
     }
+  }
 
-    return AllowlistedHttpResponse(
-      statusCode: streamed.statusCode,
-      headers: streamed.headers,
-      bodyBytes: bodyBytes,
-      finalUri: uri,
-    );
+  static Map<String, String> _lowercaseHeaders(Map<String, String> headers) {
+    return {
+      for (final entry in headers.entries) entry.key.toLowerCase(): entry.value,
+    };
   }
 
   static Map<String, String> _safeRedirectHeaders(

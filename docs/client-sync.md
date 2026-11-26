@@ -9,9 +9,12 @@ offline. Sync is split into three stages:
 2. **Compatibility check** — `BundleManifest.checkCompatibility`, already part
    of the parsed manifest. A failed check stops the sync and leaves the current
    database untouched.
-3. **Dataset download and ingestion** — task 4.2 and later: download only
-   datasets whose `sha256` differs from `datasetState`, verify the bytes,
-   decompress, ingest in one transaction, and refresh FTS.
+3. **Dataset download** — task 4.2, implemented by `DatasetDownloader`: download
+   only the datasets whose `sha256` differs from `datasetState`, stream them to
+   disk, verify the byte count and SHA-256, and atomically replace the previous
+   file.
+4. **Decompression and ingestion** — task 4.3 and later: decompress the verified
+   bytes, ingest in one transaction, and refresh FTS.
 
 The public bundle contract lives in [`data-bundles.md`](data-bundles.md); the
 network policy lives in [`network.md`](network.md).
@@ -42,8 +45,12 @@ ManifestFetcher.fetch(mode)
           |
           +-- incompatible -> keep the current data, ask for an app update
           |
-          +-- compatible   -> task 4.2: compare each dataset sha256 with
-                              datasetState and download only what changed
+          +-- compatible   -> for each dataset whose sha256 differs from
+                              datasetState: DatasetDownloader.download()
+                                GET <manifest>/<dataset.path>
+                                stream to <destination>.part (+ SHA-256)
+                                verify size + digest
+                                rename over <destination>
 ```
 
 ## Manifest URL
@@ -109,6 +116,83 @@ reads the persisted value without a request.
 The fetcher performs no dataset request in either state. Task 4.2 receives the
 manifest and decides what to download.
 
+## Dataset download
+
+Task 4.2, implemented by `DatasetDownloader` in
+`app/packages/data/lib/src/sync/dataset_downloader.dart`. Given the manifest
+URL, one `ManifestDataset` and the final `File`, it owns steps 4 and 5 of the
+client resolution algorithm in
+[`data-bundles.md`](data-bundles.md#client-resolution).
+
+The asset URL is `manifestUri.resolve(dataset.path)`, never string
+concatenation. It goes through the same `AllowlistedHttpClient.send` checks as
+the manifest, so a dataset served from an unlisted host is rejected before any
+bytes are requested.
+
+```dart
+final token = DownloadCancellationToken();
+await DatasetDownloader(client).download(
+  manifestUri: ManifestFetcher.uriFor(mode),
+  dataset: entry,               // ManifestDataset from the parsed manifest
+  destination: File('.../regular/items.jsonl.zst'),
+  cancellation: token,
+  onProgress: (progress) => show(progress.fraction),
+);
+```
+
+Rules:
+
+1. **Stream, do not buffer.** `AllowlistedHttpClient.send` returns the status,
+   lowercased headers, the final URI after redirects and a single-subscription
+   body. Each chunk is written to `<destination>.part` and flushed, so memory is
+   bounded by the chunk size rather than by the dataset.
+2. **Hash while writing.** SHA-256 is computed over exactly the bytes written to
+   disk. Nothing is decompressed or parsed before verification passes.
+3. **Progress is per chunk and monotonic.** `downloadedBytes` never decreases,
+   `totalBytes` is the manifest's `compressedBytes`, and `fraction` reaches
+   `1.0` when the last byte arrives.
+4. **Cancellation is cooperative.** `DownloadCancellationToken.cancel()` is
+   checked before the request and between chunks, and is safe to call from an
+   `onProgress` handler. A cancelled download cancels the body subscription
+   (releasing the connection), deletes the `.part` file and throws
+   `DownloadCancelled`.
+5. **Verify both numbers.** When the body ends, the received byte count must
+   equal `compressedBytes` (`DownloadSizeMismatchException`) and the digest must
+   equal `sha256` (`DownloadChecksumMismatchException`). A mismatch deletes the
+   `.part` file.
+6. **Replace atomically.** Parent directories are created, then the verified
+   temp file is renamed onto `destination`. POSIX `rename` replaces the file
+   atomically; on Windows, where `rename` cannot overwrite, the previous file is
+   deleted immediately before the rename. That delete is the only window in
+   which the destination is absent, and it opens only after verification.
+
+### Failure and replacement semantics
+
+| Outcome | Destination | `.part` |
+|---|---|---|
+| First download succeeds | Created | Gone after the rename |
+| First download fails (transport, cancel, size, checksum) | Absent | Deleted |
+| Update succeeds | Replaced by the verified bytes | Gone after the rename |
+| Update fails | Previous verified file untouched | Deleted |
+
+**The old dataset file remains until verification succeeds.** A corrupted,
+cancelled or timed-out update therefore never removes working data: the app
+keeps serving the previous dataset until a verified replacement is ready. A
+leftover `.part` from a crash or power loss is truncated by the next
+`openWrite`; the rename is the only step that makes a dataset visible.
+
+### Typed download errors
+
+| Error | Cause |
+|---|---|
+| `DownloadCancelled` | The token was cancelled before or during the transfer |
+| `DownloadSizeMismatchException` | Byte count differs from `compressedBytes` |
+| `DownloadChecksumMismatchException` | SHA-256 differs from the manifest |
+| `DownloadReplaceException` | The verified file could not be moved into place |
+| `HttpStatusException` | Final status outside `2xx`, e.g. `404` for a missing asset |
+| `HttpTimeoutException` | Headers, or an idle body read, exceeded the timeout |
+| `DisallowedHostException` (and the other policy errors) | Asset URL outside the network policy |
+
 ## Typed failures
 
 | Error | Cause | Cache |
@@ -137,17 +221,30 @@ request (see [`network.md`](network.md#redirects)). The validators stored in
 ## Tests
 
 All sync tests are offline: `MockClient` is injected into
-`AllowlistedHttpClient`, and no dataset body exists in the fixtures. Run them
-with:
+`AllowlistedHttpClient`, and no dataset body exists in the fixtures. The
+downloader is driven by a fake streaming transport that returns a
+`Stream<List<int>>`, so cancellation and a corrupted payload are deterministic
+and no socket is opened. Run them with:
 
 ```bash
 cd app
 dart test packages/data/test/sync
+dart test packages/data/test/net
 dart test packages/data/test/schema_v2_migration_test.dart
 ```
 
-The suite proves the 200-then-304 sequence sends `If-None-Match`, returns the
-cached manifest, moves only `lastCheckedAt`, and makes exactly two transport
-calls, both to the manifest URL — a `304` performs no dataset download. It also
-covers changed/identical bodies, `404`, malformed JSON and schema, mode
-mismatch, `304` without a cache, per-mode isolation and clock injection.
+The manifest suite proves the 200-then-304 sequence sends `If-None-Match`,
+returns the cached manifest, moves only `lastCheckedAt`, and makes exactly two
+transport calls, both to the manifest URL — a `304` performs no dataset
+download. It also covers changed/identical bodies, `404`, malformed JSON and
+schema, mode mismatch, `304` without a cache, per-mode isolation and clock
+injection.
+
+The download suite covers a valid multi-chunk download (bytes on disk, digest,
+monotonic progress ending at `1.0`, temp file gone), a single flipped byte, a
+wrong byte count, `404`, an asset URL outside the allowlist (no request sent),
+cancellation after the first chunk (subscription cancelled, no files left),
+cancellation before the request, parent-directory creation, and re-downloading
+over an existing file where a failed update leaves the previous dataset intact.
+The HTTP suite adds the streaming API: unbuffered body, pre-flight allowlist,
+redirect-body drain before the next hop, and a non-2xx status error.

@@ -401,4 +401,128 @@ void main() {
       },
     );
   });
+
+  group('streaming send', () {
+    CountingClient buildStreaming(
+      Future<http.StreamedResponse> Function(http.Request) handler,
+    ) {
+      return CountingClient(
+        MockClient.streaming((request, _) async {
+          return handler(request as http.Request);
+        }),
+      );
+    }
+
+    test('returns the status, headers and an unbuffered body stream', () async {
+      final counting = buildStreaming((request) async {
+        expect(request.url, manifestUrl);
+        expect(request.headers['accept-encoding'], 'identity');
+        return http.StreamedResponse(
+          Stream.fromIterable([
+            [1, 2],
+            [3],
+          ]),
+          200,
+          headers: {'Content-Type': 'application/octet-stream'},
+        );
+      });
+      final client = buildClient(counting);
+
+      final response = await client.send(manifestUrl);
+
+      expect(response.statusCode, 200);
+      expect(response.headers['content-type'], 'application/octet-stream');
+      expect(response.finalUri, manifestUrl);
+      expect(await response.body.toList(), [
+        [1, 2],
+        [3],
+      ]);
+      expect(counting.calls, 1);
+    });
+
+    test('applies the allowlist before any streaming request', () async {
+      final counting = buildStreaming((_) async {
+        fail('a disallowed host must not be requested');
+      });
+      final client = buildClient(counting);
+
+      await expectLater(
+        client.send(Uri.parse('https://evil.example/items.jsonl.zst')),
+        throwsA(isA<DisallowedHostException>()),
+      );
+      expect(counting.calls, 0);
+    });
+
+    test('drains a redirect body before requesting the next hop', () async {
+      final target = Uri.parse(
+        'https://objects.githubusercontent.com/items.jsonl.zst',
+      );
+      var redirectBodyListened = false;
+
+      Stream<List<int>> redirectBody() async* {
+        redirectBodyListened = true;
+        yield [7, 7, 7];
+      }
+
+      final counting = buildStreaming((request) async {
+        if (request.url.host == 'github.com') {
+          return http.StreamedResponse(
+            redirectBody(),
+            302,
+            headers: {'Location': target.toString()},
+          );
+        }
+        expect(
+          redirectBodyListened,
+          isTrue,
+          reason: 'the redirect body must be read before the next request',
+        );
+        return http.StreamedResponse(
+          Stream.fromIterable([
+            [9],
+          ]),
+          200,
+        );
+      });
+      final client = buildClient(counting);
+
+      final response = await client.send(manifestUrl);
+
+      expect(response.finalUri, target);
+      expect(await response.body.toList(), [
+        [9],
+      ]);
+      expect(counting.calls, 2);
+    });
+
+    test(
+      'throws HttpStatusException for a non-2xx streamed response',
+      () async {
+        var errorBodyListened = false;
+
+        Stream<List<int>> errorBody() async* {
+          errorBodyListened = true;
+          yield [1];
+        }
+
+        final counting = buildStreaming(
+          (_) async => http.StreamedResponse(errorBody(), 404),
+        );
+        final client = buildClient(counting);
+
+        await expectLater(
+          client.send(manifestUrl),
+          throwsA(
+            isA<HttpStatusException>().having(
+              (error) => error.statusCode,
+              'statusCode',
+              404,
+            ),
+          ),
+        );
+        expect(errorBodyListened, isTrue);
+        expect(counting.calls, 1);
+      },
+    );
+  });
 }
