@@ -6,13 +6,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { MANIFEST_FILE, manifestSchema } from "../bundle/index.js";
+import { MANIFEST_FILE, manifestSchema, type BundleMode } from "../bundle/index.js";
 import { MemoryReleaseClient } from "../release/index.js";
 import { FIXTURES_ROOT } from "../schemas/fixtures.js";
+import type { NormalizeDataset } from "../normalize/index.js";
 import {
   FileNormalizedDatasetCacheStore,
   UpstreamDatasetProvider,
   runSync,
+  type DatasetFetchInput,
+  type DatasetFetchResult,
+  type DatasetProvider,
   type ModeSyncSummary,
   type SyncReport,
 } from "./index.js";
@@ -115,6 +119,41 @@ function fakeUpstream(
   };
 }
 
+/**
+ * Test-only provider that reports a missing dictionary key while leaving the
+ * payload untouched, so the gate runs on an otherwise valid bundle.
+ */
+class MissingKeyProvider implements DatasetProvider {
+  readonly #inner: DatasetProvider;
+  readonly #missingKeys: readonly string[];
+
+  constructor(inner: DatasetProvider, missingKeys: readonly string[]) {
+    this.#inner = inner;
+    this.#missingKeys = missingKeys;
+  }
+
+  modes(): Promise<readonly BundleMode[]> {
+    return this.#inner.modes();
+  }
+
+  datasets(mode: BundleMode): Promise<readonly NormalizeDataset[]> {
+    return this.#inner.datasets(mode);
+  }
+
+  source(mode: BundleMode): ReturnType<DatasetProvider["source"]> {
+    return this.#inner.source(mode);
+  }
+
+  async fetch(input: DatasetFetchInput): Promise<DatasetFetchResult> {
+    const result = await this.#inner.fetch(input);
+    if (result.status !== "modified") return result;
+    return {
+      ...result,
+      localization: { ...result.localization, missingKeys: [...this.#missingKeys] },
+    };
+  }
+}
+
 interface Harness {
   readonly report: SyncReport;
   readonly client: MemoryReleaseClient | null;
@@ -132,6 +171,8 @@ async function runHarness(options: {
   readonly force?: boolean;
   readonly cacheDir?: string;
   readonly logs?: string[];
+  readonly maxCompressedBytes?: number;
+  readonly missingKeys?: readonly string[];
 }): Promise<Harness> {
   const cacheDir = options.cacheDir ?? (await tempDir("tarkov-sync-cache-"));
   const outDir = await tempDir("tarkov-sync-out-");
@@ -146,10 +187,14 @@ async function runHarness(options: {
     fetchImpl: options.fetchImpl,
     now: () => FIXED_TIME,
   });
+  const effectiveProvider =
+    options.missingKeys === undefined
+      ? provider
+      : new MissingKeyProvider(provider, options.missingKeys);
 
   const report = await runSync({
     modes: options.modes ?? ["regular"],
-    provider,
+    provider: effectiveProvider,
     normalizedCache: new FileNormalizedDatasetCacheStore({ dir: normalizedDir }),
     releaseClient: client,
     outDir,
@@ -158,6 +203,9 @@ async function runHarness(options: {
     repository: "Tayuha/tarkov-companion",
     now: () => FIXED_TIME,
     log: (line) => logs.push(line),
+    ...(options.maxCompressedBytes === undefined
+      ? {}
+      : { maxCompressedBytes: options.maxCompressedBytes }),
   });
 
   return { report, client, cacheDir, outDir, normalizedDir, logs };
@@ -200,6 +248,13 @@ describe("runSync", () => {
     expect(mode.publication?.tag).toBe("data-regular-latest");
     expect(mode.publication?.mutations).toBeGreaterThan(0);
     expect(mode.publication?.uploads.at(-1)).toBe(MANIFEST_FILE);
+
+    // The gate ran on the full localization diagnostics and passed.
+    expect(mode.gate?.ok).toBe(true);
+    expect(mode.gate?.metrics.compressedBytes).toBe(mode.totals?.compressedBytes);
+    expect(mode.localization).toHaveLength(7);
+    expect(mode.localization.every((entry) => entry.missingKeys === 0)).toBe(true);
+    expect(harness.logs.some((line) => line.includes("gate passed"))).toBe(true);
 
     // Every normalized JSONL is persisted under its content checksum.
     const cached = await readdir(harness.normalizedDir);
@@ -302,6 +357,40 @@ describe("runSync", () => {
     expect(mode.errors).toHaveLength(1);
     expect(mode.errors[0]?.dataset).toBe("items");
     expect(mode.errors[0]?.message).toContain("validation failed");
+    expect(clientOf(harness).operations).toEqual([]);
+    expect(existsSync(join(harness.outDir, "regular", MANIFEST_FILE))).toBe(false);
+  });
+
+  it("blocks publication when the gate rejects the compressed size", async () => {
+    const harness = await runHarness({
+      fetchImpl: fakeUpstream(FIXTURES_ROOT),
+      maxCompressedBytes: 1,
+    });
+    const mode = onlyMode(harness.report);
+
+    expect(harness.report.exitCode).toBe(1);
+    expect(mode.status).toBe("failed");
+    expect(mode.publication).toBeNull();
+    expect(mode.gate?.ok).toBe(false);
+    expect(mode.gate?.failures.map((entry) => entry.code)).toContain("compressed-size");
+    expect(mode.errors.some((entry) => entry.message.startsWith("gate:"))).toBe(true);
+    expect(mode.localization).toHaveLength(7);
+    expect(clientOf(harness).operations).toEqual([]);
+    expect(existsSync(join(harness.outDir, "regular", MANIFEST_FILE))).toBe(false);
+  });
+
+  it("blocks publication when translation coverage regresses", async () => {
+    const harness = await runHarness({
+      fetchImpl: fakeUpstream(FIXTURES_ROOT),
+      missingKeys: ["5447a9cd4bdc2dbd208b4567 Name"],
+    });
+    const mode = onlyMode(harness.report);
+
+    expect(harness.report.exitCode).toBe(1);
+    expect(mode.status).toBe("failed");
+    expect(mode.publication).toBeNull();
+    expect(mode.gate?.ok).toBe(false);
+    expect(mode.gate?.failures.map((entry) => entry.code)).toContain("missing-keys");
     expect(clientOf(harness).operations).toEqual([]);
     expect(existsSync(join(harness.outDir, "regular", MANIFEST_FILE))).toBe(false);
   });

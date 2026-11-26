@@ -51,3 +51,19 @@ export type {
   BundleValidationResult,
   DatasetValidation,
 } from "./validate.js";
+export {
+  DEFAULT_MAX_COMPRESSED_BYTES,
+  DEFAULT_MAX_MISSING_KEYS,
+  datasetLocalizationMetricsSchema,
+  gateBundle,
+  localizationMetricsFromStats,
+} from "./gate.js";
+export type {
+  DatasetLocalizationMetrics,
+  GateInput,
+  GateIssue,
+  GateIssueCode,
+  GateMetrics,
+  GateResult,
+  LocalizationPathFailure,
+} from "./gate.js";

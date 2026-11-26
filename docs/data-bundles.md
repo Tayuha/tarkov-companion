@@ -2,8 +2,10 @@
 
 > This is the public data contract. Tasks 2.6–2.8 implement the writer, the
 > no-op comparison and publication to GitHub Releases; task 2.10 finalizes the
-> document and adds `npm run validate:bundle`. Every statement below is
-> enforced by code or by a test, so a change here is a contract change.
+> document and adds `npm run validate:bundle`; task 2.11 adds the publication
+> gate (`npm run gate`) that sync runs before uploading anything. Every
+> statement below is enforced by code or by a test, so a change here is a
+> contract change.
 
 The pipeline turns each validated, localized upstream dataset into **JSONL**:
 one JSON object per line, one record kind per line. The app ingests the records
@@ -953,6 +955,111 @@ The validator is the executable form of this document. `npm test` runs it
 against the hand-built fixture and against a mutated copy for each error code
 above, so a documentation change that the code does not implement fails CI.
 
+## Publication gate
+
+`validate:bundle` proves a bundle is structurally valid. The **publication
+gate** adds the policy rules that decide whether a valid bundle may be
+uploaded. `npm run sync` runs it after building a mode and before the first
+release call; a failure leaves the previous release untouched and makes the run
+exit 1.
+
+The gate is `gateBundle` in `pipeline/src/bundle/gate.ts`. It is pure: it takes
+a parsed manifest, the compressed files when available, and the localization
+diagnostics for the mode.
+
+| Rule | Code | Outcome |
+|---|---|---|
+| Compressed dataset bytes of one mode exceed `maxCompressedBytes` | `compressed-size` | Failure |
+| A string in the JSONL matches the localization placeholder pattern | `placeholder` | Failure (same check as the validator) |
+| Missing dictionary keys exceed `maxMissingKeys` | `missing-keys` | Failure |
+| A translation pointer cannot be parsed | `failed-path` | Failure |
+| The full contract validator reports another error | `invalid-bundle` | Failure |
+| Stale/unresolved translation pointers | `stale-pointer` | Warning |
+| A dataset is listed under `skipped` | `skipped-dataset` | Warning |
+| A local `.jsonl.zst` file is not referenced by the manifest | `prune-candidate` | Warning (inactive `--prune`) |
+
+Thresholds:
+
+| Setting | Default | Why |
+|---|---|---|
+| `maxCompressedBytes` | `10 * 1024 * 1024` (10 MiB) | Design D7: one mode must download in under 10 MB compressed. The measured full set is ~1.98 MiB at zstd -3, so this is a regression alarm, not a tight cap. |
+| `maxMissingKeys` | `0` | Normalization already rejects placeholders; the gate is the second net. Any key without a dictionary entry means coverage regressed upstream. |
+
+The size total is computed from the actual compressed files when a directory or
+a built bundle is supplied, otherwise from `datasets[].compressedBytes`. The
+manifest `totals` block is **not** trusted, because a wrong total must not be
+able to hide an oversized mode. Stale pointers are warnings because upstream
+metadata is permitted to be stale (13 task pointers today); an unparsable
+pointer is a failure because it means the metadata drifted outside the
+supported JSONPath grammar.
+
+### Sync integration
+
+After normalizing and building a mode, sync passes the built files and the
+per-dataset localization diagnostics to the gate. On failure it publishes
+nothing for that mode, records every gate failure in the run report, continues
+with the other modes, and exits 1 at the end. On success it logs:
+
+```
+regular: gate passed — 1.98 MiB compressed, 0 missing key(s), 15 stale pointer(s)
+```
+
+The JSON sync report carries what the gate needs:
+
+- `modes[].localization[]`: `dataset`, `translated`, `visited`, `missingKeys`
+  (count), `failedPaths` (`{path, error}`), `stalePointers` (array of pointers).
+  A dataset rebuilt from the normalized cache after a `304` has no entry, so
+  its diagnostics are absent rather than invented.
+- `modes[].gate`: the full `ok`/`failures`/`warnings`/`metrics` result, or
+  `null` when the mode failed before the gate ran.
+
+### Command
+
+```bash
+cd pipeline
+npm run gate -- --dir dist/bundles/regular
+npm run gate -- --dir dist/bundles/regular --report dist/sync-report.json
+npm run gate -- --dir dist/bundles/regular --max-bytes 12582912
+npm run gate -- --dir ../test/fixtures/handbuilt-bundle --json
+```
+
+| Option | Meaning |
+|---|---|
+| `--dir <bundle-dir>` | Required. The mode directory that contains `manifest.json`. |
+| `--report <sync-report.json>` | Reads localization stats for the manifest's mode. Without it, only size and content are checked. |
+| `--max-bytes <n>` | Overrides the compressed budget for this run. |
+| `--json` | Prints the machine-readable result. |
+
+Exit codes: `0` gate passed, `1` gate failed, `2` invalid input (missing or
+unreadable directory, manifest or report; malformed `--max-bytes`). The command
+performs no network access.
+
+```json
+{
+  "dir": "/path/to/bundle",
+  "manifest": "/path/to/bundle/manifest.json",
+  "report": "/path/to/sync-report.json",
+  "mode": "regular",
+  "ok": true,
+  "failures": [],
+  "warnings": [
+    { "code": "stale-pointer", "message": "tasks: 13 stale translation pointer(s): ...", "dataset": "tasks" }
+  ],
+  "metrics": {
+    "mode": "regular",
+    "datasets": 7,
+    "compressedBytes": 2076000,
+    "maxCompressedBytes": 10485760,
+    "missingKeys": 0,
+    "maxMissingKeys": 0,
+    "failedPaths": 0,
+    "stalePointers": 15,
+    "skippedDatasets": 0,
+    "pruneCandidates": 0
+  }
+}
+```
+
 ## Produce and verify
 
 ```bash
@@ -980,7 +1087,11 @@ npm run validate:bundle -- --dir dist/bundles/regular        # contract check
 npm run validate:bundle -- --dir dist/bundles/regular --json
 npm run validate:bundle -- --dir ../test/fixtures/handbuilt-bundle
 
-npm test                                   # golden, bundle, comparison, release and invariant suite
+npm run gate -- --dir dist/bundles/regular                   # publication gate
+npm run gate -- --dir dist/bundles/regular --report dist/sync-report.json
+npm run gate -- --dir ../test/fixtures/handbuilt-bundle --json
+
+npm test                                   # golden, bundle, gate, comparison, release and invariant suite
 ```
 
 `--previous` accepts three forms:
@@ -1047,3 +1158,12 @@ SHA-256, corrupt zstd, invalid JSONL, missing `kind`/`id`, duplicate `kind`+`id`
 wrong record count, placeholder text, traversal path, an aggregate schema version
 below a dataset's, schema-invalid manifest) fails with that code. The CLI cases cover the human summary, `--json`, exit `0`,
 exit `1`, and a directory without `manifest.json`.
+
+Gate tests run offline too: the clean hand-built bundle passes; a synthetic
+manifest above the budget fails (`compressed-size`) and exactly at the budget
+passes; missing keys fail while zero keys and a raised threshold pass; a
+placeholder payload fails through the reused validator; unparsable pointers
+fail while stale pointers only warn; skipped datasets and inactive prune
+candidates warn. The CLI tests cover exit `0`, `1` and `2`, `--json`, and
+`--report`; a sync orchestration test proves an oversized or uncovered mode is
+reported as failed and never mutates a release.

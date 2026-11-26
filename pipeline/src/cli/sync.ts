@@ -23,6 +23,9 @@ import { DEFAULT_CACHE_DIR, FileDatasetCacheStore } from "../upstream/cache.js";
  *   npm run sync -- --all --force       # ignore conditional-request validators
  *   npm run sync -- --all --fixtures ../test/fixtures/upstream --dry-run
  *
+ * Every mode is gated before publication: an oversized mode, missing
+ * translations or unparsable pointers fail that mode and exit 1.
+ *
  * The fixtures path is offline by construction and refuses anything but
  * `--dry-run`: publishing a fixture bundle to a real release is never intended.
  */
@@ -54,10 +57,19 @@ async function main(): Promise<void> {
       out: { type: "string" },
       fixtures: { type: "string" },
       report: { type: "string" },
+      "max-bytes": { type: "string" },
     },
   });
 
   const dryRun = values["dry-run"];
+  const maxBytes =
+    values["max-bytes"] === undefined ? undefined : Number(values["max-bytes"]);
+  if (
+    maxBytes !== undefined &&
+    (!Number.isSafeInteger(maxBytes) || maxBytes <= 0)
+  ) {
+    throw new Error(`--max-bytes expects a positive integer, got "${values["max-bytes"]}"`);
+  }
   const offline = values.fixtures !== undefined;
   if (offline && !dryRun) {
     throw new Error(
@@ -95,6 +107,7 @@ async function main(): Promise<void> {
     dryRun,
     force: values.force,
     ...(offline ? { releaseClient: null } : {}),
+    ...(maxBytes === undefined ? {} : { maxCompressedBytes: maxBytes }),
   });
 
   for (const line of describeSyncReport(report)) console.log(line);

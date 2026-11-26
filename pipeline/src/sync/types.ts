@@ -1,9 +1,12 @@
 import type {
   BundleMode,
+  DatasetLocalizationMetrics,
+  GateResult,
   ManifestDatasetEntry,
   ManifestTotals,
 } from "../bundle/index.js";
 import type { NormalizeDataset } from "../normalize/index.js";
+import type { LocalizationStats } from "../upstream/localize.js";
 
 /**
  * Shared types for the production sync orchestration.
@@ -32,6 +35,8 @@ export type DatasetFetchResult =
       /** SHA-256 of the canonical localized data, used as the cache key. */
       readonly checksum: string;
       readonly meta: DatasetSourceMeta;
+      /** Translation diagnostics for this fetch, consumed by the publication gate. */
+      readonly localization: LocalizationStats;
     }
   | {
       readonly status: "not-modified";
@@ -113,6 +118,10 @@ export interface ModeSyncSummary {
   readonly refetched: number;
   readonly totals: ManifestTotals | null;
   readonly entries: readonly ManifestDatasetEntry[];
+  /** Localization diagnostics per fetched dataset (a reused 304 has none). */
+  readonly localization: readonly DatasetLocalizationMetrics[];
+  /** Publication gate result; `null` when the mode failed before it ran. */
+  readonly gate: GateResult | null;
   readonly publication: ModePublication | null;
   readonly errors: readonly SyncFailure[];
 }

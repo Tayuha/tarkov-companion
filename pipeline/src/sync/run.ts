@@ -3,11 +3,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   buildBundle,
+  gateBundle,
+  localizationMetricsFromStats,
   writeBundle,
   type BuiltBundle,
   type BundleDatasetSource,
   type BundleManifest,
   type BundleMode,
+  type DatasetLocalizationMetrics,
+  type GateResult,
   type ManifestDatasetEntry,
   type ManifestTotals,
 } from "../bundle/index.js";
@@ -21,6 +25,7 @@ import {
   type ReleaseClient,
 } from "../release/index.js";
 import {
+  isNormalizeDataset,
   normalizeDataset,
   serializeJsonl,
   type BundleRecord,
@@ -77,12 +82,18 @@ export interface SyncOptions {
   readonly now?: () => Date;
   /** Progress log sink; defaults to `console.log`. */
   readonly log?: (line: string) => void;
+  /** Compressed-size budget for one mode; defaults to the gate's 10 MB. */
+  readonly maxCompressedBytes?: number;
+  /** Allowed missing dictionary keys; defaults to the gate's 0. */
+  readonly maxMissingKeys?: number;
 }
 
 interface PreparedDataset {
   readonly records: readonly BundleRecord[];
   readonly meta: DatasetSourceMeta;
   readonly outcome: DatasetOutcome;
+  /** Resolver diagnostics; `null` when a `304` reused the normalized cache. */
+  readonly localization: DatasetLocalizationMetrics | null;
 }
 
 interface Counters {
@@ -94,6 +105,10 @@ interface Counters {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function normalizeDatasetOf(value: string | null): NormalizeDataset | null {
+  return value !== null && isNormalizeDataset(value) ? value : null;
 }
 
 function earliestTimestamp(values: readonly (string | null | undefined)[]): string | null {
@@ -124,7 +139,7 @@ async function prepareDataset(input: {
         `  ${mode}/${dataset}: 304 Not Modified, reusing cached normalized JSONL ` +
           `(${String(records.length)} records)`,
       );
-      return { records, meta: result.meta, outcome: "reused" };
+      return { records, meta: result.meta, outcome: "reused", localization: null };
     }
 
     log(
@@ -155,7 +170,12 @@ async function prepareDataset(input: {
       (outcome === "refetched" ? " (forced re-fetch)" : ""),
   );
 
-  return { records: normalized.records, meta: result.meta, outcome };
+  return {
+    records: normalized.records,
+    meta: result.meta,
+    outcome,
+    localization: localizationMetricsFromStats(dataset, result.localization),
+  };
 }
 
 function publicationFromResult(
@@ -236,6 +256,8 @@ function failedSummary(
   errors: readonly SyncFailure[],
   totals: ManifestTotals | null = null,
   entries: readonly ManifestDatasetEntry[] = [],
+  localization: readonly DatasetLocalizationMetrics[] = [],
+  gate: GateResult | null = null,
 ): ModeSyncSummary {
   return {
     mode,
@@ -247,6 +269,8 @@ function failedSummary(
     refetched: counters.refetched,
     totals,
     entries,
+    localization,
+    gate,
     publication: null,
     errors,
   };
@@ -264,6 +288,8 @@ export async function syncMode(input: {
   readonly repository: string;
   readonly generatedAt: string;
   readonly log: (line: string) => void;
+  readonly maxCompressedBytes?: number;
+  readonly maxMissingKeys?: number;
 }): Promise<ModeSyncSummary> {
   const {
     mode,
@@ -277,9 +303,12 @@ export async function syncMode(input: {
     repository,
     generatedAt,
     log,
+    maxCompressedBytes,
+    maxMissingKeys,
   } = input;
 
   const datasets: DatasetSyncSummary[] = [];
+  const localization: DatasetLocalizationMetrics[] = [];
   const errors: SyncFailure[] = [];
   const recordsByDataset: Record<string, readonly BundleRecord[]> = {};
   const sourceByDataset: Record<string, BundleDatasetSource> = {};
@@ -310,6 +339,7 @@ export async function syncMode(input: {
       recordsByDataset[dataset] = prepared.records;
       sourceByDataset[dataset] = prepared.meta;
       datasets.push({ dataset, outcome: prepared.outcome, records: prepared.records.length });
+      if (prepared.localization !== null) localization.push(prepared.localization);
 
       if (prepared.outcome === "reused") {
         counters.reused += 1;
@@ -333,7 +363,7 @@ export async function syncMode(input: {
       `  ${mode}: build blocked by ${String(errors.length)} dataset failure(s); ` +
         "nothing published",
     );
-    return failedSummary(mode, datasets, counters, errors);
+    return failedSummary(mode, datasets, counters, errors, null, [], localization);
   }
 
   let bundle: BuiltBundle;
@@ -357,8 +387,47 @@ export async function syncMode(input: {
     const message = errorMessage(error);
     errors.push({ mode, dataset: null, message: `bundle build failed: ${message}` });
     log(`  ${mode}: bundle build failed — ${message}`);
-    return failedSummary(mode, datasets, counters, errors);
+    return failedSummary(mode, datasets, counters, errors, null, [], localization);
   }
+
+  // Gate before publication: a bundle that is oversized or lost translation
+  // coverage is never uploaded, and the mode is reported as failed so the
+  // workflow exits 1 while the last good release keeps serving clients.
+  const gate = gateBundle({
+    manifest: bundle.manifest,
+    files: new Map(bundle.artifacts.map((artifact) => [artifact.path, artifact.compressed])),
+    localization,
+    ...(maxCompressedBytes === undefined ? {} : { maxCompressedBytes }),
+    ...(maxMissingKeys === undefined ? {} : { maxMissingKeys }),
+  });
+
+  if (!gate.ok) {
+    for (const failure of gate.failures) {
+      errors.push({
+        mode,
+        dataset: normalizeDatasetOf(failure.dataset),
+        message: `gate: ${failure.message}`,
+      });
+      log(`  ${mode}: gate FAILED — ${failure.message}`);
+    }
+    log(`  ${mode}: ${String(gate.failures.length)} gate failure(s); nothing published`);
+    return failedSummary(
+      mode,
+      datasets,
+      counters,
+      errors,
+      bundle.manifest.totals,
+      bundle.manifest.datasets,
+      localization,
+      gate,
+    );
+  }
+
+  log(
+    `  ${mode}: gate passed — ${(gate.metrics.compressedBytes / (1024 * 1024)).toFixed(2)} MiB ` +
+      `compressed, ${String(gate.metrics.missingKeys)} missing key(s), ` +
+      `${String(gate.metrics.stalePointers)} stale pointer(s)`,
+  );
 
   let publication: ModePublication;
   try {
@@ -381,6 +450,8 @@ export async function syncMode(input: {
       errors,
       bundle.manifest.totals,
       bundle.manifest.datasets,
+      localization,
+      gate,
     );
   }
 
@@ -400,6 +471,8 @@ export async function syncMode(input: {
     refetched: counters.refetched,
     totals: bundle.manifest.totals,
     entries: bundle.manifest.datasets,
+    localization,
+    gate,
     publication,
     errors,
   };
@@ -430,6 +503,12 @@ export async function runSync(options: SyncOptions): Promise<SyncReport> {
         repository,
         generatedAt,
         log,
+        ...(options.maxCompressedBytes === undefined
+          ? {}
+          : { maxCompressedBytes: options.maxCompressedBytes }),
+        ...(options.maxMissingKeys === undefined
+          ? {}
+          : { maxMissingKeys: options.maxMissingKeys }),
       }),
     );
   }

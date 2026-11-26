@@ -34,6 +34,9 @@ Implemented so far:
 - Bundle contract validation (`npm run validate:bundle`): manifest schema, file presence, compressed
   size and SHA-256, zstd decompression, JSONL records and ids, record counts, placeholder strings and
   path traversal. It also passes the hand-built example in `test/fixtures/handbuilt-bundle/`.
+- Publication gate (`npm run gate`): compressed size (10 MiB per mode), translation coverage (zero
+  missing keys, zero unparsable pointers) and content checks, run by `npm run sync` before any upload.
+  Stale pointers, skipped datasets and inactive `--prune` candidates are warnings only.
 
 Bundle writing uses zstd from `node:zlib`, so the pipeline requires **Node 24 or newer** (declared in
 `engines`); no native module or WASM dependency is involved.
@@ -58,6 +61,12 @@ npm run validate:bundle -- --dir dist/bundles/regular
 npm run validate:bundle -- --dir dist/bundles/regular --json
 npm run validate:bundle -- --dir ../test/fixtures/handbuilt-bundle
 
+# Publication gate: size, translation coverage and content (offline)
+npm run gate -- --dir dist/bundles/regular
+npm run gate -- --dir dist/bundles/regular --report dist/sync-report.json
+npm run gate -- --dir dist/bundles/regular --max-bytes 12582912 --json
+npm run gate -- --dir ../test/fixtures/handbuilt-bundle
+
 # Compare with a published bundle and skip writing when nothing changed
 npm run bundle -- --mode regular --previous /tmp/bundles
 npm run bundle -- --mode regular --previous /tmp/bundles/regular/manifest.json
@@ -78,6 +87,7 @@ npm run sync -- --all                            # every mode, rolling releases
 npm run sync -- --mode regular --dry-run         # read the release, mutate nothing
 npm run sync -- --all --force                    # bypass conditional-request validators
 npm run sync -- --all --fixtures ../test/fixtures/upstream --dry-run   # offline plan
+npm run sync -- --mode regular --max-bytes 12582912                    # override gate budget
 
 # CI failure-issue reporter (used by .github/workflows/data-sync.yml)
 npm run report:status -- --status success --run-url https://github.com/Tayuha/tarkov-companion/actions/runs/0
@@ -189,11 +199,13 @@ pipeline/src/bundle/
   writer.ts     buildBundle() (no I/O) and writeBundle() (atomic files)
   compare.ts    compareBundles(), manifest loading, no-op classification
   validate.ts   pure contract validator (manifest, bytes, JSONL, paths)
+  gate.ts       pure publication gate (size, coverage, content)
   index.ts      public exports
 pipeline/src/fixtures/bundle-set.ts   fixtures -> normalized bundle input
 pipeline/src/cli/bundle.ts            npm run bundle (with --previous)
 pipeline/src/cli/compare.ts           npm run compare
 pipeline/src/cli/validate-bundle.ts   npm run validate:bundle
+pipeline/src/cli/gate.ts              npm run gate
 ```
 
 Output layout (relative to `--out`, default `dist/bundles`):
@@ -234,6 +246,17 @@ flat traversal-free paths. Unknown extra files are warnings; any error exits 1. 
 machine-readable report. The implementation is `src/bundle/validate.ts` (pure) plus
 `src/cli/validate-bundle.ts`, and the documented hand-built example lives in
 `test/fixtures/handbuilt-bundle/`.
+
+**Publication gate.** `src/bundle/gate.ts` (`gateBundle`, pure) runs after a mode is built and before
+any release call. A mode fails the build when its compressed datasets exceed the budget
+(`10 * 1024 * 1024` bytes by default), any placeholder survives in the JSONL (delegated to the
+validator), missing dictionary keys exceed the threshold (`0`), or a translation pointer cannot be
+parsed. Stale/unresolved pointers, skipped datasets and unreferenced local `.jsonl.zst` files
+(inactive `--prune` candidates) are warnings. Sizes come from the actual compressed files when
+available, never from the manifest `totals`. `npm run gate -- --dir <bundle-dir>` applies the same
+rules to a directory, optionally with `--report dist/sync-report.json` for localization stats,
+`--max-bytes <n>` and `--json`; it exits `0` on pass, `1` on a gate failure and `2` on invalid input.
+The full rules and thresholds are in [`../docs/data-bundles.md`](../docs/data-bundles.md#publication-gate).
 
 **Comparison and no-op builds.** `src/bundle/compare.ts` compares two manifests by dataset presence and
 `sha256`: only in current is `added`, only in previous is `removed`, a different checksum is `changed`,
@@ -339,6 +362,11 @@ pipeline/src/ci/report-status.ts  failure/success issue lifecycle
 - A validation or normalization failure blocks that dataset's whole mode:
   publishing the rest would mark the dataset `removed` and make clients delete
   their rows. Other modes still run.
+- After a mode is built, `gateBundle` checks the compressed size (10 MiB by
+  default), placeholder strings, missing dictionary keys (zero by default) and
+  unparsable translation pointers. A gate failure publishes nothing for that
+  mode, is recorded in the report (`modes[].gate`, `modes[].localization`) and
+  makes the run exit 1; `--max-bytes <n>` overrides the budget.
 - All modes are processed before exiting. `exitCode` is 1 when any mode failed,
   and a JSON report is written for the CI issue reporter.
 - A mode with no changes still builds locally, but `publishBundle` makes zero

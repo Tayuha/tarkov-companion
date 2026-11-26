@@ -21,7 +21,7 @@
 - [x] 2.8 Implement bundle publication to GitHub Releases with an idempotent upload and a stable `latest` manifest pointer, verified by a dry-run mode test and one manual run against a test release
 - [x] 2.9 Add `.github/workflows/data-sync.yml` running every 6 hours with concurrency control and failure notification, verified by a manual `workflow_dispatch` run publishing or correctly skipping a release
 - [x] 2.10 Document the pipeline contract (bundle layout, schema versions, manifest fields, localization) in `docs/data-bundles.md`, verified by a reader being able to hand-build a valid bundle from the document and pass a validation command
-- [ ] 2.11 Add a pipeline check that fails on missing translation coverage or compressed bundle size above the 10 MB budget, verified by tests with a missing-key fixture and an oversized synthetic dataset both failing the build
+- [x] 2.11 Add a pipeline check that fails on missing translation coverage or compressed bundle size above the 10 MB budget, verified by tests with a missing-key fixture and an oversized synthetic dataset both failing the build
 
 ## 3. Client foundation
 

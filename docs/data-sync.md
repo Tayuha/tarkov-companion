@@ -47,7 +47,11 @@ and `maps`.
    under its upstream content checksum.
 4. **Bundle** the mode once every dataset is ready, then compare it with the
    published manifest.
-5. **Publish** changed dataset assets first and `manifest.json` last. No change
+5. **Gate** the built mode before any release call: compressed size (10 MiB),
+   placeholder strings, missing dictionary keys (zero) and unparsable
+   translation pointers must pass. Stale pointers, skipped datasets and
+   inactive prune candidates are warnings.
+6. **Publish** changed dataset assets first and `manifest.json` last. No change
    means zero create/upload/delete calls.
 
 ### Partial failure
@@ -61,9 +65,11 @@ A dataset that fails validation or normalization blocks its **entire mode**.
 Publishing the remaining datasets would mark the failed one as `removed` in the
 manifest and make clients delete its rows. The other modes are still published.
 
-The CLI writes `pipeline/dist/sync-report.json` with the per-mode counters and
-the first error, which the workflow uses to name the failed mode/dataset in the
-issue.
+The CLI writes `pipeline/dist/sync-report.json` with the per-mode counters,
+the per-dataset localization metrics (`missingKeys`, `failedPaths`,
+`stalePointers`) and the full gate result (`modes[].gate`). The workflow uses it
+to name the failed mode/dataset in the issue, and `npm run gate -- --report`
+can replay the coverage checks against a downloaded bundle.
 
 ## Cache behavior
 
@@ -144,6 +150,7 @@ Other flags:
 | `--out <dir>` | Bundle output root (default `dist/bundles`). |
 | `--fixtures <dir>` | Offline source. Requires `--dry-run`. |
 | `--report <file>` | Report path (default `dist/sync-report.json`; not written in dry-run). |
+| `--max-bytes <n>` | Override the 10 MiB publication-gate budget for this run. |
 
 Offline verification against the committed fixtures, with no network and no
 release access:

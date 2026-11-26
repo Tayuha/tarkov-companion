@@ -89,6 +89,7 @@ export class FixtureDatasetProvider implements DatasetProvider {
       status: "modified",
       data: fixture.data,
       checksum: canonicalSha256(fixture.data),
+      localization: fixture.stats,
       meta: {
         url: file?.source ?? null,
         etag: file?.etag ?? null,

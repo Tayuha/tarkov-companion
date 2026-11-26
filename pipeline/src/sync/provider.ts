@@ -42,7 +42,13 @@ function toProviderResult(result: FetchDatasetResult): DatasetFetchResult {
   if (result.status === "not-modified") {
     return { status: "not-modified", checksum: result.cache.checksum, meta };
   }
-  return { status: "modified", data: result.data, checksum: result.cache.checksum, meta };
+  return {
+    status: "modified",
+    data: result.data,
+    checksum: result.cache.checksum,
+    meta,
+    localization: result.stats,
+  };
 }
 
 export class UpstreamDatasetProvider implements DatasetProvider {

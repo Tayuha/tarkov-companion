@@ -14,6 +14,12 @@ function formatBytes(value: number): string {
   return `${value} B`;
 }
 
+function formatBudget(value: number): string {
+  if (value >= 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(2)} MiB`;
+  if (value >= 1024) return `${(value / 1024).toFixed(2)} kB`;
+  return `${value} B`;
+}
+
 function describeMode(mode: ModeSyncSummary): string[] {
   const lines: string[] = [];
 
@@ -48,6 +54,24 @@ function describeMode(mode: ModeSyncSummary): string[] {
       `  totals   ${String(mode.totals.records).padStart(6)} records  ` +
         `${formatBytes(mode.totals.uncompressedBytes).padStart(9)} -> ` +
         `${formatBytes(mode.totals.compressedBytes).padStart(9)}`,
+    );
+  }
+
+  for (const entry of mode.localization) {
+    lines.push(
+      `  localize ${entry.dataset.padEnd(8)} missing ${String(entry.missingKeys)}, ` +
+        `failed ${String(entry.failedPaths.length)}, ` +
+        `stale ${String(entry.stalePointers.length)}`,
+    );
+  }
+
+  if (mode.gate !== null) {
+    lines.push(
+      `  gate     ${mode.gate.ok ? "passed" : "FAILED"} — ` +
+        `${formatBudget(mode.gate.metrics.compressedBytes)} compressed ` +
+        `(budget ${formatBudget(mode.gate.metrics.maxCompressedBytes)}), ` +
+        `${String(mode.gate.metrics.missingKeys)} missing key(s), ` +
+        `${String(mode.gate.metrics.stalePointers)} stale pointer(s)`,
     );
   }
 
