@@ -1,6 +1,6 @@
 import { canonicalSha256 } from "../util/canonical.js";
 import type { DatasetCacheEntry, DatasetCacheStore } from "./cache.js";
-import { localizeInPlace, type LocalizationStats } from "./localize.js";
+import { localizeInPlace, resolveDictionaryFallback, type LocalizationStats } from "./localize.js";
 
 export type GameMode = "regular" | "pve" | "pvp-season";
 
@@ -45,6 +45,12 @@ export interface FetchDatasetOptions {
   readonly cache?: DatasetCacheStore;
   /** Ignore stored validators and re-download both resources. */
   readonly forceRefresh?: boolean;
+  /**
+   * Also resolve dictionary-covered placeholder strings that no declared
+   * translation pointer selects. The scheduled sync opts in; fixture
+   * localization keeps the pointer-only contract.
+   */
+  readonly resolveUncoveredPlaceholders?: boolean;
   /** Clock seam for cache timestamps. Defaults to `new Date()`. */
   readonly now?: () => Date;
 }
@@ -276,6 +282,7 @@ export async function fetchDataset(options: FetchDatasetOptions): Promise<FetchD
     allowMissingDictionary = false,
     cache,
     forceRefresh = false,
+    resolveUncoveredPlaceholders = false,
     now = () => new Date(),
   } = options;
 
@@ -382,6 +389,11 @@ export async function fetchDataset(options: FetchDatasetOptions): Promise<FetchD
   }
 
   const stats = localizeInPlace({ data: payload.data, translations }, dictionary);
+
+  if (resolveUncoveredPlaceholders && Object.keys(dictionary).length > 0) {
+    const extra = resolveDictionaryFallback(payload.data, dictionary);
+    if (extra > 0) stats.resolvedOutsidePointers = extra;
+  }
 
   if (stats.missingKeys.length > 0) {
     warnings.push(

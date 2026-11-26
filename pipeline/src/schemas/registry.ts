@@ -123,13 +123,19 @@ export function parseDictionary(payload: unknown): z.ZodSafeParseResult<unknown>
 }
 
 /** Human-readable `path: message` lines for a failed parse. */
-export function formatIssues(error: z.ZodError): string {
-  return error.issues
-    .map((issue) => {
-      const path = issue.path.length > 0 ? issue.path.join(".") : "<root>";
-      return `${path}: ${issue.message}`;
-    })
-    .join("\n");
+export function formatIssues(
+  error: z.ZodError,
+  maxIssues: number = Number.POSITIVE_INFINITY,
+): string {
+  const shown = error.issues.slice(0, maxIssues);
+  const lines = shown.map((issue) => {
+    const path = issue.path.length > 0 ? issue.path.join(".") : "<root>";
+    return `${path}: ${issue.message}`;
+  });
+  if (shown.length < error.issues.length) {
+    lines.push(`... ${String(error.issues.length - shown.length)} more issue(s) not shown`);
+  }
+  return lines.join("\n");
 }
 
 /**

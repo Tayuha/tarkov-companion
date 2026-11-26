@@ -12,6 +12,7 @@ import {
   projectMap,
   requireId,
   requireRecord,
+  requireString,
   stringList,
   vector3,
   vector3List,
@@ -154,12 +155,32 @@ const STATIONARY_WEAPON_POINT_SPEC: FieldSpec = {
   position: { to: "position", transform: vector3 },
 };
 
+function projectActivations(
+  value: unknown,
+  ctx: NormalizeContext,
+  path: string,
+): JsonRecord[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return value.map((entry, index) => {
+    const activation = requireRecord(entry, `${path}[${index}]`);
+    for (const key of Object.keys(activation)) {
+      if (key !== "operation" && key !== "switch") {
+        ctx.stats.drop(`${path}[${index}].${key}`);
+      }
+    }
+    return {
+      operation: requireString(activation["operation"], `${path}[${index}].operation`),
+      switchId: requireId(activation["switch"], `${path}[${index}].switch`),
+    };
+  });
+}
+
 const SWITCH_SPEC: FieldSpec = {
   id: "id",
   name: "name",
   switchType: "switchType",
   activatedBy: "activatedBy",
-  activates: { to: "activates", transform: stringList },
+  activates: { to: "activates", transform: projectActivations },
   // `door` is opaque upstream (null or an unmodelled payload); copy it as-is.
   door: "door",
   bottom: { to: "bottom", transform: numberValue },

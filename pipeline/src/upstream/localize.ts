@@ -40,6 +40,11 @@ export interface LocalizationStats {
   failedPaths: Array<{ path: string; error: string }>;
   /** Selected strings with no dictionary entry that do not look like placeholders. */
   unmatched: number;
+  /**
+   * Strings the dictionary fallback resolved although no declared pointer
+   * selected them. Only populated when the caller opts in.
+   */
+  resolvedOutsidePointers?: number;
 }
 
 const PLACEHOLDER = /^[0-9a-f]{24} \S/;
@@ -124,4 +129,53 @@ export function localizeInPlace(
 /** True when a string still looks like an unresolved localization key. */
 export function isPlaceholder(value: string): boolean {
   return PLACEHOLDER.test(value);
+}
+
+/**
+ * Resolve placeholder-shaped strings the dictionary covers even when no
+ * declared translation pointer selects them.
+ *
+ * The dictionary is keyed by the full placeholder string (`"<id> Name"`), so an
+ * exact match is a safe signal. Upstream occasionally adds a translatable field
+ * before adding its pointer (observed on top-level task objective `effects`);
+ * pointers alone would leave those keys in the payload and normalization would
+ * reject the dataset. This fallback is opt-in so fixture localization and its
+ * goldens keep the pointer-only contract.
+ *
+ * Mutates `data` in place and returns the number of replaced strings.
+ */
+export function resolveDictionaryFallback(
+  data: unknown,
+  dictionary: Readonly<Record<string, string>>,
+): number {
+  let resolved = 0;
+
+  function visit(value: unknown): unknown {
+    if (typeof value === "string") {
+      // Only placeholder-shaped strings are candidates. The dictionary also
+      // contains bare entity ids mapped to empty strings; a blind key lookup
+      // would blank out identity fields.
+      if (!PLACEHOLDER.test(value)) return value;
+      const replacement = dictionary[value];
+      if (replacement === undefined) return value;
+      resolved += 1;
+      return replacement;
+    }
+    if (Array.isArray(value)) {
+      for (let index = 0; index < value.length; index += 1) {
+        value[index] = visit(value[index]);
+      }
+      return value;
+    }
+    if (typeof value === "object" && value !== null) {
+      const record = value as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        record[key] = visit(record[key]);
+      }
+    }
+    return value;
+  }
+
+  visit(data);
+  return resolved;
 }

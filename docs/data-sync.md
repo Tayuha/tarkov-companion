@@ -36,6 +36,11 @@ and `maps`.
 
 1. **Fetch** each `{mode, dataset}` with the conditional cache. A `200` returns
    the localized payload; a `304` proves the content did not change.
+   Localization follows the declared JSONPath pointers and then applies a
+   dictionary-keyed fallback for placeholder-shaped strings no pointer selects
+   (upstream occasionally adds a translatable field before its pointer). The
+   fallback never rewrites identity fields; an unknown placeholder still blocks
+   validation.
 2. **Validate** the localized payload with the registry schema. A failure blocks
    the whole mode.
 3. **Normalize** to bundle records and persist the JSONL in the normalized cache

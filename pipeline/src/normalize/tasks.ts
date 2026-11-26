@@ -6,6 +6,7 @@ import {
   type NormalizeContext,
   integerValue,
   makeRecord,
+  nullableInteger,
   nullableNumber,
   numberValue,
   projectFields,
@@ -94,7 +95,7 @@ const COMPARISON_SPEC: FieldSpec = {
 const HEALTH_EFFECT_SPEC: FieldSpec = {
   bodyParts: { to: "bodyParts", transform: stringList },
   effects: { to: "effects", transform: stringList },
-  time: { to: "time", transform: projectComparison },
+  time: { to: "time", transform: nullableComparison },
 };
 
 const POSSIBLE_LOCATION_SPEC: FieldSpec = {
@@ -138,7 +139,7 @@ const CONDITION_SPEC: FieldSpec = {
   usingWeapon: { to: "usingWeaponItemIds", transform: stringList },
   usingWeaponMods: { to: "usingWeaponModItemIds", transform: stringMatrix },
   requiredKeys: { to: "requiredKeyItemIds", transform: stringMatrix },
-  notWearing: { to: "notWearingItemIds", transform: stringList },
+  notWearing: { to: "notWearingItemIds", transform: projectWornIds },
   wearing: { to: "wearingItemIds", transform: projectWearing },
   possibleLocations: { to: "possibleLocations", transform: projectPossibleLocations },
   zones: { to: "zones", transform: projectZones },
@@ -265,7 +266,7 @@ const TASK_SPEC: FieldSpec = {
   id: "id",
   name: "name",
   normalizedName: "normalizedName",
-  experience: { to: "experience", transform: integerValue },
+  experience: { to: "experience", transform: nullableInteger },
   factionName: "factionName",
   kappaRequired: "kappaRequired",
   lightkeeperRequired: "lightkeeperRequired",
@@ -533,6 +534,21 @@ function projectZones(
   return projectList(value, ctx, path, (entry, context, entryPath) =>
     projectFields(entry, ZONE_SPEC, context, entryPath),
   );
+}
+
+function projectWornIds(
+  value: unknown,
+  ctx: NormalizeContext,
+  path: string,
+): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return value.map((entry, index) => {
+    const worn = requireRecord(entry, `${path}[${index}]`);
+    for (const key of Object.keys(worn)) {
+      if (key !== "id") ctx.stats.drop(`${path}[${index}].${key}`);
+    }
+    return requireId(worn["id"], `${path}[${index}].id`);
+  });
 }
 
 function projectWearing(

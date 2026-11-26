@@ -30,9 +30,9 @@ const extractTransferItem = z.looseObject({
   item: entityId,
 });
 
-const mapExtract = z.looseObject({
+export const mapExtractSchema = z.looseObject({
   bottom: z.number(),
-  faction: z.string(),
+  faction: z.string().nullish(),
   id: entityId,
   name: z.string(),
   outline,
@@ -60,13 +60,13 @@ const bossSpawnLocation = z.looseObject({
   spawnKey: z.string(),
 });
 
-const mapBoss = z.looseObject({
+export const mapBossSchema = z.looseObject({
   escorts: z.array(bossEscort),
   mob: z.string(),
   spawnChance: z.number(),
   spawnLocations: z.array(bossSpawnLocation),
   spawnTime: z.number(),
-  spawnTimeRandom: z.boolean(),
+  spawnTimeRandom: z.boolean().nullish(),
   spawnTrigger: z.string().nullable(),
   supports: stringArray,
 });
@@ -107,19 +107,24 @@ const mapTransit = z.looseObject({
   conditions: z.string().optional(),
 });
 
-const mapHazard = z.looseObject({
-  bottom: z.number(),
+export const mapHazardSchema = z.looseObject({
+  bottom: z.number().nullish(),
   hazardType: z.string(),
   id: entityId,
   name: z.string(),
   outline,
   position: vector3,
-  top: z.number(),
+  top: z.number().nullish(),
 });
 
-const mapSwitch = z.looseObject({
-  activatedBy: z.boolean(),
-  activates: stringArray,
+export const mapSwitchActivationSchema = z.looseObject({
+  operation: z.string(),
+  switch: entityId,
+});
+
+export const mapSwitchSchema = z.looseObject({
+  activatedBy: z.union([z.boolean(), entityId]),
+  activates: z.array(mapSwitchActivationSchema),
   bottom: z.number(),
   door: z.unknown(),
   id: entityId,
@@ -154,13 +159,13 @@ export const mapSchema = z.looseObject({
   accessKeys: idArray,
   accessKeysMinPlayerLevel: z.number(),
   artillery: artillery.optional(),
-  bosses: z.array(mapBoss),
+  bosses: z.array(mapBossSchema),
   btrStops: opaqueArray,
   coordinateToCardinalRotation: z.number(),
   description: translatedText,
   enemies: stringArray,
-  extracts: z.array(mapExtract),
-  hazards: z.array(mapHazard),
+  extracts: z.array(mapExtractSchema),
+  hazards: z.array(mapHazardSchema),
   id: entityId,
   locks: z.array(mapLock),
   lootContainers: z.array(lootContainerPoint),
@@ -175,7 +180,7 @@ export const mapSchema = z.looseObject({
   scenePath: z.string(),
   spawns: z.array(mapSpawn),
   stationaryWeapons: z.array(mapStationaryWeapon),
-  switches: z.array(mapSwitch),
+  switches: z.array(mapSwitchSchema),
   transits: z.array(mapTransit),
   wiki: webUrl,
 });

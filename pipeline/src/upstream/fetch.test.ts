@@ -152,6 +152,38 @@ describe("fetchDataset", () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it("resolves dictionary keys outside the declared pointers when opted in", async () => {
+    const payload = {
+      data: {
+        [PRAPOR]: {
+          id: PRAPOR,
+          name: `${PRAPOR} Nickname`,
+          // No pointer selects this field, but the dictionary has its key.
+          effects: [`${PRAPOR} Description`],
+        },
+      },
+      translations: ["$.data.*.name"],
+    };
+    const { fetchImpl } = mockFetch((url) =>
+      jsonResponse(url.endsWith("_en") ? dictionary() : payload),
+    );
+
+    const result = modifiedOf(
+      await fetchDataset({
+        mode: "regular",
+        dataset: "traders",
+        baseUrl: BASE,
+        fetchImpl,
+        resolveUncoveredPlaceholders: true,
+      }),
+    );
+
+    expect(
+      (result.data as Record<string, { effects: string[] }>)[PRAPOR]?.effects,
+    ).toEqual(["Warrant officer."]);
+    expect(result.stats.resolvedOutsidePointers).toBe(1);
+  });
+
   it("exposes the unresolved payload, dictionary and pointers for fixture capture", async () => {
     const { fetchImpl } = mockFetch((url) =>
       jsonResponse(url.endsWith("_en") ? dictionary() : basePayload()),

@@ -142,7 +142,7 @@ async function prepareDataset(input: {
 
   const parsed = parseDatasetData(mode, dataset, result.data);
   if (!parsed.success) {
-    throw new Error(`validation failed: ${formatIssues(parsed.error)}`);
+    throw new Error(`validation failed: ${formatIssues(parsed.error, 10)}`);
   }
 
   const normalized = normalizeDataset(dataset, parsed.data);
@@ -336,21 +336,29 @@ export async function syncMode(input: {
     return failedSummary(mode, datasets, counters, errors);
   }
 
-  const source = await provider.source(mode);
-  const bundle = buildBundle(
-    {
-      mode,
-      datasets: recordsByDataset,
-      sourceMeta: {
-        baseUrl: source.baseUrl,
-        capturedAt:
-          source.capturedAt ??
-          earliestTimestamp(Object.values(sourceByDataset).map((meta) => meta.fetchedAt)),
-        datasets: sourceByDataset,
+  let bundle: BuiltBundle;
+  try {
+    const source = await provider.source(mode);
+    bundle = buildBundle(
+      {
+        mode,
+        datasets: recordsByDataset,
+        sourceMeta: {
+          baseUrl: source.baseUrl,
+          capturedAt:
+            source.capturedAt ??
+            earliestTimestamp(Object.values(sourceByDataset).map((meta) => meta.fetchedAt)),
+          datasets: sourceByDataset,
+        },
       },
-    },
-    generatedAt,
-  );
+      generatedAt,
+    );
+  } catch (error) {
+    const message = errorMessage(error);
+    errors.push({ mode, dataset: null, message: `bundle build failed: ${message}` });
+    log(`  ${mode}: bundle build failed — ${message}`);
+    return failedSummary(mode, datasets, counters, errors);
+  }
 
   let publication: ModePublication;
   try {

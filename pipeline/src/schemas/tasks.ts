@@ -50,7 +50,7 @@ const comparison = z.looseObject({
 const healthEffect = z.looseObject({
   bodyParts: stringArray,
   effects: stringArray,
-  time: comparison,
+  time: comparison.nullish(),
 });
 
 const possibleLocation = z.looseObject({
@@ -81,7 +81,7 @@ export const taskConditionSchema = z.looseObject({
   distance: comparison.nullish(),
   dogTagLevel: z.number().optional(),
   effects: stringArray.optional(),
-  enemyHealthEffect: z.null().optional(),
+  enemyHealthEffect: healthEffect.nullish(),
   exitName: z.string().optional(),
   exitStatus: stringArray.optional(),
   foundInRaid: z.boolean().optional(),
@@ -100,7 +100,8 @@ export const taskConditionSchema = z.looseObject({
   markerItem: entityId.optional(),
   maxDurability: z.number().optional(),
   minDurability: z.number().optional(),
-  notWearing: stringArray.optional(),
+  // Live payloads carry full `{id, name}` objects here, not bare item ids.
+  notWearing: z.array(wornItem).optional(),
   playerHealthEffect: healthEffect.nullish(),
   playerLevel: z.number().optional(),
   possibleLocations: z.array(possibleLocation).optional(),
@@ -216,7 +217,7 @@ const otherRequirement = z.looseObject({
 export const taskSchema = z.looseObject({
   availableDelaySecondsMax: z.number().optional(),
   availableDelaySecondsMin: z.number().optional(),
-  experience: z.number(),
+  experience: z.number().nullish(),
   factionName: z.string(),
   failConditions: z.array(taskConditionSchema),
   failureOutcome: taskRewardsSchema,

@@ -403,6 +403,35 @@ a plan either reflects a publishable bundle or fails before any mutation.
 | Objective types | `type` is always present. Only the fields admitted for that type are emitted; absent union fields are omitted, never `undefined`. |
 | Opaque payloads | `map.btrStops` and `map.switches[].door` are copied as validated because upstream has no observable element shape. |
 
+### Upstream drift tolerance
+
+The live API is slightly richer than the trimmed fixtures. These allowances are
+deliberate and do not change the bundle shape:
+
+- `item.wikiLink` may be an empty string when there is no wiki page.
+- Item price fields (`avg24hPrice`, `changeLast48h`, `changeLast48hPercent`,
+  `lastLowPrice`, `lastOfferCount`, `lastScan`) may be absent on PvE items; the
+  normalized `price` object writes `null` for them.
+- `item.properties.propertiesType` and the nullable property numbers (`moa`,
+  `defaultWidth`, `defaultHeight`, `defaultPreset`, `defaultAmmo`,
+  `hpCostHeavyBleeding`, `hpCostLightBleeding`) may be absent or `null`.
+- `task.experience` may be `null`; a null is kept as `null`.
+- Map `hazards[]` may omit `top`/`bottom`, `bosses[]` may omit
+  `spawnTimeRandom`, and `extracts[]` may omit `faction`.
+- Map `switches[]` upstream `activates` entries are `{operation, switch}`; the
+  bundle stores `{operation, switchId}`. `activatedBy` is a boolean or the id
+  of the activating switch.
+- Task objectives serve `notWearing` as `{id, name}` objects; the bundle keeps
+  only `notWearingItemIds`.
+- Craft `requiredQuestItems` entries are `{item}`; the bundle stores
+  `{itemId}`.
+
+The scheduled sync also applies a dictionary-keyed fallback for
+placeholder-shaped strings that no declared translation pointer selects (for
+example top-level objective `effects`). It only rewrites strings matching the
+placeholder pattern, so identity fields are never touched. A placeholder key
+missing from the dictionary still fails normalization.
+
 ### Price object
 
 Items carry the live price snapshot in `price`:
@@ -442,10 +471,11 @@ emitted again.
 ```
 
 `loyaltyLevel` is the upstream `minTraderLevel` and is only present when
-upstream provides it. `currencyItemId` is the item used to pay (for example the
-roubles item id). `restockAmount` is the stock per trader reset.
-`taskUnlockId` references a task that unlocks the offer, or is `null` when no
-task is required; it is always present on buy offers.
+upstream provides it. `buyLimit` is the upstream `buyLimit` and is **omitted
+when upstream sends `null`** (no purchase limit). `currencyItemId` is the item
+used to pay (for example the roubles item id). `restockAmount` is the stock per
+trader reset. `taskUnlockId` references a task that unlocks the offer, or is
+`null` when no task is required; it is always present on buy offers.
 
 ## Intentional embedded values
 

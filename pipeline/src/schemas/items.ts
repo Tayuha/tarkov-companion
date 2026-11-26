@@ -23,11 +23,12 @@ import {
  * Strictness policy: every object is a loose object, so a new upstream field
  * is preserved and ignored instead of failing a build. Known fields are
  * type-checked. Item property payloads are a union keyed by `propertiesType`;
- * only `propertiesType` is required, while the known per-type fields are
- * validated when present, because the committed fixture does not prove that
- * every field is present for every item of a given type. Item-level flat
- * combat fields (`damage`, `penetrationPower`, ...) are optional for the same
- * reason: upstream only emits them for the relevant item types.
+ * every known per-type field is validated when present, because the committed
+ * fixture does not prove that every field is present for every item of a given
+ * type. `propertiesType` itself is optional because some PvE properties blocks
+ * omit it. Item-level flat combat fields (`damage`, `penetrationPower`, ...)
+ * are optional for the same reason: upstream only emits them for the relevant
+ * item types.
  *
  * `playerLevels`, `mastering`, `skills` and `specialItems` are arrays upstream
  * (not id-keyed maps), and the mode markers carry the same shapes as the
@@ -50,7 +51,8 @@ const containedItem = z.looseObject({
 });
 
 const buyOffer = z.looseObject({
-  buyLimit: z.number(),
+  // Upstream serves `null` for "no limit" on some offers.
+  buyLimit: z.number().nullable(),
   currency: z.string(),
   currencyItem: entityId,
   minTraderLevel: z.number(),
@@ -119,7 +121,7 @@ const armorSlot = z.looseObject({
  * `propertiesType`.
  */
 const itemProperties = z.looseObject({
-  propertiesType: z.string(),
+  propertiesType: z.string().optional(),
   accuracyModifier: z.number().optional(),
   allowedAmmo: idArray.optional(),
   ambientVolume: z.number().optional(),
@@ -153,14 +155,14 @@ const itemProperties = z.looseObject({
   damage: z.number().optional(),
   deafening: z.string().optional(),
   default: z.boolean().optional(),
-  defaultAmmo: entityId.optional(),
+  defaultAmmo: entityId.nullish(),
   defaultErgonomics: nullableNumber.optional(),
-  defaultHeight: z.number().optional(),
-  defaultPreset: entityId.optional(),
+  defaultHeight: z.number().nullish(),
+  defaultPreset: entityId.nullish(),
   defaultRecoilHorizontal: nullableNumber.optional(),
   defaultRecoilVertical: nullableNumber.optional(),
   defaultWeight: nullableNumber.optional(),
-  defaultWidth: z.number().optional(),
+  defaultWidth: z.number().nullish(),
   deviationCurve: z.number().optional(),
   deviationMax: z.number().optional(),
   diffuseIntensity: z.number().optional(),
@@ -184,8 +186,8 @@ const itemProperties = z.looseObject({
   heatFactor: z.number().optional(),
   heavyBleedModifier: z.number().optional(),
   hitpoints: z.number().optional(),
-  hpCostHeavyBleeding: z.number().optional(),
-  hpCostLightBleeding: z.number().optional(),
+  hpCostHeavyBleeding: z.number().nullish(),
+  hpCostLightBleeding: z.number().nullish(),
   hydration: z.number().optional(),
   hydrationImpact: z.number().optional(),
   increaseSize: z
@@ -211,7 +213,7 @@ const itemProperties = z.looseObject({
   minExplosionDistance: z.number().optional(),
   minLimbHealth: z.number().optional(),
   misfireChance: z.number().optional(),
-  moa: z.number().optional(),
+  moa: z.number().nullish(),
   noiseIntensity: z.number().optional(),
   noiseScale: z.number().optional(),
   painkillerDuration: z.number().optional(),
@@ -271,17 +273,18 @@ export const itemSchema = z.looseObject({
   weight: z.number(),
   minLevelForFlea: z.number(),
   link: webUrl,
-  wikiLink: webUrl,
+  // Some items have no wiki page and upstream sends an empty string.
+  wikiLink: z.union([webUrl, z.literal("")]),
   types: stringArray,
   updated: isoDateTime,
   sellToTrader: z.array(sellOffer),
   properties: itemProperties.nullable(),
-  avg24hPrice: nullableNumber,
-  changeLast48h: nullableNumber,
-  changeLast48hPercent: nullableNumber,
-  lastLowPrice: nullableNumber,
-  lastOfferCount: nullableNumber,
-  lastScan: isoDateTime.nullable(),
+  avg24hPrice: nullableNumber.nullish(),
+  changeLast48h: nullableNumber.nullish(),
+  changeLast48hPercent: nullableNumber.nullish(),
+  lastLowPrice: nullableNumber.nullish(),
+  lastOfferCount: nullableNumber.nullish(),
+  lastScan: isoDateTime.nullish(),
   // Present in some records and null in others: both states are recorded.
   high24hPrice: z.number().nullish(),
   // Absent from some records but never null.

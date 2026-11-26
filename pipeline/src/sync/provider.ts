@@ -85,6 +85,7 @@ export class UpstreamDatasetProvider implements DatasetProvider {
       fetchImpl: this.#fetchImpl,
       cache: this.#cache,
       forceRefresh: input.forceRefresh,
+      resolveUncoveredPlaceholders: true,
       now: this.#now,
     });
     return toProviderResult(result);

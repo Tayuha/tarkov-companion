@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { localizeInPlace } from "./localize.js";
+import { localizeInPlace, resolveDictionaryFallback } from "./localize.js";
 
 const A = "54cb50c76803fa8b248b4571";
 const B = "54cb57776803fa99248b456e";
@@ -94,5 +94,44 @@ describe("localizeInPlace", () => {
     expect(payload.data.value).toBe(`${A} Name`);
     expect(stats.translated).toBe(0);
     expect(stats.visited).toBe(0);
+  });
+});
+
+describe("resolveDictionaryFallback", () => {
+  it("resolves dictionary keys that no translation pointer selected", () => {
+    const payload = {
+      data: {
+        task: {
+          objectives: [
+            { effects: [`${A} Name`, "already final"], nested: { label: "" } },
+            { effects: [], nested: { label: `${B} Name` } },
+          ],
+        },
+      },
+      translations: [],
+    };
+    const resolved = resolveDictionaryFallback(payload, {
+      [`${A} Name`]: "Stimulant",
+      [`${B} Name`]: "Painkiller",
+    });
+
+    expect(resolved).toBe(2);
+    expect(payload.data.task.objectives[0]?.effects).toEqual(["Stimulant", "already final"]);
+    expect(payload.data.task.objectives[1]?.nested.label).toBe("Painkiller");
+  });
+
+  it("leaves placeholder-shaped strings without a dictionary entry untouched", () => {
+    const payload = { data: { name: `${A} Name` } };
+    expect(resolveDictionaryFallback(payload, {})).toBe(0);
+    expect(payload.data.name).toBe(`${A} Name`);
+  });
+
+  it("never rewrites identity fields that happen to be dictionary keys", () => {
+    // The task dictionary contains bare entity ids mapped to an empty string.
+    const payload = { data: { id: A, name: `${A} Name` } };
+    const resolved = resolveDictionaryFallback(payload, { [A]: "", [`${A} Name`]: "Thing" });
+    expect(resolved).toBe(1);
+    expect(payload.data.id).toBe(A);
+    expect(payload.data.name).toBe("Thing");
   });
 });

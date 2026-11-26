@@ -15,6 +15,16 @@ export const craftItemSchema = z.looseObject({
   item: entityId,
 });
 
+/**
+ * `requiredQuestItems` is only `{item}` upstream: these entries are quest-item
+ * references, not craft ingredients, so they carry no count or attributes.
+ */
+export const craftQuestItemSchema = z.looseObject({
+  item: entityId,
+  count: z.number().optional(),
+  attributes: attributeBag.optional(),
+});
+
 export const craftSchema = z.looseObject({
   duration: z.number(),
   gameEditions: stringArray,
@@ -22,7 +32,7 @@ export const craftSchema = z.looseObject({
   level: z.number(),
   productItem: craftItemSchema,
   requiredItems: z.array(craftItemSchema),
-  requiredQuestItems: z.array(craftItemSchema),
+  requiredQuestItems: z.array(craftQuestItemSchema),
   station: entityId,
   taskUnlock: entityId.optional(),
 });
