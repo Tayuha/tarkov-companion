@@ -41,7 +41,7 @@
 - [ ] 4.4 Implement ingestion failure rollback so a failed dataset leaves prior rows and version intact, verified by a test that injects a failure after partial insert and asserts rollback
 - [ ] 4.5 Implement FTS5 search indexing over item name, shortName, and normalizedName with diacritic folding, refreshed after items ingestion, verified by search tests including an accented name matched by an unaccented query
 - [x] 4.6 Implement the background update scheduler honoring the auto-update preference, metered connections, and app foreground state, verified by fake-clock tests for each preference combination
-- [ ] 4.7 Implement stale-data labelling based on the newest price observation, verified by tests at the threshold boundary showing fresh vs stale states
+- [x] 4.7 Implement stale-data labelling based on the newest price observation, verified by tests at the threshold boundary showing fresh vs stale states
 - [ ] 4.8 Add an ingestion performance benchmark on the full item dataset asserting the 10 MB compressed and bounded-memory budgets, verified by the benchmark running in CI on the Windows runner
 - [ ] 4.9 Document the sync protocol, failure semantics, and offline behavior in `docs/sync.md`, verified by each documented state being reproducible from the sync test suite
 

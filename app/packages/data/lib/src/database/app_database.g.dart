@@ -1183,6 +1183,18 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         type: DriftSqlType.double,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _priceObservedAtMeta = const VerificationMeta(
+    'priceObservedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> priceObservedAt =
+      GeneratedColumn<DateTime>(
+        'priceObservedAt',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _iconLinkMeta = const VerificationMeta(
     'iconLink',
   );
@@ -1229,6 +1241,7 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     avg24hPrice,
     lastLowPrice,
     changeLast48hPercent,
+    priceObservedAt,
     iconLink,
     gridImageLink,
     payload,
@@ -1328,6 +1341,15 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         ),
       );
     }
+    if (data.containsKey('priceObservedAt')) {
+      context.handle(
+        _priceObservedAtMeta,
+        priceObservedAt.isAcceptableOrUnknown(
+          data['priceObservedAt']!,
+          _priceObservedAtMeta,
+        ),
+      );
+    }
     if (data.containsKey('iconLink')) {
       context.handle(
         _iconLinkMeta,
@@ -1404,6 +1426,10 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         DriftSqlType.double,
         data['${effectivePrefix}changeLast48hPercent'],
       ),
+      priceObservedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}priceObservedAt'],
+      ),
       iconLink: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}iconLink'],
@@ -1459,6 +1485,14 @@ class Item extends DataClass implements Insertable<Item> {
   /// 48 h flea price change as a percentage, `price.change48hPercent`.
   final double? changeLast48hPercent;
 
+  /// When the newest price snapshot was observed, `price.observedAt`.
+  ///
+  /// This is the price's own observation time, not the time the dataset was
+  /// applied (`datasetState.appliedAt`): a bundle can be reloaded without
+  /// upstream observing a new price. `null` means the bundle carried no
+  /// observation, which the freshness policy reports as unknown.
+  final DateTime? priceObservedAt;
+
   /// Icon URL.
   final String? iconLink;
 
@@ -1479,6 +1513,7 @@ class Item extends DataClass implements Insertable<Item> {
     this.avg24hPrice,
     this.lastLowPrice,
     this.changeLast48hPercent,
+    this.priceObservedAt,
     this.iconLink,
     this.gridImageLink,
     required this.payload,
@@ -1510,6 +1545,9 @@ class Item extends DataClass implements Insertable<Item> {
     }
     if (!nullToAbsent || changeLast48hPercent != null) {
       map['changeLast48hPercent'] = Variable<double>(changeLast48hPercent);
+    }
+    if (!nullToAbsent || priceObservedAt != null) {
+      map['priceObservedAt'] = Variable<DateTime>(priceObservedAt);
     }
     if (!nullToAbsent || iconLink != null) {
       map['iconLink'] = Variable<String>(iconLink);
@@ -1548,6 +1586,9 @@ class Item extends DataClass implements Insertable<Item> {
       changeLast48hPercent: changeLast48hPercent == null && nullToAbsent
           ? const Value.absent()
           : Value(changeLast48hPercent),
+      priceObservedAt: priceObservedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(priceObservedAt),
       iconLink: iconLink == null && nullToAbsent
           ? const Value.absent()
           : Value(iconLink),
@@ -1577,6 +1618,7 @@ class Item extends DataClass implements Insertable<Item> {
       changeLast48hPercent: serializer.fromJson<double?>(
         json['changeLast48hPercent'],
       ),
+      priceObservedAt: serializer.fromJson<DateTime?>(json['priceObservedAt']),
       iconLink: serializer.fromJson<String?>(json['iconLink']),
       gridImageLink: serializer.fromJson<String?>(json['gridImageLink']),
       payload: serializer.fromJson<String>(json['payload']),
@@ -1597,6 +1639,7 @@ class Item extends DataClass implements Insertable<Item> {
       'avg24hPrice': serializer.toJson<int?>(avg24hPrice),
       'lastLowPrice': serializer.toJson<int?>(lastLowPrice),
       'changeLast48hPercent': serializer.toJson<double?>(changeLast48hPercent),
+      'priceObservedAt': serializer.toJson<DateTime?>(priceObservedAt),
       'iconLink': serializer.toJson<String?>(iconLink),
       'gridImageLink': serializer.toJson<String?>(gridImageLink),
       'payload': serializer.toJson<String>(payload),
@@ -1615,6 +1658,7 @@ class Item extends DataClass implements Insertable<Item> {
     Value<int?> avg24hPrice = const Value.absent(),
     Value<int?> lastLowPrice = const Value.absent(),
     Value<double?> changeLast48hPercent = const Value.absent(),
+    Value<DateTime?> priceObservedAt = const Value.absent(),
     Value<String?> iconLink = const Value.absent(),
     Value<String?> gridImageLink = const Value.absent(),
     String? payload,
@@ -1632,6 +1676,9 @@ class Item extends DataClass implements Insertable<Item> {
     changeLast48hPercent: changeLast48hPercent.present
         ? changeLast48hPercent.value
         : this.changeLast48hPercent,
+    priceObservedAt: priceObservedAt.present
+        ? priceObservedAt.value
+        : this.priceObservedAt,
     iconLink: iconLink.present ? iconLink.value : this.iconLink,
     gridImageLink: gridImageLink.present
         ? gridImageLink.value
@@ -1659,6 +1706,9 @@ class Item extends DataClass implements Insertable<Item> {
       changeLast48hPercent: data.changeLast48hPercent.present
           ? data.changeLast48hPercent.value
           : this.changeLast48hPercent,
+      priceObservedAt: data.priceObservedAt.present
+          ? data.priceObservedAt.value
+          : this.priceObservedAt,
       iconLink: data.iconLink.present ? data.iconLink.value : this.iconLink,
       gridImageLink: data.gridImageLink.present
           ? data.gridImageLink.value
@@ -1681,6 +1731,7 @@ class Item extends DataClass implements Insertable<Item> {
           ..write('avg24hPrice: $avg24hPrice, ')
           ..write('lastLowPrice: $lastLowPrice, ')
           ..write('changeLast48hPercent: $changeLast48hPercent, ')
+          ..write('priceObservedAt: $priceObservedAt, ')
           ..write('iconLink: $iconLink, ')
           ..write('gridImageLink: $gridImageLink, ')
           ..write('payload: $payload')
@@ -1701,6 +1752,7 @@ class Item extends DataClass implements Insertable<Item> {
     avg24hPrice,
     lastLowPrice,
     changeLast48hPercent,
+    priceObservedAt,
     iconLink,
     gridImageLink,
     payload,
@@ -1720,6 +1772,7 @@ class Item extends DataClass implements Insertable<Item> {
           other.avg24hPrice == this.avg24hPrice &&
           other.lastLowPrice == this.lastLowPrice &&
           other.changeLast48hPercent == this.changeLast48hPercent &&
+          other.priceObservedAt == this.priceObservedAt &&
           other.iconLink == this.iconLink &&
           other.gridImageLink == this.gridImageLink &&
           other.payload == this.payload);
@@ -1737,6 +1790,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<int?> avg24hPrice;
   final Value<int?> lastLowPrice;
   final Value<double?> changeLast48hPercent;
+  final Value<DateTime?> priceObservedAt;
   final Value<String?> iconLink;
   final Value<String?> gridImageLink;
   final Value<String> payload;
@@ -1753,6 +1807,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.avg24hPrice = const Value.absent(),
     this.lastLowPrice = const Value.absent(),
     this.changeLast48hPercent = const Value.absent(),
+    this.priceObservedAt = const Value.absent(),
     this.iconLink = const Value.absent(),
     this.gridImageLink = const Value.absent(),
     this.payload = const Value.absent(),
@@ -1770,6 +1825,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.avg24hPrice = const Value.absent(),
     this.lastLowPrice = const Value.absent(),
     this.changeLast48hPercent = const Value.absent(),
+    this.priceObservedAt = const Value.absent(),
     this.iconLink = const Value.absent(),
     this.gridImageLink = const Value.absent(),
     required String payload,
@@ -1791,6 +1847,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Expression<int>? avg24hPrice,
     Expression<int>? lastLowPrice,
     Expression<double>? changeLast48hPercent,
+    Expression<DateTime>? priceObservedAt,
     Expression<String>? iconLink,
     Expression<String>? gridImageLink,
     Expression<String>? payload,
@@ -1809,6 +1866,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       if (lastLowPrice != null) 'lastLowPrice': lastLowPrice,
       if (changeLast48hPercent != null)
         'changeLast48hPercent': changeLast48hPercent,
+      if (priceObservedAt != null) 'priceObservedAt': priceObservedAt,
       if (iconLink != null) 'iconLink': iconLink,
       if (gridImageLink != null) 'gridImageLink': gridImageLink,
       if (payload != null) 'payload': payload,
@@ -1828,6 +1886,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Value<int?>? avg24hPrice,
     Value<int?>? lastLowPrice,
     Value<double?>? changeLast48hPercent,
+    Value<DateTime?>? priceObservedAt,
     Value<String?>? iconLink,
     Value<String?>? gridImageLink,
     Value<String>? payload,
@@ -1845,6 +1904,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       avg24hPrice: avg24hPrice ?? this.avg24hPrice,
       lastLowPrice: lastLowPrice ?? this.lastLowPrice,
       changeLast48hPercent: changeLast48hPercent ?? this.changeLast48hPercent,
+      priceObservedAt: priceObservedAt ?? this.priceObservedAt,
       iconLink: iconLink ?? this.iconLink,
       gridImageLink: gridImageLink ?? this.gridImageLink,
       payload: payload ?? this.payload,
@@ -1890,6 +1950,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
         changeLast48hPercent.value,
       );
     }
+    if (priceObservedAt.present) {
+      map['priceObservedAt'] = Variable<DateTime>(priceObservedAt.value);
+    }
     if (iconLink.present) {
       map['iconLink'] = Variable<String>(iconLink.value);
     }
@@ -1919,6 +1982,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
           ..write('avg24hPrice: $avg24hPrice, ')
           ..write('lastLowPrice: $lastLowPrice, ')
           ..write('changeLast48hPercent: $changeLast48hPercent, ')
+          ..write('priceObservedAt: $priceObservedAt, ')
           ..write('iconLink: $iconLink, ')
           ..write('gridImageLink: $gridImageLink, ')
           ..write('payload: $payload, ')
@@ -6848,6 +6912,7 @@ typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
   Value<int?> avg24hPrice,
   Value<int?> lastLowPrice,
   Value<double?> changeLast48hPercent,
+  Value<DateTime?> priceObservedAt,
   Value<String?> iconLink,
   Value<String?> gridImageLink,
   required String payload,
@@ -6865,6 +6930,7 @@ typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
   Value<int?> avg24hPrice,
   Value<int?> lastLowPrice,
   Value<double?> changeLast48hPercent,
+  Value<DateTime?> priceObservedAt,
   Value<String?> iconLink,
   Value<String?> gridImageLink,
   Value<String> payload,
@@ -6931,6 +6997,11 @@ class $$ItemsTableFilterComposer extends Composer<_$AppDatabase, $ItemsTable> {
 
   ColumnFilters<double> get changeLast48hPercent => $composableBuilder(
     column: $table.changeLast48hPercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get priceObservedAt => $composableBuilder(
+    column: $table.priceObservedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7014,6 +7085,11 @@ class $$ItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get priceObservedAt => $composableBuilder(
+    column: $table.priceObservedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get iconLink => $composableBuilder(
     column: $table.iconLink,
     builder: (column) => ColumnOrderings(column),
@@ -7080,6 +7156,11 @@ class $$ItemsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<DateTime> get priceObservedAt => $composableBuilder(
+    column: $table.priceObservedAt,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get iconLink =>
       $composableBuilder(column: $table.iconLink, builder: (column) => column);
 
@@ -7131,6 +7212,7 @@ class $$ItemsTableTableManager
                 Value<int?> avg24hPrice = const Value.absent(),
                 Value<int?> lastLowPrice = const Value.absent(),
                 Value<double?> changeLast48hPercent = const Value.absent(),
+                Value<DateTime?> priceObservedAt = const Value.absent(),
                 Value<String?> iconLink = const Value.absent(),
                 Value<String?> gridImageLink = const Value.absent(),
                 Value<String> payload = const Value.absent(),
@@ -7147,6 +7229,7 @@ class $$ItemsTableTableManager
                 avg24hPrice: avg24hPrice,
                 lastLowPrice: lastLowPrice,
                 changeLast48hPercent: changeLast48hPercent,
+                priceObservedAt: priceObservedAt,
                 iconLink: iconLink,
                 gridImageLink: gridImageLink,
                 payload: payload,
@@ -7165,6 +7248,7 @@ class $$ItemsTableTableManager
                 Value<int?> avg24hPrice = const Value.absent(),
                 Value<int?> lastLowPrice = const Value.absent(),
                 Value<double?> changeLast48hPercent = const Value.absent(),
+                Value<DateTime?> priceObservedAt = const Value.absent(),
                 Value<String?> iconLink = const Value.absent(),
                 Value<String?> gridImageLink = const Value.absent(),
                 required String payload,
@@ -7181,6 +7265,7 @@ class $$ItemsTableTableManager
                 avg24hPrice: avg24hPrice,
                 lastLowPrice: lastLowPrice,
                 changeLast48hPercent: changeLast48hPercent,
+                priceObservedAt: priceObservedAt,
                 iconLink: iconLink,
                 gridImageLink: gridImageLink,
                 payload: payload,

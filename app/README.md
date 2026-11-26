@@ -92,6 +92,11 @@ factory. Game data (`items`, `tasks`, ...) is replaceable and written by bundle 
 refresh cannot delete progress. `docs/schema.md` documents the split, the WAL/FTS setup, and the
 no-cascade rule.
 
+Price age is separate from catalog age: `items.priceObservedAt` stores the bundle's
+`price.observedAt`, and `FreshnessPolicy` / `ItemsRepository.priceFreshness` label it fresh, stale or
+unknown using the `dataFreshnessHours` setting. The rule (including the strict boundary and the UI
+obligation to show the observation time) is documented in [`docs/freshness.md`](../docs/freshness.md).
+
 Open the file through `openAppDatabase` (`lib/src/database/migration_runner.dart`). It reads
 `user_version` before drift starts, copies an older database to `backups/` with a WAL-safe
 `VACUUM INTO` (retaining the newest 3), and returns either `DatabaseOpened` or a read-only

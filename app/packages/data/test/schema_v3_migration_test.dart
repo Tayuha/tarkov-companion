@@ -70,6 +70,11 @@ Future<void> _seedV1(String path) async {
   await db.close();
 }
 
+/// Opens at version 3 so this suite keeps exercising the v2 -> v3 step now that
+/// the shipped schema is v4 (whose own suite covers v2 -> v4 and v1 -> v4).
+AppDatabase _openV3(String path) =>
+    AppDatabase.atPath(path, targetSchemaVersion: 3);
+
 void main() {
   test(
     'v2 -> v3 adds gameRecords and its kind index, keeps every row, and backs '
@@ -79,7 +84,7 @@ void main() {
       final path = '${directory.path}/tarkov_companion.sqlite';
       await _seedV2(path);
 
-      final result = await openAppDatabase(path);
+      final result = await openAppDatabase(path, open: _openV3);
       expect(result, isA<DatabaseOpened>());
       final opened = result as DatabaseOpened;
       addTearDown(opened.close);
@@ -174,7 +179,7 @@ void main() {
     final path = '${directory.path}/tarkov_companion.sqlite';
     await _seedV1(path);
 
-    final result = await openAppDatabase(path) as DatabaseOpened;
+    final result = await openAppDatabase(path, open: _openV3) as DatabaseOpened;
     addTearDown(result.close);
 
     expect(result.fromVersion, 1);

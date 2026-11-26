@@ -69,12 +69,12 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// When [upgrade] is `null`, the built-in forward migrations declared in
   /// [_builtInUpgrade] run. Version 2 adds `remoteManifest`; version 3 adds
-  /// `gameRecords`.
-  AppDatabase(super.e, {this.targetSchemaVersion = 3, this.upgrade});
+  /// `gameRecords`; version 4 adds `items.priceObservedAt`.
+  AppDatabase(super.e, {this.targetSchemaVersion = 4, this.upgrade});
 
   /// An in-memory database, for tests and short-lived tools.
   factory AppDatabase.memory({
-    int targetSchemaVersion = 3,
+    int targetSchemaVersion = 4,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inMemory(),
@@ -85,7 +85,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database at [path]; parent directories are created.
   factory AppDatabase.atPath(
     String path, {
-    int targetSchemaVersion = 3,
+    int targetSchemaVersion = 4,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.atPath(path),
@@ -96,7 +96,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database whose I/O runs on a background isolate.
   factory AppDatabase.inBackground(
     String path, {
-    int targetSchemaVersion = 3,
+    int targetSchemaVersion = 4,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inBackground(path),
@@ -123,6 +123,7 @@ class AppDatabase extends _$AppDatabase {
     //
     // Version 2 adds `remoteManifest` and nothing else; v1 data is untouched.
     // Version 3 adds `gameRecords` and its kind index; v2 data is untouched.
+    // Version 4 adds `items.priceObservedAt`; v3 data is untouched.
     // Future versions add a `DatabaseUpgrade` callback from the constructor
     // (or a step in `_builtInUpgrade`) while bumping `schemaVersion`. The
     // runner in `migration_runner.dart` decides when an upgrade may run: it
@@ -172,15 +173,18 @@ class AppDatabase extends _$AppDatabase {
   /// v1 straight to the current schema), so the steps run in order inside the
   /// transaction drift already opened.
   DatabaseUpgrade? _builtInUpgrade(int from, int to) {
-    if (to > 3 || from < 1 || from >= to) {
+    if (to > 4 || from < 1 || from >= to) {
       return null;
     }
     return (migrator, fromVersion, toVersion) async {
-      if (fromVersion < 2) {
+      if (fromVersion < 2 && toVersion >= 2) {
         await _upgradeV1ToV2(migrator, fromVersion, 2);
       }
-      if (fromVersion < 3) {
+      if (fromVersion < 3 && toVersion >= 3) {
         await _upgradeV2ToV3(migrator, fromVersion, 3);
+      }
+      if (fromVersion < 4 && toVersion >= 4) {
+        await _upgradeV3ToV4(migrator, fromVersion, 4);
       }
     };
   }
@@ -201,5 +205,14 @@ class AppDatabase extends _$AppDatabase {
   Future<void> _upgradeV2ToV3(Migrator migrator, int from, int to) async {
     await migrator.createTable(gameRecords);
     await migrator.create(gameRecordsKind);
+  }
+
+  /// Version 4: add `items.priceObservedAt` for price-freshness labelling.
+  ///
+  /// The column is nullable, so existing item rows migrate without a rewrite
+  /// of their price fields: an item ingested before v4 has an unknown price
+  /// observation until the next `items` bundle is applied.
+  Future<void> _upgradeV3ToV4(Migrator migrator, int from, int to) async {
+    await migrator.addColumn(items, items.priceObservedAt);
   }
 }

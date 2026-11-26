@@ -64,7 +64,7 @@ Future<List<SchemaObject>> readSchemaObjects(AppDatabase db) async {
 /// is checked in and regenerated with `UPDATE_GOLDENS=1 dart test`.
 String renderSchemaSnapshot(List<SchemaObject> objects) {
   final buffer = StringBuffer()
-    ..writeln('-- AppDatabase schema snapshot (schemaVersion 3).')
+    ..writeln('-- AppDatabase schema snapshot (schemaVersion 4).')
     ..writeln(
       '-- Regenerate: (cd app/packages/data && UPDATE_GOLDENS=1 dart test)',
     )

@@ -90,6 +90,11 @@ void main() {
     expect(m4a1.avg24hPrice, 111351);
     expect(m4a1.lastLowPrice, 40000);
     expect(m4a1.changeLast48hPercent, 16.91);
+    expect(
+      m4a1.priceObservedAt!.toUtc(),
+      DateTime.utc(2026, 11, 25, 17, 8, 2),
+      reason: 'price.observedAt is the newest price observation',
+    );
     expect(m4a1.iconLink, contains('5447a9cd4bdc2dbd208b4567-icon'));
     expect(m4a1.gridImageLink, contains('5447a9cd4bdc2dbd208b4567-grid'));
 

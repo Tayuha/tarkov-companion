@@ -4,7 +4,7 @@ The app keeps everything it knows in one local SQLite database. There is no
 server: game data arrives as bundles (`docs/data-bundles.md`), player progress is
 created by the user and never leaves the device. The schema lives in
 `app/packages/data/lib/src/database/` and is versioned by
-`AppDatabase.schemaVersion` (currently **3**).
+`AppDatabase.schemaVersion` (currently **4**).
 
 - Tables: `lib/src/database/tables.dart` (drift table classes)
 - Search schema: `lib/src/database/fts.dart`
@@ -92,6 +92,7 @@ file.
 | 1 | Initial game-data, player-data and FTS5 schema. |
 | 2 | Adds `remoteManifest` for conditional manifest fetching (task 4.1). Existing tables, indexes, triggers and rows are untouched; the upgrade runs inside one transaction after a pre-migration backup. |
 | 3 | Adds `gameRecords` and its `gameRecordsKind` index for bundle kinds without a dedicated table (task 4.3). Existing rows, FTS objects and sync bookkeeping are untouched. |
+| 4 | Adds nullable `items.priceObservedAt`, the bundle's `price.observedAt`, for price-freshness labelling (task 4.7). Existing rows keep their prices and read as an unknown observation until the next `items` bundle is applied; no other table changes. |
 
 ## Migrations, backups and recovery
 

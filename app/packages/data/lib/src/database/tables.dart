@@ -154,6 +154,15 @@ class Items extends Table {
   RealColumn get changeLast48hPercent =>
       real().named('changeLast48hPercent').nullable()();
 
+  /// When the newest price snapshot was observed, `price.observedAt`.
+  ///
+  /// This is the price's own observation time, not the time the dataset was
+  /// applied (`datasetState.appliedAt`): a bundle can be reloaded without
+  /// upstream observing a new price. `null` means the bundle carried no
+  /// observation, which the freshness policy reports as unknown.
+  DateTimeColumn get priceObservedAt =>
+      dateTime().named('priceObservedAt').nullable()();
+
   /// Icon URL.
   TextColumn get iconLink => text().named('iconLink').nullable()();
 

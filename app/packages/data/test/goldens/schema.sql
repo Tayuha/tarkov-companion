@@ -1,4 +1,4 @@
--- AppDatabase schema snapshot (schemaVersion 3).
+-- AppDatabase schema snapshot (schemaVersion 4).
 -- Regenerate: (cd app/packages/data && UPDATE_GOLDENS=1 dart test)
 -- FTS5 shadow tables (items_fts_data, _idx, _docsize,
 -- _config) are omitted; items_fts and its triggers are part
@@ -68,7 +68,7 @@ table hideoutStations
 CREATE TABLE "hideoutStations" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
 
 table items
-CREATE TABLE "items" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "shortName" TEXT NOT NULL, "normalizedName" TEXT NOT NULL, "weight" REAL NULL, "width" INTEGER NULL, "height" INTEGER NULL, "basePrice" INTEGER NULL, "avg24hPrice" INTEGER NULL, "lastLowPrice" INTEGER NULL, "changeLast48hPercent" REAL NULL, "iconLink" TEXT NULL, "gridImageLink" TEXT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
+CREATE TABLE "items" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "shortName" TEXT NOT NULL, "normalizedName" TEXT NOT NULL, "weight" REAL NULL, "width" INTEGER NULL, "height" INTEGER NULL, "basePrice" INTEGER NULL, "avg24hPrice" INTEGER NULL, "lastLowPrice" INTEGER NULL, "changeLast48hPercent" REAL NULL, "priceObservedAt" INTEGER NULL, "iconLink" TEXT NULL, "gridImageLink" TEXT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
 
 table items_fts
 CREATE VIRTUAL TABLE items_fts USING fts5(

@@ -562,6 +562,7 @@ Insertable<Item> _itemRow(
     changeLast48hPercent: Value(
       _optionalDouble(priceMap, 'change48hPercent', line),
     ),
+    priceObservedAt: Value(_optionalDateTime(priceMap, 'observedAt', line)),
     iconLink: Value(_optionalString(record, 'iconLink', line)),
     gridImageLink: Value(_optionalString(record, 'gridImageLink', line)),
     payload: payload,
@@ -647,4 +648,36 @@ bool? _optionalBool(Map<String, Object?> record, String field, int line) {
     'Field "$field" must be a boolean or null.',
     line: line,
   );
+}
+
+/// Parses an ISO 8601 timestamp (the bundle's `observedAt` shape) into UTC.
+///
+/// A missing or `null` field is "unknown" and returns `null`. A present but
+/// unparsable value is a contract violation: silently dropping it would turn a
+/// malformed observation into an unqualified current price.
+DateTime? _optionalDateTime(
+  Map<String, Object?> record,
+  String field,
+  int line,
+) {
+  final value = record[field];
+  if (value == null) {
+    return null;
+  }
+  if (value is! String) {
+    throw IngestError(
+      IngestFailure.invalidRecord,
+      'Field "$field" must be an ISO 8601 string or null.',
+      line: line,
+    );
+  }
+  final parsed = DateTime.tryParse(value);
+  if (parsed == null) {
+    throw IngestError(
+      IngestFailure.invalidRecord,
+      'Field "$field" is not a valid ISO 8601 timestamp: "$value".',
+      line: line,
+    );
+  }
+  return parsed.toUtc();
 }
