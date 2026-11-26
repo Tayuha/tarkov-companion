@@ -1827,18 +1827,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 2,
+      "categoryID": "review",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "In progress in worktree t89-linux-package (branch t89-linux-package). AppImage preferred + optional .deb, versioned artifact, SHA256SUMS, CI package job, local AppImage smoke launch. Task stays open until the manual launch->sync->browse approval. Branch merged after review.",
+      "notes": "Packaging implemented and merged (branch commit 2a8f29b). Artifacts: TarkovCompanion-0.1.0-x86_64.AppImage (11,065,848 B, sha 00ed43ec...), optional .deb (8,299,720 B, sha ecc4e967...), SHA256SUMS. scripts/package-linux.sh + package-linux CI job (artifact tarkov-companion-linux-x86_64). Provisional neutral icon. Local smoke launch reached the Flutter engine and exited on timeout. AWAITING MANUAL GATE: verify checksums on clean Linux, launch AppImage, complete first-run sync, search/filter/open item detail, offline restart. Do not tick tasks.md 8.9 until approved.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710284167,
-      "archived": false,
-      "sessionID": "ses_de753bfeeffdc0Zf15iAoSnihP"
+      "updatedAt": 1795710618024,
+      "archived": false
     },
     {
       "id": "task_impl_8_10",
