@@ -645,17 +645,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 14,
       "tagIDs": [
         "tag_implementation",
         "tag_infra",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: ci.yml on push/PR/dispatch with read-only permissions and concurrency; pipeline lint/test/build/fixtures/bundle/gate on ubuntu; Flutter 3.50.1 analyze/test/windows debug build on windows-latest; badges; task 1.6 checked only after a green run with Windows compile evidence.",
+      "notes": "Completed 2026-11-26 in session ses_de851ab55ffeEUY6AhvRSU2xXS. ci.yml: pipeline job (ubuntu, Node 24, lint/test/build/fixtures/bundle/gate), App Windows (windows-latest, Flutter 3.50.1, analyze/test/windows debug build), App Linux (ubuntu, fast feedback). Read-only permissions, concurrency cancel. Run 45813896386: all three jobs success; Windows produced build\\windows\\x64\\runner\\Debug\\tarkov_companion.exe. Badges added. tasks.md 1.6 checked. Commit dbb839d.",
       "sessionID": "ses_de851ab55ffeEUY6AhvRSU2xXS",
       "createdAt": 1795693641828,
-      "updatedAt": 1795693641828,
+      "updatedAt": 1795694158638,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_1",
+      "title": "T3.1 Core/data/features package boundaries",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: pub workspace or path deps for core (pure Dart), data (pure Dart, core only), features (Flutter), app; import-boundary checker with synthetic violation tests; regression test on the real tree; CI step; analyze/test/linux build and CI green; task 3.1 checked.",
+      "sessionID": "ses_de849c807ffewBbdpV0kkoGzR1",
+      "createdAt": 1795694158638,
+      "updatedAt": 1795694158638,
       "archived": false
     }
   ]
