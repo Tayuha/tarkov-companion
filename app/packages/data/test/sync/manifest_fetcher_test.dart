@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -59,8 +60,11 @@ void main() {
 
   tearDown(() => db.close());
 
-  ManifestFetcher fetcherWith(MockClient mock) {
-    client = AllowlistedHttpClient(innerClient: mock);
+  ManifestFetcher fetcherWith(
+    MockClient mock, {
+    Duration timeout = AllowlistedHttpClient.defaultTimeout,
+  }) {
+    client = AllowlistedHttpClient(innerClient: mock, timeout: timeout);
     addTearDown(client.close);
     fetcher = ManifestFetcher(client, repository, clock: clock);
     return fetcher;
@@ -288,6 +292,126 @@ void main() {
       expect(requests, hasLength(1));
       expect(requests.single.url, ManifestFetcher.uriFor(GameMode.regular));
     });
+
+    test(
+      'an offline transport failure propagates and leaves the cache untouched',
+      () async {
+        final body = _manifestBody(fixture);
+        var calls = 0;
+        fetcherWith(
+          responding((request) {
+            calls++;
+            if (calls == 1) {
+              return _ok(body, etag: '"v1"');
+            }
+            throw const SocketException('Network is unreachable');
+          }),
+        );
+
+        final first = await fetcher.fetch(GameMode.regular);
+        now = DateTime.utc(2026, 11, 26, 13);
+
+        await expectLater(
+          fetcher.fetch(GameMode.regular),
+          throwsA(isA<SocketException>()),
+        );
+
+        final cached = await repository.read(GameMode.regular);
+        expect(cached!.manifestJson, first.cache.manifestJson);
+        expect(cached.lastCheckedAt, first.cache.lastCheckedAt);
+        expect(cached.etag, '"v1"');
+      },
+    );
+
+    test(
+      'a first run with no connectivity leaves no manifest and no applied data',
+      () async {
+        fetcherWith(
+          responding((request) {
+            throw const SocketException('No route to host');
+          }),
+        );
+
+        await expectLater(
+          fetcher.fetch(GameMode.regular),
+          throwsA(isA<SocketException>()),
+        );
+
+        expect(await repository.read(GameMode.regular), isNull);
+        expect(
+          await DatasetStateRepository(db).appliedForMode(GameMode.regular),
+          isEmpty,
+        );
+      },
+    );
+
+    test(
+      'a 5xx propagates HttpStatusException and leaves the cache untouched',
+      () async {
+        final body = _manifestBody(fixture);
+        var calls = 0;
+        fetcherWith(
+          responding((request) {
+            calls++;
+            return calls == 1
+                ? _ok(body, etag: '"v1"')
+                : http.Response('upstream unavailable', 503);
+          }),
+        );
+
+        final first = await fetcher.fetch(GameMode.regular);
+
+        await expectLater(
+          fetcher.fetch(GameMode.regular),
+          throwsA(
+            isA<HttpStatusException>().having(
+              (error) => error.statusCode,
+              'statusCode',
+              503,
+            ),
+          ),
+        );
+
+        final cached = await repository.read(GameMode.regular);
+        expect(cached!.manifestJson, first.cache.manifestJson);
+        expect(cached.lastCheckedAt, first.cache.lastCheckedAt);
+      },
+    );
+
+    test(
+      'a timeout propagates HttpTimeoutException and keeps the cache',
+      () async {
+        final body = _manifestBody(fixture);
+        var calls = 0;
+        fetcherWith(
+          responding((request) {
+            calls++;
+            return calls == 1
+                ? _ok(body, etag: '"v1"')
+                : Completer<http.Response>().future;
+          }),
+          timeout: const Duration(milliseconds: 50),
+        );
+
+        final first = await fetcher.fetch(GameMode.regular);
+
+        await expectLater(
+          fetcher.fetch(GameMode.regular),
+          throwsA(
+            isA<HttpTimeoutException>().having(
+              (error) => error.timeout,
+              'timeout',
+              const Duration(milliseconds: 50),
+            ),
+          ),
+        );
+
+        final cached = await repository.read(GameMode.regular);
+        expect(cached!.manifestJson, first.cache.manifestJson);
+        expect(cached.lastCheckedAt, first.cache.lastCheckedAt);
+        expect(requests, hasLength(2));
+      },
+    );
   });
 
   test('per-mode URLs and caches are isolated', () async {
