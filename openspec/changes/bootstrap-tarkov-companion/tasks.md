@@ -48,7 +48,7 @@
 ## 5. Item catalog
 
 - [x] 5.1 Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination
-- [ ] 5.2 Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset
+- [x] 5.2 Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset
 - [ ] 5.3 Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item
 - [ ] 5.4 Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships
 - [ ] 5.5 Implement price presentation with source, observation time, 48-hour direction, and explicit missing-data states, verified by widget tests for complete, missing-flea, and zero-price fixtures
@@ -56,6 +56,8 @@
 - [ ] 5.7 Implement on-demand price history fetch, caching with TTL, and the chart view including the offline-without-cache state, verified by tests for fetch, cache hit, TTL expiry, and offline miss
 - [ ] 5.8 Implement item deep links by game identifier with resolved and removed-item states, verified by tests opening a known id and a deleted id against a fixture dataset
 - [ ] 5.9 Add a catalog performance test asserting p95 query latency under 50 ms and initial render under 1.5 s with the full fixture set, verified by the test running in CI
+
+- [ ] 5.10 Expose item category labels from the bundle categories/`gameRecords` so the catalog filter uses real names, verified by a category query test returning id/name pairs and a widget test using the loaded options
 
 ## 6. Quest tracker
 

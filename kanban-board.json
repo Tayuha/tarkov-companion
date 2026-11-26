@@ -1067,15 +1067,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 34,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in worktree t52-catalog-screen (session ses_de765a0aaffe61gnsoFUV1fXZx). CatalogScreen with debounced search, category/type/flea chips, sort, virtualized rows, pagination, empty/reset states, and an onItemSelected callback. No app wiring; plain Material. Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t52-catalog-screen (session ses_de765a0aaffe61gnsoFUV1fXZx), merged as 57a4a15. CatalogScreen/CatalogFilterBar/CatalogItemRow with 300ms debounce, stale-response generation guard, AND category/type/flea filters, per-chip removal, reset, 4 sort fields both directions, ListView.builder + Load more, total count, loading/error/empty states, row callback. Plain Material placeholder icon until 5.6. 8 widget tests (10 features), 11 app, linux debug build. Branch 84efc45. Gap: category labels are a starter set because the query layer does not yet expose bundle category names; tracked as 5.10.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795709107061,
+      "updatedAt": 1795709662442,
       "archived": false,
       "sessionID": "ses_de765a0aaffe61gnsoFUV1fXZx"
     },
@@ -2003,6 +2003,27 @@
       "notes": "Add issue and pull-request templates plus a roadmap issue, verified by opening a test issue that renders both templates",
       "createdAt": 1795706841847,
       "updatedAt": 1795706841847,
+      "archived": false
+    },
+    {
+      "id": "task_impl_5_10",
+      "title": "T5.10 Load real category labels for catalog filters",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "backlog",
+      "position": 60,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "Discovered during T5.2: the catalog filter bar ships a starter category set because the query layer does not expose bundle category labels. Read itemCategory/handbookCategory records from gameRecords (or a dedicated query), return id/name pairs, and feed the filter bar. Tests: category query + widget using loaded options.",
+      "createdAt": 1795709662442,
+      "updatedAt": 1795709662442,
       "archived": false
     }
   ]
