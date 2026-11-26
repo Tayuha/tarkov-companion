@@ -88,7 +88,7 @@
 
 ## 8. Desktop shell
 
-- [ ] 8.1 Implement the first-run bootstrap flow with size estimate, progress, cancel, retry, and resume, verified by widget tests for each state and an integration test against a local mock manifest server
+- [x] 8.1 Implement the first-run bootstrap flow with size estimate, progress, cancel, retry, and resume, verified by widget tests for each state and an integration test against a local mock manifest server
 - [ ] 8.2 Implement non-blocking startup that renders from the last dataset before any network call, verified by a test that delays the manifest response and asserts the first frame still renders
 - [ ] 8.3 Implement update check controls (schedule, manual check, last check time/outcome) with non-modal indicators, verified by widget tests for each outcome and preference combination
 - [ ] 8.4 Implement offline and upstream-error states across catalog, quests, and history views with retry, verified by widget tests with a failing network layer

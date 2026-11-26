@@ -1656,16 +1656,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 35,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "In progress in worktree t81-first-run (session ses_de765a0acffe1D3uFdzHLls9TV). Sync coordinator (manifest -> compat -> download -> ingest, skip applied, cancel/resume, progress) plus the first-run gate UI and app wiring. Plain Material, Linux-first. Integration test against a loopback manifest server. Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t81-first-run (session ses_de765a0acffe1D3uFdzHLls9TV), merged as ad8fdc2 plus wiring fab5adc. SyncCoordinator: prepare (manifest/compat/pending/bytes) and run (download/verify/ingest, skip current, progress, cancel/resume, typed errors). FirstRunScreen states loading/estimate/downloading/cancelling/error/ready. App paths under XDG_DATA_HOME, migration lifecycle, rotating logger, loopback integration test with test-only allowInsecureLocalhost. Ready screen now opens CatalogScreen. 340 data + 17 app + 16 features tests; linux debug build green.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795709107061,
+      "updatedAt": 1795710212966,
       "archived": false,
       "sessionID": "ses_de765a0acffe1D3uFdzHLls9TV"
     },
