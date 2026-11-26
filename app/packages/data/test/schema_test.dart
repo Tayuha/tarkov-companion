@@ -21,6 +21,7 @@ const expectedTables = <String>{
   'crafts',
   'barters',
   'maps',
+  'gameRecords',
   'priceHistory',
   // Player data.
   'profiles',
@@ -48,6 +49,7 @@ const expectedIndexes = <String>{
   'craftsStationId',
   'craftsProductItemId',
   'mapsNormalizedName',
+  'gameRecordsKind',
   'priceHistoryItemId',
   'questProgressQuestId',
   'objectiveProgressQuestId',
@@ -123,7 +125,7 @@ void main() {
     test(
       'records the schema version and enables the expected pragmas',
       () async {
-        expect(await readPragma(db, 'PRAGMA user_version'), 2);
+        expect(await readPragma(db, 'PRAGMA user_version'), 3);
         expect(await readPragma(db, 'PRAGMA foreign_keys'), 1);
         expect(await readPragma(db, 'PRAGMA synchronous'), 1); // NORMAL
       },

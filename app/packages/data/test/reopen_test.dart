@@ -34,7 +34,7 @@ void main() {
       final second = AppDatabase.atPath(path);
       addTearDown(second.close);
 
-      expect(await readPragma(second, 'PRAGMA user_version'), 2);
+      expect(await readPragma(second, 'PRAGMA user_version'), 3);
       expect(await readPragma(second, 'PRAGMA journal_mode'), 'wal');
       expect(await second.select(second.items).get(), hasLength(1));
       expect(await second.select(second.profiles).get(), hasLength(1));

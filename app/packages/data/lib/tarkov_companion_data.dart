@@ -6,6 +6,7 @@
 library;
 
 export 'src/bundle/bundle_contract.dart';
+export 'src/bundle/canonical_json.dart';
 export 'src/bundle/game_mode.dart';
 export 'src/bundle/manifest.dart';
 export 'src/database/app_database.dart';
@@ -27,5 +28,7 @@ export 'src/net/http_errors.dart';
 export 'src/settings/app_settings.dart';
 export 'src/settings/settings_repository.dart';
 export 'src/sync/dataset_downloader.dart';
+export 'src/sync/dataset_ingestor.dart';
+export 'src/sync/jsonl_reader.dart';
 export 'src/sync/manifest_fetcher.dart';
 export 'src/sync/manifest_repository.dart';

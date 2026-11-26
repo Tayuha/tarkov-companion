@@ -24,8 +24,8 @@ typedef DatabaseUpgrade = Future<void> Function(
 /// Two data classes share one SQLite file (design D4):
 ///
 /// * game data — [DatasetStates], [Items], [Tasks], [TaskObjectives],
-///   [Traders], [HideoutStations], [Crafts], [Barters], [Maps] and
-///   [PriceHistory]; replaceable and written by ingestion;
+///   [Traders], [HideoutStations], [Crafts], [Barters], [Maps],
+///   [GameRecords] and [PriceHistory]; replaceable and written by ingestion;
 /// * player data — [Profiles], [QuestProgress], [ObjectiveProgress] and
 ///   [AppSettings]; durable, and **never** reachable from game data by a
 ///   foreign key. A dataset refresh deletes and re-inserts game rows and cannot
@@ -53,6 +53,7 @@ typedef DatabaseUpgrade = Future<void> Function(
     Crafts,
     Barters,
     Maps,
+    GameRecords,
     PriceHistory,
     // Player data.
     Profiles,
@@ -67,12 +68,13 @@ class AppDatabase extends _$AppDatabase {
   /// [upgrade] step from the previous version.
   ///
   /// When [upgrade] is `null`, the built-in forward migrations declared in
-  /// [_builtInUpgrade] run. Version 2 adds `remoteManifest` only.
-  AppDatabase(super.e, {this.targetSchemaVersion = 2, this.upgrade});
+  /// [_builtInUpgrade] run. Version 2 adds `remoteManifest`; version 3 adds
+  /// `gameRecords`.
+  AppDatabase(super.e, {this.targetSchemaVersion = 3, this.upgrade});
 
   /// An in-memory database, for tests and short-lived tools.
   factory AppDatabase.memory({
-    int targetSchemaVersion = 2,
+    int targetSchemaVersion = 3,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inMemory(),
@@ -83,7 +85,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database at [path]; parent directories are created.
   factory AppDatabase.atPath(
     String path, {
-    int targetSchemaVersion = 2,
+    int targetSchemaVersion = 3,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.atPath(path),
@@ -94,7 +96,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database whose I/O runs on a background isolate.
   factory AppDatabase.inBackground(
     String path, {
-    int targetSchemaVersion = 2,
+    int targetSchemaVersion = 3,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inBackground(path),
@@ -120,6 +122,7 @@ class AppDatabase extends _$AppDatabase {
     // `tables.dart`, plus the FTS5 index and its triggers.
     //
     // Version 2 adds `remoteManifest` and nothing else; v1 data is untouched.
+    // Version 3 adds `gameRecords` and its kind index; v2 data is untouched.
     // Future versions add a `DatabaseUpgrade` callback from the constructor
     // (or a step in `_builtInUpgrade`) while bumping `schemaVersion`. The
     // runner in `migration_runner.dart` decides when an upgrade may run: it
@@ -164,11 +167,22 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// The forward migration for `from -> to`, or `null` when there is none.
+  ///
+  /// One `onUpgrade` call can span several versions (a client can upgrade from
+  /// v1 straight to the current schema), so the steps run in order inside the
+  /// transaction drift already opened.
   DatabaseUpgrade? _builtInUpgrade(int from, int to) {
-    if (from == 1 && to == 2) {
-      return _upgradeV1ToV2;
+    if (to > 3 || from < 1 || from >= to) {
+      return null;
     }
-    return null;
+    return (migrator, fromVersion, toVersion) async {
+      if (fromVersion < 2) {
+        await _upgradeV1ToV2(migrator, fromVersion, 2);
+      }
+      if (fromVersion < 3) {
+        await _upgradeV2ToV3(migrator, fromVersion, 3);
+      }
+    };
   }
 
   /// Version 2: add the sync layer's `remoteManifest` cache.
@@ -178,5 +192,14 @@ class AppDatabase extends _$AppDatabase {
   /// altered, and no row is rewritten.
   Future<void> _upgradeV1ToV2(Migrator migrator, int from, int to) async {
     await migrator.createTable(remoteManifests);
+  }
+
+  /// Version 3: add `gameRecords` for bundle kinds without a dedicated table.
+  ///
+  /// Only a new table and its kind index are created. Existing game rows,
+  /// player rows, FTS5 objects and sync bookkeeping are untouched.
+  Future<void> _upgradeV2ToV3(Migrator migrator, int from, int to) async {
+    await migrator.createTable(gameRecords);
+    await migrator.create(gameRecordsKind);
   }
 }

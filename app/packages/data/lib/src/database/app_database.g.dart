@@ -4292,6 +4292,270 @@ class MapsCompanion extends UpdateCompanion<TarkovMap> {
   }
 }
 
+class $GameRecordsTable extends GameRecords
+    with TableInfo<$GameRecordsTable, GameRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GameRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [kind, id, payload];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'gameRecords';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GameRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {kind, id};
+  @override
+  GameRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GameRecord(
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+    );
+  }
+
+  @override
+  $GameRecordsTable createAlias(String alias) {
+    return $GameRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class GameRecord extends DataClass implements Insertable<GameRecord> {
+  /// Bundle record discriminator (`itemCategory`, `achievement`, ...).
+  final String kind;
+
+  /// Upstream identifier of the record.
+  final String id;
+
+  /// The complete bundle record as canonical JSON.
+  final String payload;
+  const GameRecord({
+    required this.kind,
+    required this.id,
+    required this.payload,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['kind'] = Variable<String>(kind);
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    return map;
+  }
+
+  GameRecordsCompanion toCompanion(bool nullToAbsent) {
+    return GameRecordsCompanion(
+      kind: Value(kind),
+      id: Value(id),
+      payload: Value(payload),
+    );
+  }
+
+  factory GameRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GameRecord(
+      kind: serializer.fromJson<String>(json['kind']),
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'kind': serializer.toJson<String>(kind),
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+    };
+  }
+
+  GameRecord copyWith({String? kind, String? id, String? payload}) =>
+      GameRecord(
+        kind: kind ?? this.kind,
+        id: id ?? this.id,
+        payload: payload ?? this.payload,
+      );
+  GameRecord copyWithCompanion(GameRecordsCompanion data) {
+    return GameRecord(
+      kind: data.kind.present ? data.kind.value : this.kind,
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameRecord(')
+          ..write('kind: $kind, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(kind, id, payload);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GameRecord &&
+          other.kind == this.kind &&
+          other.id == this.id &&
+          other.payload == this.payload);
+}
+
+class GameRecordsCompanion extends UpdateCompanion<GameRecord> {
+  final Value<String> kind;
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<int> rowid;
+  const GameRecordsCompanion({
+    this.kind = const Value.absent(),
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GameRecordsCompanion.insert({
+    required String kind,
+    required String id,
+    required String payload,
+    this.rowid = const Value.absent(),
+  }) : kind = Value(kind),
+       id = Value(id),
+       payload = Value(payload);
+  static Insertable<GameRecord> custom({
+    Expression<String>? kind,
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (kind != null) 'kind': kind,
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GameRecordsCompanion copyWith({
+    Value<String>? kind,
+    Value<String>? id,
+    Value<String>? payload,
+    Value<int>? rowid,
+  }) {
+    return GameRecordsCompanion(
+      kind: kind ?? this.kind,
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameRecordsCompanion(')
+          ..write('kind: $kind, ')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $PriceHistoryTable extends PriceHistory
     with TableInfo<$PriceHistoryTable, PriceHistoryEntry> {
   @override
@@ -5901,6 +6165,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CraftsTable crafts = $CraftsTable(this);
   late final $BartersTable barters = $BartersTable(this);
   late final $MapsTable maps = $MapsTable(this);
+  late final $GameRecordsTable gameRecords = $GameRecordsTable(this);
   late final $PriceHistoryTable priceHistory = $PriceHistoryTable(this);
   late final $ProfilesTable profiles = $ProfilesTable(this);
   late final $QuestProgressTable questProgress = $QuestProgressTable(this);
@@ -5951,6 +6216,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'mapsNormalizedName',
     'CREATE INDEX mapsNormalizedName ON maps (normalizedName)',
   );
+  late final Index gameRecordsKind = Index(
+    'gameRecordsKind',
+    'CREATE INDEX gameRecordsKind ON gameRecords (kind)',
+  );
   late final Index priceHistoryItemId = Index(
     'priceHistoryItemId',
     'CREATE INDEX priceHistoryItemId ON priceHistory (itemId)',
@@ -5978,6 +6247,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     crafts,
     barters,
     maps,
+    gameRecords,
     priceHistory,
     profiles,
     questProgress,
@@ -5994,6 +6264,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     craftsStationId,
     craftsProductItemId,
     mapsNormalizedName,
+    gameRecordsKind,
     priceHistoryItemId,
     questProgressQuestId,
     objectiveProgressQuestId,
@@ -8512,6 +8783,177 @@ typedef $$MapsTableProcessedTableManager =
       TarkovMap,
       PrefetchHooks Function()
     >;
+typedef $$GameRecordsTableCreateCompanionBuilder =
+    GameRecordsCompanion Function({
+      required String kind,
+      required String id,
+      required String payload,
+      Value<int> rowid,
+    });
+typedef $$GameRecordsTableUpdateCompanionBuilder =
+    GameRecordsCompanion Function({
+      Value<String> kind,
+      Value<String> id,
+      Value<String> payload,
+      Value<int> rowid,
+    });
+
+class $$GameRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $GameRecordsTable> {
+  $$GameRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GameRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $GameRecordsTable> {
+  $$GameRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GameRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GameRecordsTable> {
+  $$GameRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+}
+
+class $$GameRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GameRecordsTable,
+          GameRecord,
+          $$GameRecordsTableFilterComposer,
+          $$GameRecordsTableOrderingComposer,
+          $$GameRecordsTableAnnotationComposer,
+          $$GameRecordsTableCreateCompanionBuilder,
+          $$GameRecordsTableUpdateCompanionBuilder,
+          (
+            GameRecord,
+            BaseReferences<_$AppDatabase, $GameRecordsTable, GameRecord>,
+          ),
+          GameRecord,
+          PrefetchHooks Function()
+        > {
+  $$GameRecordsTableTableManager(_$AppDatabase db, $GameRecordsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GameRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GameRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GameRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> kind = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GameRecordsCompanion(
+                kind: kind,
+                id: id,
+                payload: payload,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String kind,
+                required String id,
+                required String payload,
+                Value<int> rowid = const Value.absent(),
+              }) => GameRecordsCompanion.insert(
+                kind: kind,
+                id: id,
+                payload: payload,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$GameRecordsTable, GameRecord>(table),
+                  BaseReferences<_$AppDatabase, $GameRecordsTable, GameRecord>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GameRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GameRecordsTable,
+      GameRecord,
+      $$GameRecordsTableFilterComposer,
+      $$GameRecordsTableOrderingComposer,
+      $$GameRecordsTableAnnotationComposer,
+      $$GameRecordsTableCreateCompanionBuilder,
+      $$GameRecordsTableUpdateCompanionBuilder,
+      (
+        GameRecord,
+        BaseReferences<_$AppDatabase, $GameRecordsTable, GameRecord>,
+      ),
+      GameRecord,
+      PrefetchHooks Function()
+    >;
 typedef $$PriceHistoryTableCreateCompanionBuilder =
     PriceHistoryCompanion Function({
       required String itemId,
@@ -9919,6 +10361,8 @@ class $AppDatabaseManager {
   $$BartersTableTableManager get barters =>
       $$BartersTableTableManager(_db, _db.barters);
   $$MapsTableTableManager get maps => $$MapsTableTableManager(_db, _db.maps);
+  $$GameRecordsTableTableManager get gameRecords =>
+      $$GameRecordsTableTableManager(_db, _db.gameRecords);
   $$PriceHistoryTableTableManager get priceHistory =>
       $$PriceHistoryTableTableManager(_db, _db.priceHistory);
   $$ProfilesTableTableManager get profiles =>

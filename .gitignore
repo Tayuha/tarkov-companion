@@ -21,6 +21,7 @@ npm-debug.log*
 dist/
 *.jsonl.zst
 !test/fixtures/**/*.jsonl.zst
+!app/packages/data/test/fixtures/**/*.jsonl.zst
 
 # Pipeline fetch cache (conditional request validators + dataset checksums)
 .cache/

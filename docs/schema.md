@@ -4,7 +4,7 @@ The app keeps everything it knows in one local SQLite database. There is no
 server: game data arrives as bundles (`docs/data-bundles.md`), player progress is
 created by the user and never leaves the device. The schema lives in
 `app/packages/data/lib/src/database/` and is versioned by
-`AppDatabase.schemaVersion` (currently **2**).
+`AppDatabase.schemaVersion` (currently **3**).
 
 - Tables: `lib/src/database/tables.dart` (drift table classes)
 - Search schema: `lib/src/database/fts.dart`
@@ -17,13 +17,20 @@ Design D4 splits the file in two halves that are written by different owners.
 
 | Half | Tables | Written by | Replacement |
 |---|---|---|---|
-| Game data | `datasetState`, `items`, `tasks`, `taskObjectives`, `traders`, `hideoutStations`, `crafts`, `barters`, `maps`, `priceHistory` | Bundle ingestion (task 4.x); `priceHistory` by the on-demand history cache | Whole-dataset `DELETE` + insert inside one transaction |
+| Game data | `datasetState`, `items`, `tasks`, `taskObjectives`, `traders`, `hideoutStations`, `crafts`, `barters`, `maps`, `gameRecords`, `priceHistory` | Bundle ingestion (task 4.x); `priceHistory` by the on-demand history cache | Whole-dataset `DELETE` + insert inside one transaction |
 | Sync cache | `remoteManifest` | `ManifestRepository` (task 4.1) | One row per mode, replaced on a changed manifest |
 | Player data | `profiles`, `questProgress`, `objectiveProgress`, `appSettings` | The user, through the app | Never touched by a dataset refresh |
 
 Game-data tables are keyed by upstream identifiers, keep the complete JSONL
 record in a `payload` column (canonical JSON), and expose the indexed columns the
 UI queries. Player-data tables reference upstream identifiers as plain text.
+
+`gameRecords(kind, id, payload)` is the lossless home for bundle kinds without a
+dedicated table yet (`itemCategory`, `handbookCategory`, `armorMaterial`,
+`achievement`, `mob`, ...). It is keyed by `(kind, id)` because an upstream id is
+only unique within its kind, and has a `gameRecordsKind` index for whole-kind
+replacement. See [`client-sync.md`](client-sync.md#record-routing) for the
+routing table.
 
 Column names are `camelCase`, matching the bundle record fields, so ingestion
 maps a record field to a column without a translation table. Timestamps are
@@ -84,6 +91,7 @@ file.
 |---|---|
 | 1 | Initial game-data, player-data and FTS5 schema. |
 | 2 | Adds `remoteManifest` for conditional manifest fetching (task 4.1). Existing tables, indexes, triggers and rows are untouched; the upgrade runs inside one transaction after a pre-migration backup. |
+| 3 | Adds `gameRecords` and its `gameRecordsKind` index for bundle kinds without a dedicated table (task 4.3). Existing rows, FTS objects and sync bookkeeping are untouched. |
 
 ## Migrations, backups and recovery
 

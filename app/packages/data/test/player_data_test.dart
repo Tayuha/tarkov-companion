@@ -17,6 +17,7 @@ Future<void> deleteAllGameData(AppDatabase db) async {
   await db.delete(db.maps).go();
   await db.delete(db.traders).go();
   await db.delete(db.hideoutStations).go();
+  await db.delete(db.gameRecords).go();
 }
 
 /// The tables that own game data (replaceable) and player data (durable).

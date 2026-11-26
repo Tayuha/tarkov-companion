@@ -13,8 +13,10 @@ offline. Sync is split into three stages:
    only the datasets whose `sha256` differs from `datasetState`, stream them to
    disk, verify the byte count and SHA-256, and atomically replace the previous
    file.
-4. **Decompression and ingestion** — task 4.3 and later: decompress the verified
-   bytes, ingest in one transaction, and refresh FTS.
+4. **Decompression and ingestion** — task 4.3, implemented by
+   `JsonlLineReader` and `DatasetIngestor`: stream the zstd frame, parse JSONL
+   line by line, replace the dataset's rows in one transaction, and record the
+   applied checksum and version.
 
 The public bundle contract lives in [`data-bundles.md`](data-bundles.md); the
 network policy lives in [`network.md`](network.md).
@@ -193,6 +195,121 @@ leftover `.part` from a crash or power loss is truncated by the next
 | `HttpTimeoutException` | Headers, or an idle body read, exceeded the timeout |
 | `DisallowedHostException` (and the other policy errors) | Asset URL outside the network policy |
 
+## Decompression and ingestion
+
+Task 4.3, implemented by `JsonlLineReader` and `DatasetIngestor` in
+`app/packages/data/lib/src/sync/`. It runs only on a file that the downloader
+has already verified; ingestion never sees an unverified byte.
+
+```dart
+final result = await DatasetIngestor(db).ingest(
+  mode: GameMode.regular,
+  dataset: entry,                               // ManifestDataset from the manifest
+  compressedFile: File('.../regular/items.jsonl.zst'),
+  onProgress: (progress) => show(progress.fraction),
+);
+// result.records == entry.records, result.stateOutcome == inserted | updated | unchanged
+```
+
+### zstd decoder and memory bound
+
+The client uses **`archive` 4.7.1's pure-Dart `ZstdDecoder`** through
+`decodeLazy`. It is a direct dependency of `tarkov_companion_data`:
+
+- no native library, FFI, build hook or DLL — the same code runs on Linux and
+  Windows CI, and on Android;
+- `decodeLazy(InputFileStream(path))` decodes a block at a time, so the
+  compressed frame and the decoded payload are never held whole;
+- `JsonlLineReader` pulls 64 KiB chunks from that stream and splits on `0x0A`
+  before UTF-8 decoding each line. Memory is bounded by the chunk size plus the
+  longest single line, independent of the dataset size.
+
+The largest shipped dataset (items, roughly 8 MB decompressed; the design table
+measured 17 MB before trimming) is well inside that bound. A one-shot decode
+would also work for today's sizes but would allocate the full payload and break
+design D7's bounded-memory rule, so streaming is the contract, not an
+optimization. Frames are standard zstd (`28 b5 2f fd`, level 3, no frame
+checksum); no decoder settings differ from the pipeline's writer.
+
+### Record routing
+
+Every line must be a JSON object with a non-empty string `kind` and `id`.
+`kind`+`id` must be unique within the dataset. The ingestor maps kinds to the
+dedicated tables and stores every other kind in `gameRecords` (schema v3), so a
+collection the UI does not query yet is still replaced atomically instead of
+being dropped:
+
+| Kinds | Destination |
+|---|---|
+| `item` | `items` (the FTS triggers index `name`, `shortName`, `normalizedName`) |
+| `task` | `tasks`, plus one `taskObjectives` row per entry in `objectives` |
+| `trader` | `traders` |
+| `hideoutStation` | `hideoutStations` |
+| `craft` | `crafts` |
+| `barter` | `barters` |
+| `map` | `maps` |
+| `itemCategory`, `handbookCategory`, `fleaMarket`, `armorMaterial`, `playerLevel`, `mastering`, `skill`, `specialItem`, `setting`, `questItem`, `achievement`, `prestige`, `mob`, `lootContainer`, `stationaryWeapon`, `goonReport`, and any future/unknown kind | `gameRecords(kind, id, payload)` |
+
+Each row keeps the complete record as canonical JSON in `payload` (object keys
+sorted recursively). Dedicated columns are mapped from the documented fields;
+`price.avg24h`, `price.lastLow` and `price.change48hPercent` feed the item price
+columns. A missing required field, a wrong type, invalid UTF-8, malformed JSON
+or a duplicate record is a typed `IngestError`; it never falls back to a null
+column silently.
+
+### One transaction, batched, whole-dataset replacement
+
+`DatasetIngestor.ingest` opens exactly **one** SQLite transaction per dataset:
+
+1. Delete the previous rows this dataset owns — the dedicated table(s) plus
+   its auxiliary kinds in `gameRecords`. Deleting `tasks` cascades the old
+   `taskObjectives` rows (the only game-data foreign key); auxiliary kinds are
+   removed even when the new payload no longer contains them, so a collection
+   that disappears upstream does not linger.
+2. Stream the JSONL and buffer rows. A buffer is flushed with
+   `batch.insertAll` when 500 rows are pending and once more at the end; tasks
+   are flushed before their objectives so the immediate foreign key holds.
+3. Compare the processed line count with `datasets[].records`. A mismatch
+   aborts the transaction.
+4. Write `datasetState` (`checksum`, `schemaVersion`, `records`,
+   `sourceUpdatedAt`, `appliedAt`) through `DatasetStateRepository` in the same
+   transaction.
+5. Commit.
+
+Nothing is published to readers until the commit succeeds. Any throw at any
+step — including a corrupt line after a partial batch, a decompression failure,
+a missing file or a count mismatch — rolls back the deletes, every inserted row
+and the `datasetState` write together. The previous dataset and its applied
+version remain exactly as they were, which is the rollback scenario in the
+[data-sync spec](../openspec/changes/bootstrap-tarkov-companion/specs/data-sync/spec.md).
+
+Player data, `priceHistory` and the FTS index are never written by ingestion.
+Player tables have no foreign key onto game data (see
+[`schema.md`](schema.md#the-no-cascade-guarantee)), price history is invalidated
+by its own TTL, and `items_fts` is maintained by the existing insert/delete/update
+triggers while the item rows are replaced.
+
+### Progress and typed errors
+
+`onProgress` reports `IngestProgress(recordsProcessed, totalRecords)` once per
+processed line, so a caller can show a fraction without knowing the dataset
+ahead of time.
+
+| `IngestError.failure` | Cause |
+|---|---|
+| `missingFile` | The verified file is gone before ingestion starts |
+| `decompression` | The bytes are not a valid zstd frame, or the frame is truncated |
+| `invalidUtf8` | A decoded line is not valid UTF-8 |
+| `malformedJson` | A line is empty or is not a JSON object |
+| `invalidRecord` | Missing `kind`/`id`, or a dedicated kind lacks a required field |
+| `duplicateRecord` | The same `kind`+`id` appears twice |
+| `recordCountMismatch` | The file's line count differs from the manifest |
+| `unsupportedSchema` | `datasets[].schemaVersion` is newer than the client supports |
+| `datasetStateRejected` | `DatasetStateRepository` refused the dataset |
+
+Every one of them is non-destructive. A failed dataset is retried on the next
+sync because its stored checksum still differs from the manifest.
+
 ## Typed failures
 
 | Error | Cause | Cache |
@@ -231,6 +348,7 @@ cd app
 dart test packages/data/test/sync
 dart test packages/data/test/net
 dart test packages/data/test/schema_v2_migration_test.dart
+dart test packages/data/test/schema_v3_migration_test.dart
 ```
 
 The manifest suite proves the 200-then-304 sequence sends `If-None-Match`,
@@ -248,3 +366,20 @@ cancellation before the request, parent-directory creation, and re-downloading
 over an existing file where a failed update leaves the previous dataset intact.
 The HTTP suite adds the streaming API: unbuffered body, pre-flight allowlist,
 redirect-body drain before the next hop, and a non-2xx status error.
+
+The ingestion suite (`test/sync/dataset_ingestor_test.dart`) uses the committed
+`test/fixtures/bundle/` slice (provenance in its README) plus synthetic frames
+built with `archive`'s encoder. It asserts:
+
+- the item fixture produces 2 `items` rows and 5 `gameRecords` rows, the
+  documented item columns and canonical `payload`, an FTS match by name, and a
+  `datasetState` row with the manifest's checksum, schema version, record count
+  and injected `appliedAt`;
+- re-ingesting the same dataset leaves the row counts and `appliedAt`
+  unchanged;
+- a corrupt line after a partial insert, a record-count mismatch, a
+  decompression failure and a missing file all roll back to empty (or to the
+  previous dataset) with a typed `IngestError`;
+- a tasks dataset creates task + objective rows and a newer version removes the
+  dropped objective through the cascade;
+- unknown kinds land in `gameRecords` and re-ingest without duplicates.

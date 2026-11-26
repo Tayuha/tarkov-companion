@@ -323,6 +323,37 @@ class Maps extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+/// Bundle records that have no dedicated table yet, keyed by record kind and id.
+///
+/// The bundle carries auxiliary collections (`itemCategory`, `armorMaterial`,
+/// `achievement`, `mob`, ...) that the UI does not query yet. Storing them here
+/// keeps a whole-dataset replacement lossless: a future feature can start
+/// reading them without a client release that had to re-download the bundle.
+/// [payload] is the complete record as canonical JSON, exactly like the
+/// dedicated tables.
+///
+/// `kind` is part of the primary key because upstream ids are only unique
+/// within a kind (for example a `questItem` and an `achievement` may share an
+/// upstream id namespace but are different records).
+@DataClassName('GameRecord')
+@TableIndex(name: 'gameRecordsKind', columns: {#kind})
+class GameRecords extends Table {
+  @override
+  String get tableName => 'gameRecords';
+
+  /// Bundle record discriminator (`itemCategory`, `achievement`, ...).
+  TextColumn get kind => text().named('kind')();
+
+  /// Upstream identifier of the record.
+  TextColumn get id => text().named('id')();
+
+  /// The complete bundle record as canonical JSON.
+  TextColumn get payload => text().named('payload')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {kind, id};
+}
+
 /// Cached per-item price history. This is game data (a cache), refreshed on
 /// demand rather than by dataset ingestion.
 ///

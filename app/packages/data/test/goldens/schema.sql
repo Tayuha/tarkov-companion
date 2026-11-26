@@ -1,4 +1,4 @@
--- AppDatabase schema snapshot (schemaVersion 2).
+-- AppDatabase schema snapshot (schemaVersion 3).
 -- Regenerate: (cd app/packages/data && UPDATE_GOLDENS=1 dart test)
 -- FTS5 shadow tables (items_fts_data, _idx, _docsize,
 -- _config) are omitted; items_fts and its triggers are part
@@ -9,6 +9,9 @@ CREATE INDEX craftsProductItemId ON crafts (productItemId);
 
 index craftsStationId
 CREATE INDEX craftsStationId ON crafts (stationId);
+
+index gameRecordsKind
+CREATE INDEX gameRecordsKind ON gameRecords (kind);
 
 index itemsAvg24hPrice
 CREATE INDEX itemsAvg24hPrice ON items (avg24hPrice);
@@ -57,6 +60,9 @@ CREATE TABLE "crafts" ("id" TEXT NOT NULL, "stationId" TEXT NOT NULL, "productIt
 
 table datasetState
 CREATE TABLE "datasetState" ("mode" TEXT NOT NULL, "dataset" TEXT NOT NULL, "checksum" TEXT NOT NULL, "schemaVersion" INTEGER NOT NULL, "records" INTEGER NOT NULL, "sourceUpdatedAt" INTEGER NULL, "appliedAt" INTEGER NOT NULL, PRIMARY KEY ("mode", "dataset"));
+
+table gameRecords
+CREATE TABLE "gameRecords" ("kind" TEXT NOT NULL, "id" TEXT NOT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("kind", "id"));
 
 table hideoutStations
 CREATE TABLE "hideoutStations" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));

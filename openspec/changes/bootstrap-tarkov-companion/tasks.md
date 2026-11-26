@@ -37,7 +37,7 @@
 
 - [x] 4.1 Implement manifest fetching with ETag conditional requests and a last-check timestamp, verified by a test asserting a 304 response performs no dataset download
 - [x] 4.2 Implement dataset download with streaming, progress reporting, cancellation, and SHA-256 verification, verified by tests for a valid file, a corrupted file, and a cancelled mid-download
-- [ ] 4.3 Implement streaming JSONL decompression and batched ingestion in a single transaction per dataset, verified by an integration test ingesting the item fixture and asserting row counts and applied version
+- [x] 4.3 Implement streaming JSONL decompression and batched ingestion in a single transaction per dataset, verified by an integration test ingesting the item fixture and asserting row counts and applied version
 - [ ] 4.4 Implement ingestion failure rollback so a failed dataset leaves prior rows and version intact, verified by a test that injects a failure after partial insert and asserts rollback
 - [ ] 4.5 Implement FTS5 search indexing over item name, shortName, and normalizedName with diacritic folding, refreshed after items ingestion, verified by search tests including an accented name matched by an unaccented query
 - [ ] 4.6 Implement the background update scheduler honoring the auto-update preference, metered connections, and app foreground state, verified by fake-clock tests for each preference combination

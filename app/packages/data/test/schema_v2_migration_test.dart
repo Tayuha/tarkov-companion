@@ -7,7 +7,8 @@ import 'package:test/test.dart';
 
 import 'support/database_helpers.dart';
 
-/// Seeds a real schema-v1 file, before `remoteManifest` existed.
+/// Seeds a real schema-v1 file, before `remoteManifest` and `gameRecords`
+/// existed.
 Future<void> _seedV1(String path) async {
   final db = AppDatabase.atPath(path, targetSchemaVersion: 1);
   await insertProfile(
@@ -26,11 +27,15 @@ Future<void> _seedV1(String path) async {
           value: Value('"profile-regular"'),
         ),
       );
-  // `onCreate` always builds the shipped (latest) schema, so remove the v2
-  // addition to leave a genuine v1 file for the migration to upgrade.
+  // `onCreate` always builds the shipped (latest) schema, so remove the later
+  // additions to leave a genuine v1 file for the migration to upgrade.
   await db.customStatement('DROP TABLE "remoteManifest"');
+  await db.customStatement('DROP TABLE "gameRecords"');
   await db.close();
 }
+
+AppDatabase _openV2(String path) =>
+    AppDatabase.atPath(path, targetSchemaVersion: 2);
 
 void main() {
   test(
@@ -41,7 +46,7 @@ void main() {
       final path = '${directory.path}/tarkov_companion.sqlite';
       await _seedV1(path);
 
-      final result = await openAppDatabase(path);
+      final result = await openAppDatabase(path, open: _openV2);
       expect(result, isA<DatabaseOpened>());
       final opened = result as DatabaseOpened;
       addTearDown(opened.close);
@@ -108,7 +113,7 @@ void main() {
 
       // A second open is a no-op and still reads the migrated rows.
       await opened.close();
-      final reopened = AppDatabase.atPath(path);
+      final reopened = AppDatabase.atPath(path, targetSchemaVersion: 2);
       addTearDown(reopened.close);
       expect(await readPragma(reopened, 'PRAGMA user_version'), 2);
       expect(
@@ -127,7 +132,8 @@ void main() {
       final directory = createTemporaryDirectory(addTearDown);
       final path = '${directory.path}/tarkov_companion.sqlite';
 
-      final opened = await openAppDatabase(path) as DatabaseOpened;
+      final opened =
+          await openAppDatabase(path, open: _openV2) as DatabaseOpened;
       addTearDown(opened.close);
 
       expect(opened.fromVersion, 0);

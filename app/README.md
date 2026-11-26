@@ -159,10 +159,14 @@ cached manifest and downloads nothing. `DatasetDownloader` (task 4.2) resolves a
 dataset path against the manifest, streams it to `<destination>.part` through
 `AllowlistedHttpClient.send`, reports monotonic progress, supports cancellation,
 verifies `compressedBytes` and SHA-256, and only then renames the file over the
-previous dataset. The flow, cache fields, download/atomic-replace rules and
-typed failures are documented in
-[`docs/client-sync.md`](../docs/client-sync.md). zstd decompression and dataset
-ingestion remain task 4.3+.
+previous dataset. `JsonlLineReader` and `DatasetIngestor` (task 4.3) then stream
+the zstd frame with `archive`'s pure-Dart decoder, parse one JSON record per
+line, and replace the dataset in one transaction: delete the dataset's rows,
+batch-insert 500 at a time, verify the line count, write `datasetState`, commit.
+A malformed line, decompression failure or count mismatch rolls everything back
+and leaves the previous dataset and version readable. The flow, cache fields,
+download/atomic-replace rules, kind routing, transaction and typed failures are
+documented in [`docs/client-sync.md`](../docs/client-sync.md).
 
 The remaining manifest work is pure data: the parser and compatibility check
 perform no I/O. The tests parse
