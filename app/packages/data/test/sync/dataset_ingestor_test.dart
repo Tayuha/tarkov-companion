@@ -187,6 +187,25 @@ void main() {
     expect(state.appliedAt.toUtc(), appliedAt);
   });
 
+  test('ingests a published craft record with nested productItem', () async {
+    final synthetic = writeSyntheticDataset(temporary, DatasetKind.crafts, [
+      '{"id":"craft-real","kind":"craft","duration":6200,"gameEditions":[],'
+          '"level":1,"productItem":{"attributes":{},"count":140,'
+          '"itemId":"57371aab2459775a77142f22"},"requiredItems":[],'
+          '"requiredQuestItems":[],"stationId":"5d484fda654e7600681d9315"}',
+    ]);
+
+    await DatasetIngestor(db, clock: () => appliedAt).ingest(
+      mode: GameMode.regular,
+      dataset: synthetic.dataset,
+      compressedFile: synthetic.file,
+    );
+
+    final craft = await db.select(db.crafts).getSingle();
+    expect(craft.stationId, '5d484fda654e7600681d9315');
+    expect(craft.productItemId, '57371aab2459775a77142f22');
+  });
+
   test('an ingested accented name is searchable without diacritics', () async {
     final synthetic = writeSyntheticDataset(temporary, DatasetKind.items, [
       '{"id":"item-accent","kind":"item","name":"Café Crème optic",'

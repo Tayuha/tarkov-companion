@@ -426,7 +426,12 @@ final class _IngestSinks {
           CraftsCompanion.insert(
             id: id,
             stationId: _requiredString(record, 'stationId', line),
-            productItemId: _requiredString(record, 'productItemId', line),
+            productItemId: _nestedRequiredString(
+              record,
+              'productItem',
+              'itemId',
+              line,
+            ),
             payload: payload,
           ),
         );
@@ -645,6 +650,24 @@ Insertable<Task> _taskRow(
     experience: Value(_optionalInt(record, 'experience', line)),
     kappaRequired: Value(_optionalBool(record, 'kappaRequired', line) ?? false),
     payload: payload,
+  );
+}
+
+String _nestedRequiredString(
+  Map<String, Object?> record,
+  String parent,
+  String field,
+  int line,
+) {
+  final container = record[parent];
+  if (container is Map) {
+    final value = container[field];
+    if (value is String && value.isNotEmpty) return value;
+  }
+  throw IngestError(
+    IngestFailure.invalidRecord,
+    'Missing or invalid required string field "$parent.$field"',
+    line: line,
   );
 }
 
