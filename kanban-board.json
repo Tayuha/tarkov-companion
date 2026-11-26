@@ -1834,9 +1834,9 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Packaging implemented and merged (branch commit 2a8f29b). Artifacts: TarkovCompanion-0.1.0-x86_64.AppImage (11,065,848 B, sha 00ed43ec...), optional .deb (8,299,720 B, sha ecc4e967...), SHA256SUMS. scripts/package-linux.sh + package-linux CI job (artifact tarkov-companion-linux-x86_64). Provisional neutral icon. Local smoke launch reached the Flutter engine and exited on timeout. AWAITING MANUAL GATE: verify checksums on clean Linux, launch AppImage, complete first-run sync, search/filter/open item detail, offline restart. Do not tick tasks.md 8.9 until approved.",
+      "notes": "Packaging merged. Final AppImage built from the merged tree (includes first-run, catalog, quests, item detail): dist/TarkovCompanion-0.1.0-x86_64.AppImage, 11 MB, sha c6720321..., checksum OK. Smoke run launches the Flutter app and stays up. BLOCKER for the manual gate: the app fetches the manifest from the public release URL, but the GitHub repository is private, so anonymous sync gets HTTP 404 (\"No bundle is published\"). The error state and Retry render correctly. Need either a public repository or a local/dev manifest override before sync/browse can be approved.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710618024,
+      "updatedAt": 1795711067037,
       "archived": false
     },
     {
