@@ -8,5 +8,6 @@ library;
 export 'src/database/app_database.dart';
 export 'src/database/connection.dart';
 export 'src/database/fts.dart';
+export 'src/database/migration_runner.dart';
 export 'src/database/tables.dart';
 export 'src/dataset_kind.dart';

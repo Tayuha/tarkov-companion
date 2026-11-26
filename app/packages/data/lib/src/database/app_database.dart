@@ -7,6 +7,18 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
+/// A forward-only schema upgrade step.
+///
+/// [AppDatabase] runs this inside a single transaction. If the callback
+/// throws, every statement it issued is rolled back and SQLite keeps the
+/// previous `user_version`, so a failed migration cannot leave a half-applied
+/// schema behind.
+typedef DatabaseUpgrade = Future<void> Function(
+  Migrator migrator,
+  int fromVersion,
+  int toVersion,
+);
+
 /// The local Tarkov Companion database.
 ///
 /// Two data classes share one SQLite file (design D4):
@@ -49,34 +61,82 @@ part 'app_database.g.dart';
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase(super.e);
+  /// [targetSchemaVersion] defaults to the shipped schema. Tests (and a future
+  /// release before it is generated) pass a higher version together with the
+  /// [upgrade] step from the previous version.
+  AppDatabase(super.e, {this.targetSchemaVersion = 1, this.upgrade});
 
   /// An in-memory database, for tests and short-lived tools.
-  factory AppDatabase.memory() =>
-      AppDatabase(TarkovDatabaseConnection.inMemory());
+  factory AppDatabase.memory({
+    int targetSchemaVersion = 1,
+    DatabaseUpgrade? upgrade,
+  }) => AppDatabase(
+    TarkovDatabaseConnection.inMemory(),
+    targetSchemaVersion: targetSchemaVersion,
+    upgrade: upgrade,
+  );
 
   /// A file-backed database at [path]; parent directories are created.
-  factory AppDatabase.atPath(String path) =>
-      AppDatabase(TarkovDatabaseConnection.atPath(path));
+  factory AppDatabase.atPath(
+    String path, {
+    int targetSchemaVersion = 1,
+    DatabaseUpgrade? upgrade,
+  }) => AppDatabase(
+    TarkovDatabaseConnection.atPath(path),
+    targetSchemaVersion: targetSchemaVersion,
+    upgrade: upgrade,
+  );
 
   /// A file-backed database whose I/O runs on a background isolate.
-  factory AppDatabase.inBackground(String path) =>
-      AppDatabase(TarkovDatabaseConnection.inBackground(path));
+  factory AppDatabase.inBackground(
+    String path, {
+    int targetSchemaVersion = 1,
+    DatabaseUpgrade? upgrade,
+  }) => AppDatabase(
+    TarkovDatabaseConnection.inBackground(path),
+    targetSchemaVersion: targetSchemaVersion,
+    upgrade: upgrade,
+  );
 
   /// The SQLite library version bundled with the app.
   static String get sqliteLibraryVersion => sqlite3.version.libVersion;
 
+  /// The schema version this database opens at.
+  final int targetSchemaVersion;
+
+  /// The upgrade from the previous version, run inside one transaction.
+  final DatabaseUpgrade? upgrade;
+
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => targetSchemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     // Version 1 is the initial schema: every table and index from
-    // `tables.dart`, plus the FTS5 index and its triggers. There is no
-    // `onUpgrade` yet; the versioned migration runner is task 3.3.
+    // `tables.dart`, plus the FTS5 index and its triggers.
+    //
+    // Future versions add a `DatabaseUpgrade` callback from the constructor
+    // (or a fixed step table) while bumping `schemaVersion`. The runner in
+    // `migration_runner.dart` decides when an upgrade may run: it only does so
+    // after a verified backup exists.
     onCreate: (migrator) async {
       await migrator.createAll();
       await _createItemSearchSchema();
+    },
+    onUpgrade: (migrator, from, to) async {
+      final upgradeStep = upgrade;
+      if (upgradeStep == null) {
+        throw StateError(
+          'No upgrade path from schema version $from to $to. '
+          'Provide an onUpgrade step for the new schemaVersion.',
+        );
+      }
+      // One transaction for the whole upgrade. SQLite DDL is transactional,
+      // so a throw here rolls back both schema changes and data changes, and
+      // drift never bumps `user_version`.
+      await migrator.database.transaction(
+        () => upgradeStep(migrator, from, to),
+      );
     },
     beforeOpen: (details) async {
       // WAL lets a reader run while ingestion writes, and is the mode the app

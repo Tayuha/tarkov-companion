@@ -72,9 +72,75 @@ it as unavailable upstream (tasks 6.8 / 5.8).
 databases report `memory` instead of `wal`; a file-backed database is the only
 place WAL can be observed, and `test/wal_test.dart` asserts both.
 
-Setting `journal_mode` needs a writable database. The read-only recovery mode
-from task 3.3 opens the file with a different connection and must not run this
-`beforeOpen`, otherwise SQLite refuses the pragma on a read-only file.
+Setting `journal_mode` needs a writable database. The read-only recovery handle
+(`RecoveryDatabase`) opens the file with a different SQLite connection and does
+not run this `beforeOpen`, otherwise SQLite refuses the pragma on a read-only
+file.
+
+## Migrations, backups and recovery
+
+`openAppDatabase` in `lib/src/database/migration_runner.dart` is the only path
+the app should use to open the file. It returns a sealed result:
+
+| Result | Meaning | Handle |
+|---|---|---|
+| `DatabaseOpened` | Normal open; migrations succeeded or were not needed | Writable drift `AppDatabase` |
+| `DatabaseRecovery` | Opening or migrating failed | `RecoveryDatabase`, opened with `OpenMode.readOnly` |
+
+`DatabaseOpened` carries the `fromVersion`, the `toVersion`, and the backup
+`File?` (null on a fresh database or when no migration was needed).
+`DatabaseRecovery` carries the same backup path when one could be made, the
+exception, and the detected `user_version` (`-1` when the file is not readable
+SQLite).
+
+### Pre-migration backup
+
+Before drift opens the database, the runner reads `PRAGMA user_version` with a
+raw `package:sqlite3` connection. When the file exists, is older than
+`AppDatabase.schemaVersion`, and a migration is required:
+
+1. `PRAGMA wal_checkpoint(TRUNCATE)` moves committed WAL frames into the main
+   file.
+2. `VACUUM INTO` writes a consistent snapshot to a temporary name in
+   `backups/`, which is then renamed into place. Copying the three files blindly
+   would race the WAL; `VACUUM INTO` cannot capture a partial WAL state.
+3. Older backups are pruned to the configured count (default **3**), counting
+   only files that match the backup pattern.
+
+Backups live next to the database:
+
+```
+<database directory>/backups/
+  tarkov_companion.v1-to-v2.20261126T120000.123456Z.sqlite
+  tarkov_companion.v1-to-v2.20261126T090000.654321Z.sqlite
+```
+
+The name is `<base>.v<from>-to-v<to>.<UTC timestamp>.sqlite`
+(`backupFileName`), and `listBackups`/`pruneBackups` only consider files that
+match it. A fresh database creates no backup.
+
+### Failure rule: never delete, never auto-restore
+
+Drift's upgrade step runs inside one transaction (`AppDatabase.migration`). If
+it throws, SQLite rolls back the DDL and data, `user_version` stays at
+`fromVersion`, and the runner does **not** delete, truncate, or overwrite the
+original file. It closes the partially opened drift handle and returns
+`DatabaseRecovery` with the pre-migration backup path.
+
+Recovery is read-only by construction: `RecoveryDatabase` exposes schema
+version, table names, and `select`; any write throws
+`SqliteException: attempt to write a readonly database`. The app must offer
+export and a user-initiated restore, and keep writes disabled until the user
+resolves it.
+
+`restoreFromBackup` (on either result, or `restoreDatabaseFromBackup`) is only
+called from an explicit user action. It closes the current handle, copies the
+backup to a temporary file, renames it over the database, deletes stale `-wal`
+and `-shm` sidecars, and reopens. Nothing in the startup path calls it
+automatically.
+
+A database whose `user_version` is higher than the app supports enters recovery
+instead of being opened or downgraded.
 
 ## Timestamps, identifiers, payloads
 
@@ -127,8 +193,9 @@ runtime; `flutter build linux --debug` puts `libsqlite3.so` in the bundle.
 ## Changing the schema
 
 1. Edit `tables.dart` / `fts.dart`.
-2. Bump `schemaVersion` in `app_database.dart` and add the `onUpgrade` step (the
-   versioned migration runner is task 3.3).
+2. Bump the schema version in `app_database.dart` and add the `DatabaseUpgrade`
+   step for the previous version. The step may add tables, indexes and the FTS
+   schema; `AppDatabase` already wraps it in a transaction.
 3. Regenerate the drift code from the package directory:
    ```bash
    cd app/packages/data
