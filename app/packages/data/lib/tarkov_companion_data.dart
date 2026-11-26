@@ -31,6 +31,8 @@ export 'src/net/allowlisted_http_client.dart';
 export 'src/net/host_allowlist.dart';
 export 'src/net/http_errors.dart';
 export 'src/profiles/profile_repository.dart';
+export 'src/quests/quest_availability.dart';
+export 'src/quests/quest_detail.dart';
 export 'src/quests/quest_query.dart';
 export 'src/quests/quest_repository.dart';
 export 'src/settings/app_settings.dart';
