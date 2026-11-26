@@ -602,7 +602,7 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "ready",
+      "categoryID": "done",
       "position": 0,
       "tagIDs": [
         "tag_planning",
@@ -610,9 +610,30 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Flutter and Dart are not installed on the Linux host, and Flutter cannot build a Windows executable from Linux. Options: (a) install Flutter here with linux+android targets, test logic locally, build/verify Windows on a windows-latest GitHub runner; (b) provide a Windows VM and verify there too; (c) defer the client and finish repo/docs polish. Recommendation: (a). Decision needed before T3.1.",
+      "notes": "Decided and executed 2026-11-26: installed Flutter 3.50.1 stable + Dart 3.14 at ~/.local/flutter (fish PATH), ninja 1.13.2 in ~/.local/bin. Linux toolchain passes. No Android SDK and no Windows host; Windows builds will be verified on windows-latest CI. Analytics disabled.",
       "createdAt": 1795690706668,
-      "updatedAt": 1795690706668,
+      "updatedAt": 1795693478390,
+      "archived": false
+    },
+    {
+      "id": "task_impl_1_4",
+      "title": "T1.4 Scaffold the Flutter client",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: flutter create with windows/linux/android, display name Tarkov Companion, app README, flutter_lints, analyze/test/linux build pass; tasks.md 1.4 marked with the Windows CI caveat.",
+      "sessionID": "ses_de854269effeAE1RR3fEqQirHX",
+      "createdAt": 1795693478390,
+      "updatedAt": 1795693478390,
       "archived": false
     }
   ]
