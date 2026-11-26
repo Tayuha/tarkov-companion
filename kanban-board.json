@@ -1088,16 +1088,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 8,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item",
+      "notes": "In progress in worktree t53-item-detail (branch t53-item-detail). ItemDetail data facade + ItemDetailScreen with type-specific sections and strict omission; golden tests for weapon/ammo/armor/barter-only. Plain Material. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795710284167,
+      "archived": false,
+      "sessionID": "ses_de753bfefffe30GzE07kKQERE2"
     },
     {
       "id": "task_impl_5_4",
@@ -1250,16 +1251,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 16,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Build the quest catalog screen with state badges and filter controls, verified by widget tests covering search, filtering, and empty results",
+      "notes": "In progress in worktree t62-quest-screen (branch t62-quest-screen). QuestListScreen with debounced search, trader/map/level/state filters, state badges, pagination and empty/reset states. Plain Material, no app wiring. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795710284167,
+      "archived": false,
+      "sessionID": "ses_de753bfeefferKWXkyNr01ULep"
     },
     {
       "id": "task_impl_6_3",
@@ -1825,17 +1827,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 44,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Gate for Windows/mobile work: AppImage preferred (.deb optional), version metadata and checksums, run on a clean Linux environment, smoke-test launch/sync/browse. Windows installer deferred until this is approved.",
+      "notes": "In progress in worktree t89-linux-package (branch t89-linux-package). AppImage preferred + optional .deb, versioned artifact, SHA256SUMS, CI package job, local AppImage smoke launch. Task stays open until the manual launch->sync->browse approval. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
-      "archived": false
+      "updatedAt": 1795710284167,
+      "archived": false,
+      "sessionID": "ses_de753bfeeffdc0Zf15iAoSnihP"
     },
     {
       "id": "task_impl_8_10",
