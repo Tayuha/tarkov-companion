@@ -3,6 +3,23 @@ import type { NormalizeDataset } from "../normalize/index.js";
 import { canonicalJson } from "../util/canonical.js";
 
 /**
+ * The closed set of dataset names a bundle may contain. Kept as an explicit
+ * tuple so the Zod enum is literal-typed; a test asserts it stays in sync with
+ * the normalization registry, and the client validates the same closed set.
+ */
+export const BUNDLE_DATASETS = [
+  "items",
+  "tasks",
+  "traders",
+  "hideout",
+  "crafts",
+  "barters",
+  "maps",
+] as const satisfies readonly NormalizeDataset[];
+
+export const bundleDatasetSchema = z.enum(BUNDLE_DATASETS);
+
+/**
  * Bundle manifest contract.
  *
  * A manifest is the only document a client needs to decide whether it can
@@ -70,7 +87,7 @@ export const manifestDatasetSourceSchema = z.object({
 });
 
 export const manifestDatasetSchema = z.object({
-  dataset: z.string().min(1),
+  dataset: bundleDatasetSchema,
   path: z.string().min(1),
   schemaVersion: z.number().int().positive(),
   sha256: sha256Hex,
@@ -86,7 +103,7 @@ export const manifestDatasetSchema = z.object({
  * so no file was written and the client must leave its existing rows alone.
  */
 export const manifestSkippedSchema = z.object({
-  dataset: z.string().min(1),
+  dataset: bundleDatasetSchema,
   reason: z.literal("not-supplied"),
 });
 
@@ -105,7 +122,7 @@ export const manifestSchema = z.object({
   generatedAt: isoDateTime,
   source: manifestSourceSchema,
   totals: manifestTotalsSchema,
-  datasets: z.array(manifestDatasetSchema),
+  datasets: z.array(manifestDatasetSchema).min(1),
   skipped: z.array(manifestSkippedSchema),
 });
 

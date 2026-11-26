@@ -1,4 +1,5 @@
 export {
+  BUNDLE_DATASETS,
   BUNDLE_MODES,
   BUNDLE_SCHEMA_VERSION,
   DATASET_FILE_SUFFIX,
@@ -6,6 +7,7 @@ export {
   MANIFEST_FILE,
   MANIFEST_VERSION,
   MIN_APP_SCHEMA_VERSION,
+  bundleDatasetSchema,
   bundleModeSchema,
   datasetSchemaVersion,
   isBundleMode,

@@ -7,6 +7,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import type { BundleInput } from "./writer.js";
 import { buildBundle, writeBundle } from "./writer.js";
 import {
+  BUNDLE_DATASETS,
   BUNDLE_SCHEMA_VERSION,
   MANIFEST_VERSION,
   ZSTD_COMPRESSION_LEVEL,
@@ -14,7 +15,7 @@ import {
   manifestSchema,
   type BundleMode,
 } from "./index.js";
-import type { BundleRecord } from "../normalize/index.js";
+import { NORMALIZE_DATASETS, type BundleRecord } from "../normalize/index.js";
 import { canonicalJson } from "../util/canonical.js";
 import { loadFixtureBundleInput } from "../fixtures/bundle-set.js";
 
@@ -211,6 +212,28 @@ describe("bundle manifest", () => {
 
     const root = JSON.parse(bundle.manifestJson) as Record<string, unknown>;
     expect(Object.keys(root)).toEqual([...Object.keys(root)].sort());
+  });
+
+  it("keeps the dataset enum in sync with the normalization registry", () => {
+    expect([...BUNDLE_DATASETS]).toEqual([...NORMALIZE_DATASETS]);
+  });
+
+  it("rejects unknown dataset names and an empty dataset list", async () => {
+    const bundle = buildBundle(await fixtureInput("regular"), FIXED_TIME);
+
+    const unknown = JSON.parse(bundle.manifestJson) as {
+      datasets: Array<{ dataset: string }>;
+    };
+    unknown.datasets[0]!.dataset = "seasons";
+    expect(manifestSchema.safeParse(unknown).success).toBe(false);
+
+    const empty = JSON.parse(bundle.manifestJson) as {
+      datasets: unknown[];
+      totals: { datasets: number };
+    };
+    empty.datasets = [];
+    empty.totals.datasets = 0;
+    expect(manifestSchema.safeParse(empty).success).toBe(false);
   });
 });
 
