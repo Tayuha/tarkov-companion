@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
 import 'catalog_query.dart';
+import 'item_detail.dart';
 
 /// Read-side execution of [CatalogQuery] over the local item catalog.
 ///
@@ -105,6 +108,84 @@ final class CatalogRepository {
         )
         .getSingle();
     return row.read<int>('n');
+  }
+
+  /// The full detail record for [itemId], or `null` when the current dataset
+  /// has no such item.
+  ///
+  /// Reads the indexed `items` columns plus the canonical `payload`, and the
+  /// type/category tag rows. Category display names are resolved from the
+  /// bundle's `itemCategory`/`handbookCategory` records when present; a
+  /// category without a matching record keeps its id so an incomplete dataset
+  /// is still usable. Corrupt payload JSON throws instead of returning a
+  /// half-filled detail, so the screen never renders invented values.
+  Future<ItemDetail?> itemDetail(String itemId) async {
+    final id = itemId.trim();
+    if (id.isEmpty) {
+      return null;
+    }
+
+    final row = await (_database.select(
+      _database.items,
+    )..where((item) => item.id.equals(id))).getSingleOrNull();
+    if (row == null) {
+      return null;
+    }
+
+    final tags = await _loadTags([id]);
+    final categoryIds = [
+      ...?tags.categories[id],
+      ...?tags.handbookCategories[id],
+    ];
+
+    return ItemDetail.fromPayload(
+      id: row.id,
+      name: row.name,
+      shortName: row.shortName,
+      weight: row.weight,
+      width: row.width,
+      height: row.height,
+      payload: row.payload,
+      types: tags.types[id] ?? const [],
+      categoryIds: tags.categories[id] ?? const [],
+      handbookCategoryIds: tags.handbookCategories[id] ?? const [],
+      categoryNames: await _loadCategoryNames(categoryIds),
+    );
+  }
+
+  /// Display names for [categoryIds] from the auxiliary bundle records.
+  Future<Map<String, String>> _loadCategoryNames(
+    List<String> categoryIds,
+  ) async {
+    if (categoryIds.isEmpty) {
+      return const {};
+    }
+    final placeholders = List.filled(categoryIds.length, '?').join(', ');
+    final rows = await _database
+        .customSelect(
+          'SELECT id, payload FROM gameRecords '
+          "WHERE kind IN ('itemCategory', 'handbookCategory') "
+          'AND id IN ($placeholders)',
+          variables: _idVariables(categoryIds),
+        )
+        .get();
+
+    final names = <String, String>{};
+    for (final row in rows) {
+      try {
+        final payload = jsonDecode(row.read<String>('payload'));
+        if (payload is Map<String, Object?>) {
+          final name = payload['name'];
+          if (name is String && name.trim().isNotEmpty) {
+            names[row.read<String>('id')] = name;
+          }
+        }
+      } on FormatException {
+        // A category record without decodable JSON must not hide the category:
+        // the caller falls back to the id.
+      }
+    }
+    return names;
   }
 
   _QueryParts _buildWhere(CatalogFilters filters, String? match) {
