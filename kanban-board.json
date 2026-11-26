@@ -960,6 +960,28 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 28,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de7c05c6affeFYn0KPZN4zFggp. Schema v4 items.priceObservedAt (migration 3->4) populated by ingestion; FreshnessPolicy with strict age > threshold (24h fresh, +1s stale), unknown for null, future clamped; repository query and settings-derived threshold. 15 tests (230 data). CI 45847616886 green. Commit 7c3a543.",
+      "sessionID": "ses_de7c05c6affeFYn0KPZN4zFggp",
+      "createdAt": 1795703164511,
+      "updatedAt": 1795706618965,
+      "archived": false
+    },
+    {
+      "id": "task_impl_4_8",
+      "title": "T4.8 Full-dataset ingest benchmark",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
@@ -967,10 +989,10 @@
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: schema v4 items.priceObservedAt with migration and ingestor population, FreshnessPolicy with strict > threshold boundary, unknown for null, future clamped, repository query, boundary/fixture/settings-change tests, docs/freshness.md, CI green, task 4.7 checked.",
-      "sessionID": "ses_de7c05c6affeFYn0KPZN4zFggp",
-      "createdAt": 1795703164511,
-      "updatedAt": 1795703164511,
+      "notes": "In progress in a linked child session. Acceptance: commit the real full items .jsonl.zst fixture (~1.4 MB), benchmark test tagged benchmark with Timeout.none asserting compressed < 10 MiB, ingest wall-clock and RSS delta budgets, row count/checksum correctness; run on windows-latest CI; docs with measured numbers; task 4.8 checked.",
+      "sessionID": "ses_pending_48",
+      "createdAt": 1795706618965,
+      "updatedAt": 1795706618965,
       "archived": false
     }
   ]
