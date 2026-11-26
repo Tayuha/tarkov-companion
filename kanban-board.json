@@ -1088,15 +1088,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 37,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in worktree t53-item-detail (branch t53-item-detail). ItemDetail data facade + ItemDetailScreen with type-specific sections and strict omission; golden tests for weapon/ammo/armor/barter-only. Plain Material. Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t53-item-detail (session ses_de753bfefffe30GzE07kKQERE2), merged as 424cef8. CatalogRepository.itemDetail with typed properties (weapon/ammo/armor/medical/generic), category labels from gameRecords, strict omission (no zero/N/A rows), header/base/categories/links, not-found and corrupt-payload states. 4 Linux goldens + 9 structural tests (13 features, 6 data); 346 data / 41 features. Branch 36fb9e6. Home now wires quests and item detail; commit after merge.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710284167,
+      "updatedAt": 1795710935253,
       "archived": false,
       "sessionID": "ses_de753bfefffe30GzE07kKQERE2"
     },

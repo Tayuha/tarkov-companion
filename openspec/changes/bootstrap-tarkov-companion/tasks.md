@@ -49,7 +49,7 @@
 
 - [x] 5.1 Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination
 - [x] 5.2 Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset
-- [ ] 5.3 Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item
+- [x] 5.3 Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item
 - [ ] 5.4 Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships
 - [ ] 5.5 Implement price presentation with source, observation time, 48-hour direction, and explicit missing-data states, verified by widget tests for complete, missing-flea, and zero-price fixtures
 - [ ] 5.6 Implement the disk-backed image cache with lazy loading, placeholder fallback, and a size budget, verified by tests for cache hit offline, failed fetch, and eviction at the budget
