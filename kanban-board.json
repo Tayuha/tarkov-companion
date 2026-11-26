@@ -1450,16 +1450,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 32,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in worktree t71-profiles (branch t71-profiles), session ses_de7734899fferplwbjv8e9WuU9. ProfileRepository: first-launch regular profile, per-mode creation, activation/switching, single-active invariant, repair of a missing active id, injected clock/ids, transactional writes. Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t71-profiles (session ses_de7734899fferplwbjv8e9WuU9), merged as 8ec5205. ProfileRepository: list/byId/active/ensureFirstLaunch/createForMode/activate; one profile per game mode, activation and creation transactional, duplicate mode returns ProfileAlreadyExists without changing the active profile, missing activation id throws ProfileNotFoundError, deterministic repair of a dangling active id via onRepair. Injectable clock and secure id generator. 14 tests; 288 data tests incl. benchmark (2.04s). Branch commit c51c94b.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
+      "updatedAt": 1795708559444,
       "archived": false,
       "sessionID": "ses_de7734899fferplwbjv8e9WuU9"
     },

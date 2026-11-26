@@ -73,7 +73,7 @@
 
 ## 7. Profiles and portability
 
-- [ ] 7.1 Implement per-mode profile creation, activation, and switching with a single active profile invariant, verified by tests for first launch, explicit creation, and switching
+- [x] 7.1 Implement per-mode profile creation, activation, and switching with a single active profile invariant, verified by tests for first launch, explicit creation, and switching
 - [ ] 7.2 Implement editable profile facts (player level, and faction if retained) with immediate re-derivation, verified by a test that a level change unlocks a quest without restart
 - [ ] 7.3 Implement profile reset and deletion with confirmation and post-delete activation of another profile, verified by integration tests including deleting the last profile
 - [ ] 7.4 Implement the export document writer with canonical JSON and checksum, verified by a golden-file test and a checksum stability test across key ordering
