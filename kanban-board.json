@@ -752,16 +752,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 19,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de8123dd7ffeiw9IQUr7LgH59E. Exact HTTPS allowlist (github.com, objects.githubusercontent.com, release-assets.githubusercontent.com, assets.tarkov.dev), manual redirect handling with per-hop validation and 5-hop cap, no HTTP downgrade, no userinfo, Authorization/Cookie dropped on redirect, TLS defaults untouched. Typed errors incl. status 404/304. 17 net tests prove zero transport calls for disallowed hosts. 96 data tests. CI 45825362797 green. Commit 8cf18be.",
+      "sessionID": "ses_de8123dd7ffeiw9IQUr7LgH59E",
+      "createdAt": 1795697801523,
+      "updatedAt": 1795698485492,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_6",
+      "title": "T3.6 Rotating local logs and export",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: pure-Dart http wrapper with exact host allowlist, HTTPS-only, no userinfo, manual redirect validation (github asset hosts allowed, downgrade and unknown hosts rejected), typed errors, TLS defaults untouched, MockClient tests proving zero requests to disallowed hosts, docs/network.md, CI green, task 3.5 checked.",
-      "sessionID": "ses_de8123dd7ffeiw9IQUr7LgH59E",
-      "createdAt": 1795697801523,
-      "updatedAt": 1795697801523,
+      "notes": "In progress in a linked child session. Acceptance: JSONL rotating file sink with maxBytes/maxFiles, serialized writes, no-throw best effort, level filtering, zip export with logs+metadata, rotation/pruning/export/no-log tests, docs/logging.md privacy rules, CI green, task 3.6 checked.",
+      "sessionID": "ses_de807c699ffed7kqJVdyknmpxD",
+      "createdAt": 1795698485492,
+      "updatedAt": 1795698485492,
       "archived": false
     }
   ]
