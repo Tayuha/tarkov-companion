@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same ref makes the older run obsolete. Pull requests from
+# forks get their own group because `github.ref` is the merge ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: pipeline/package-lock.json
+
+      - name: Install dependencies
+        working-directory: pipeline
+        run: npm ci
+
+      - name: Lint
+        working-directory: pipeline
+        run: npm run lint
+
+      - name: Test
+        working-directory: pipeline
+        run: npm test
+
+      - name: Compile
+        working-directory: pipeline
+        run: npm run build
+
+      - name: Validate fixtures
+        working-directory: pipeline
+        run: npm run validate:fixtures
+
+      # Exercises the whole offline path against the committed fixtures, so a
+      # broken bundler or gate fails here instead of in the scheduled sync.
+      - name: Bundle fixtures
+        working-directory: pipeline
+        run: npm run bundle -- --all
+
+      - name: Gate handbuilt bundle
+        working-directory: pipeline
+        run: npm run gate -- --dir ../test/fixtures/handbuilt-bundle
+
+  app:
+    name: App (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pinned to the version in app/README.md so the Windows toolchain is
+      # reproducible; `cache: true` keeps the SDK between runs keyed by version.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.50.1"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: app
+        run: flutter analyze
+
+      - name: Test
+        working-directory: app
+        run: flutter test
+
+      # The development host is Linux, so this is the only place the Windows
+      # runner sources are compiled.
+      - name: Build Windows app (debug)
+        working-directory: app
+        run: flutter build windows --debug
+
+  app-linux:
+    name: App (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Duplicates the analyze/test half of the Windows job for fast feedback on
+    # Dart-only changes; the Windows job remains the gate for the app.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.50.1"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: app
+        run: flutter analyze
+
+      - name: Test
+        working-directory: app
+        run: flutter test

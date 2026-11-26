@@ -25,9 +25,11 @@ The Linux debug bundle is written to `build/linux/x64/debug/bundle/`.
 
 ## Windows (CI only)
 
-Windows builds are verified in GitHub Actions (task 1.6, `windows-latest` runner) because the
-development host is Linux. The Windows runner sources are generated and tracked, but they cannot be
-compiled or launched here. On a Windows machine:
+Windows builds are verified in GitHub Actions because the development host is Linux. The `app` job in
+`.github/workflows/ci.yml` runs on a `windows-latest` runner pinned to Flutter 3.50.1 and executes
+`flutter pub get`, `flutter analyze`, `flutter test`, and `flutter build windows --debug`. The Windows
+runner sources are generated and tracked, but they cannot be compiled or launched locally. On a Windows
+machine:
 
 ```powershell
 flutter pub get

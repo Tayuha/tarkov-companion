@@ -1,5 +1,8 @@
 # Tarkov Companion
 
+[![CI](https://github.com/Tayuha/tarkov-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/Tayuha/tarkov-companion/actions/workflows/ci.yml)
+[![Data sync](https://github.com/Tayuha/tarkov-companion/actions/workflows/data-sync.yml/badge.svg)](https://github.com/Tayuha/tarkov-companion/actions/workflows/data-sync.yml)
+
 An open-source, local-first companion app for **Escape from Tarkov**: browse every item, follow the
 flea market, and track quest progress — on your machine, offline, without an account.
 

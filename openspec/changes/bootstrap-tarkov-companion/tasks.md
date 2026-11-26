@@ -7,7 +7,7 @@
 - [ ] 1.3 Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters
 - [x] 1.4 Create the Flutter project in `app/` with Windows, Linux, and Android targets, verified by `flutter config` listing the desktop targets, `flutter analyze` and `flutter test` passing, and `flutter build linux --debug` succeeding locally; the Windows debug build is verified by task 1.6 CI on a `windows-latest` runner because the development host is Linux
 - [x] 1.5 Create the TypeScript pipeline in `pipeline/` with strict `tsconfig`, linting, and a `npm test` runner, verified by `npm run lint && npm test` passing with one placeholder test
-- [ ] 1.6 Add `.github/workflows/ci.yml` running app analyze/test, pipeline lint/test, and a Windows debug build, verified by the workflow succeeding on a pull request
+- [x] 1.6 Add `.github/workflows/ci.yml` running app analyze/test, pipeline lint/test, and a Windows debug build, verified by the workflow succeeding on the `main` branch (push or dispatch) and on pull requests
 
 ## 2. Data pipeline
 
