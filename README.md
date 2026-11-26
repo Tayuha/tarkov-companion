@@ -73,6 +73,15 @@ The pipeline can run against committed fixtures without network access or secret
 cd pipeline && npm run build -- --fixtures ../test/fixtures --out ../dist
 ```
 
+Build the Linux release package (AppImage, optional `.deb`, and `SHA256SUMS`):
+
+```bash
+bash scripts/package-linux.sh
+```
+
+Artifacts land in `dist/`. See [`docs/linux-package.md`](docs/linux-package.md) for versioning,
+checksum verification, and the manual approval checklist.
+
 ## Data and attribution
 
 Game data comes from the community-run [tarkov.dev](https://tarkov.dev) API. Item images are served from

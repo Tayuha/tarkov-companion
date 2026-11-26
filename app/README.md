@@ -23,7 +23,18 @@ flutter build linux --release
 ```
 
 The debug bundle is written to `build/linux/x64/debug/bundle/` and the release bundle to
-`build/linux/x64/release/bundle/`. Linux packaging (AppImage/.deb) is tracked as task 8.9.
+`build/linux/x64/release/bundle/`.
+
+Build the release package from the repository root:
+
+```bash
+bash scripts/package-linux.sh
+```
+
+It produces `dist/TarkovCompanion-<version>-x86_64.AppImage`, an optional `.deb` when `dpkg-deb` is
+installed, and `dist/SHA256SUMS`. The version comes from `app/pubspec.yaml`. Packaging, checksum
+verification, and the manual launch/sync/browse gate are documented in
+[`docs/linux-package.md`](../docs/linux-package.md).
 
 ## Windows and mobile (deferred)
 

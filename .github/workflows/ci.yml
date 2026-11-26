@@ -157,3 +157,51 @@ jobs:
       - name: Test
         working-directory: app
         run: flutter test
+
+  package-linux:
+    name: Package (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    # Builds the first-release Linux artifacts (AppImage, optional .deb and
+    # SHA256SUMS). It uploads them for manual verification on a clean machine;
+    # it does not tag, sign or publish a GitHub Release. Linux packaging is the
+    # gate before Windows/mobile packaging resumes (design D9).
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.50.1"
+          channel: stable
+          cache: true
+
+      # Flutter's Linux desktop build needs the GTK/CMake toolchain; dpkg-deb
+      # ships with dpkg on the runner and produces the optional .deb.
+      - name: Install Linux build and packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev
+
+      - name: Build Linux package
+        run: bash scripts/package-linux.sh
+
+      - name: Verify checksums
+        run: (cd dist && sha256sum -c SHA256SUMS)
+
+      - name: Inspect artifacts
+        run: file dist/*.AppImage dist/*.deb
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarkov-companion-linux-x86_64
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/SHA256SUMS
+          if-no-files-found: error

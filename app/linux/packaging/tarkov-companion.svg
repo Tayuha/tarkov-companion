@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Provisional placeholder icon for Tarkov Companion.
+  Neutral geometric monogram only: no official game art, logos or trademarks.
+  Replace this file (and the rendered PNG) when real branding is approved.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b3138"/>
+      <stop offset="1" stop-color="#15181c"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c9d3dd"/>
+      <stop offset="1" stop-color="#8b98a5"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#3d454e" stroke-width="8"/>
+  <!-- Compass diamond: a neutral "find your way" mark, not game artwork. -->
+  <path d="M256 96 L336 256 L256 416 L176 256 Z" fill="none" stroke="url(#mark)" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M256 176 L296 256 L256 336 L216 256 Z" fill="url(#mark)"/>
+</svg>

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Tarkov Companion
+GenericName=Escape from Tarkov Companion
+Comment=Local-first item catalog and quest tracker for Escape from Tarkov
+Exec=tarkov_companion
+Icon=tarkov-companion
+Terminal=false
+Categories=Game;
+Keywords=tarkov;companion;catalog;quests;
+StartupWMClass=tarkov_companion
+X-AppImage-Version=@VERSION@
