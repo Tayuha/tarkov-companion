@@ -193,6 +193,17 @@ void main() {
     expect(find.text('Colt M4A1 5.56x45 assault rifle'), findsWidgets);
   });
 
+  testWidgets('a quest tap opens the quest detail screen', (tester) async {
+    await pumpShell(tester);
+
+    await tester.tap(find.byKey(const Key('home-rail-quests-label')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quest-row-quest-checking')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(QuestDetailScreen), findsOneWidget);
+  });
+
   testWidgets('a quest tap is reported to the shell callback', (tester) async {
     String? selected;
     await pumpShell(tester, onQuestSelected: (id) => selected = id);

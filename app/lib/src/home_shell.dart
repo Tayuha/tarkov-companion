@@ -19,8 +19,9 @@ import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 /// the preserved state possible.
 ///
 /// The app bar title follows the selected tab. Rows are routed here, not in the
-/// feature screens: an item tap pushes [ItemDetailScreen], while a quest tap is
-/// only reported through [onQuestSelected] until the quest detail view exists.
+/// feature screens: an item tap pushes [ItemDetailScreen] and a quest tap pushes
+/// [QuestDetailScreen]. [onQuestSelected] is a test seam that overrides the
+/// default navigation when supplied.
 class HomeShell extends StatefulWidget {
   const HomeShell({
     super.key,
@@ -40,10 +41,8 @@ class HomeShell extends StatefulWidget {
   /// Profile whose progress supplies quest state badges.
   final String? activeProfileId;
 
-  /// Called with the quest id when a row is tapped.
-  ///
-  /// TODO(t8.12): push the quest detail screen here once the detail view and
-  /// its read model land. The shell deliberately stops at reporting the tap.
+  /// Test seam: when supplied, a quest tap reports the id instead of pushing
+  /// [QuestDetailScreen]. Production leaves it null.
   final ValueChanged<String>? onQuestSelected;
 
   @override
@@ -162,7 +161,24 @@ class _HomeShellState extends State<HomeShell> {
     return QuestListScreen(
       repository: quests,
       profileId: widget.activeProfileId,
-      onQuestSelected: widget.onQuestSelected,
+      onQuestSelected: widget.onQuestSelected ?? _openQuest,
+    );
+  }
+
+  void _openQuest(String questId) {
+    final catalog = widget.catalog;
+    final quests = widget.quests;
+    if (catalog == null || quests == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => QuestDetailScreen(
+          repository: quests,
+          catalog: catalog,
+          questId: questId,
+          profileId: widget.activeProfileId,
+        ),
+      ),
     );
   }
 }
