@@ -709,16 +709,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 17,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: sealed success/recovery open result, WAL-safe VACUUM INTO backup with versioned names and retention, transactional upgrades, failure leaves the original file intact and opens read-only, explicit restoreFromBackup, tests for success/failure/WAL consistency/pruning/restore/fresh/version-too-new, docs, CI green, task 3.3 checked.",
+      "notes": "Completed 2026-11-26 in session ses_de82e9d50ffezuCRM5auYHg0vK. Sealed DatabaseOpened/DatabaseRecovery lifecycle; raw user_version check before drift; WAL checkpoint + VACUUM INTO backups named <base>.v<from>-to-v<to>.<utc>.sqlite with retention 3 and pattern-only pruning; failed migration rolls back and leaves the original intact, opens read-only recovery; explicit restoreFromBackup; newer/corrupt files enter recovery. 39 data tests. CI 45821094158 green. Commit ad7fbe2.",
       "sessionID": "ses_de82e9d50ffezuCRM5auYHg0vK",
       "createdAt": 1795695940777,
-      "updatedAt": 1795695940777,
+      "updatedAt": 1795696802363,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_4",
+      "title": "T3.4 Manifest model and dataset state",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: BundleManifest/ManifestDataset parsing with typed errors and strict path/sha validation, GameMode enum, compatibility rule, dataset-state repository with inserted/updated/unchanged outcomes and newer-schema refusal, real manifest fixture, tests for all invalid shapes, docs, CI green, task 3.4 checked.",
+      "sessionID": "ses_de821755fffe8ILg2pUJcjF62H",
+      "createdAt": 1795696802363,
+      "updatedAt": 1795696802363,
       "archived": false
     }
   ]
