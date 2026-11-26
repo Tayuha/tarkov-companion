@@ -8,5 +8,6 @@ library;
 export 'src/catalog/catalog_screen.dart';
 export 'src/catalog/item_detail_screen.dart';
 export 'src/first_run/first_run_screen.dart';
+export 'src/quests/quest_detail_screen.dart';
 export 'src/quests/quest_list_screen.dart';
 export 'src/section_header.dart';
