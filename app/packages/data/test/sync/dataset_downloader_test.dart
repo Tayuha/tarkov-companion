@@ -51,10 +51,12 @@ void main() {
   });
 
   ({DatasetDownloader downloader, FakeStreamingClient client}) harness(
-    FutureOr<http.StreamedResponse> Function(http.BaseRequest request) handler,
-  ) {
+    FutureOr<http.StreamedResponse> Function(http.BaseRequest request)
+    handler, {
+    Duration timeout = AllowlistedHttpClient.defaultTimeout,
+  }) {
     final fake = FakeStreamingClient(handler);
-    final client = AllowlistedHttpClient(innerClient: fake);
+    final client = AllowlistedHttpClient(innerClient: fake, timeout: timeout);
     addTearDown(client.close);
     return (downloader: DatasetDownloader(client), client: fake);
   }
@@ -278,6 +280,35 @@ void main() {
         expect(harnessed.client.requests, isEmpty);
       },
     );
+
+    test('a stalled body times out and removes the partial file', () async {
+      const timeout = Duration(milliseconds: 50);
+      final controller = StreamController<List<int>>();
+      addTearDown(controller.close);
+      final harnessed = harness(
+        (_) async => http.StreamedResponse(controller.stream, 200),
+        timeout: timeout,
+      );
+      final destination = destinationIn('items.jsonl.zst');
+
+      await expectLater(
+        harnessed.downloader.download(
+          manifestUri: manifestUri,
+          dataset: datasetFor(samplePayload()),
+          destination: destination,
+        ),
+        throwsA(
+          isA<HttpTimeoutException>().having(
+            (error) => error.timeout,
+            'timeout',
+            timeout,
+          ),
+        ),
+      );
+
+      expect(await destination.exists(), isFalse);
+      expect(await File('${destination.path}.part').exists(), isFalse);
+    });
   });
 
   group('cancellation', () {

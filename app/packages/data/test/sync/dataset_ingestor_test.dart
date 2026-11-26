@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
 import 'package:drift/drift.dart' show Variable;
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:test/test.dart';
@@ -315,6 +316,123 @@ void main() {
           'failure',
           IngestFailure.missingFile,
         ),
+      ),
+    );
+
+    expect(await db.select(db.items).get(), isEmpty);
+    expect(await db.select(db.datasetStates).get(), isEmpty);
+  });
+
+  test('a newer dataset schema is refused before any write', () async {
+    final newer = writeSyntheticDataset(temporary, DatasetKind.items, [
+      '{"id":"synthetic-one","kind":"item","name":"One","shortName":"One",'
+          '"normalizedName":"one"}',
+    ], schemaVersion: BundleContract.appDataSchemaVersion + 1);
+
+    await expectLater(
+      DatasetIngestor(db).ingest(
+        mode: GameMode.regular,
+        dataset: newer.dataset,
+        compressedFile: newer.file,
+      ),
+      throwsA(
+        isA<IngestError>().having(
+          (error) => error.failure,
+          'failure',
+          IngestFailure.unsupportedSchema,
+        ),
+      ),
+    );
+
+    expect(await db.select(db.items).get(), isEmpty);
+    expect(await db.select(db.datasetStates).get(), isEmpty);
+  });
+
+  test('a duplicate record is rejected and rolled back', () async {
+    final duplicate = writeSyntheticDataset(temporary, DatasetKind.items, [
+      '{"id":"synthetic-one","kind":"item","name":"One","shortName":"One",'
+          '"normalizedName":"one"}',
+      '{"id":"synthetic-one","kind":"item","name":"One again",'
+          '"shortName":"One","normalizedName":"one"}',
+    ]);
+
+    await expectLater(
+      DatasetIngestor(db).ingest(
+        mode: GameMode.regular,
+        dataset: duplicate.dataset,
+        compressedFile: duplicate.file,
+      ),
+      throwsA(
+        isA<IngestError>()
+            .having(
+              (error) => error.failure,
+              'failure',
+              IngestFailure.duplicateRecord,
+            )
+            .having((error) => error.line, 'line', 2),
+      ),
+    );
+
+    expect(await db.select(db.items).get(), isEmpty);
+    expect(await db.select(db.datasetStates).get(), isEmpty);
+  });
+
+  test(
+    'a record missing a required field is refused and rolled back',
+    () async {
+      final invalid = writeSyntheticDataset(temporary, DatasetKind.items, [
+        '{"id":"synthetic-one","kind":"item","name":"One","shortName":"One",'
+            '"normalizedName":"one"}',
+        '{"id":"synthetic-two","kind":"item","shortName":"Two",'
+            '"normalizedName":"two"}',
+      ]);
+
+      await expectLater(
+        DatasetIngestor(db).ingest(
+          mode: GameMode.regular,
+          dataset: invalid.dataset,
+          compressedFile: invalid.file,
+        ),
+        throwsA(
+          isA<IngestError>()
+              .having(
+                (error) => error.failure,
+                'failure',
+                IngestFailure.invalidRecord,
+              )
+              .having((error) => error.line, 'line', 2),
+        ),
+      );
+
+      expect(await db.select(db.items).get(), isEmpty);
+      expect(await db.select(db.datasetStates).get(), isEmpty);
+    },
+  );
+
+  test('a line that is not UTF-8 is typed and writes nothing', () async {
+    final frame = ZstdEncoder(level: 3)
+        .encodeBytes(Uint8List.fromList(<int>[0xFF, 0x0A]));
+    final invalid = writeSyntheticFrame(
+      temporary,
+      DatasetKind.items,
+      Uint8List.fromList(frame),
+      records: 1,
+    );
+
+    await expectLater(
+      DatasetIngestor(db).ingest(
+        mode: GameMode.regular,
+        dataset: invalid.dataset,
+        compressedFile: invalid.file,
+      ),
+      throwsA(
+        isA<IngestError>()
+            .having(
+              (error) => error.failure,
+              'failure',
+              IngestFailure.invalidUtf8,
+            )
+            .having((error) => error.line, 'line', 1),
       ),
     );
 
