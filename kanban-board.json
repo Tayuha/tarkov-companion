@@ -688,16 +688,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 16,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de83e5b24ffeVgr5porfzQ057W. drift 2.35.4 + sqlite3 3.9.2 (sqlite3_flutter_libs is EOL; sqlite3 3.x bundles SQLite via build hooks, verified in Linux and Windows builds). 10 game tables incl. items FTS5 (unicode61 remove_diacritics 2) and 4 player tables; no player->game FK, only in-half taskObjectives->tasks and progress->profiles. WAL journal, foreign_keys ON, synchronous NORMAL. sqlite_master snapshot golden with UPDATE_GOLDENS. 29 data tests. CI 45818743008 green. Commit 0660433.",
+      "sessionID": "ses_de83e5b24ffeVgr5porfzQ057W",
+      "createdAt": 1795694907782,
+      "updatedAt": 1795695940777,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_3",
+      "title": "T3.3 Migration backup and recovery mode",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: game tables (datasetState, items+FTS, tasks, objectives, traders, hideout, crafts, barters, maps, price history) and player tables (profiles, quest/objective progress, settings) with no player->game FK/cascade; WAL; schema v1 with committed codegen; sqlite_master snapshot golden; WAL/persistence/no-cascade/FTS tests; docs/schema.md; CI green; task 3.2 checked.",
-      "sessionID": "ses_de83e5b24ffeVgr5porfzQ057W",
-      "createdAt": 1795694907782,
-      "updatedAt": 1795694907782,
+      "notes": "In progress in a linked child session. Acceptance: sealed success/recovery open result, WAL-safe VACUUM INTO backup with versioned names and retention, transactional upgrades, failure leaves the original file intact and opens read-only, explicit restoreFromBackup, tests for success/failure/WAL consistency/pruning/restore/fresh/version-too-new, docs, CI green, task 3.3 checked.",
+      "sessionID": "ses_de82e9d50ffezuCRM5auYHg0vK",
+      "createdAt": 1795695940777,
+      "updatedAt": 1795695940777,
       "archived": false
     }
   ]
