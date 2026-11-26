@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -90,11 +91,14 @@ def has_running_tool(session_id: str) -> bool:
 
 
 def notify(title: str, body: str) -> None:
+    env = os.environ.copy()
+    env.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
     try:
         subprocess.run(
             ["notify-send", "-a", "Tarkov Companion", "-u", "critical", title, body],
             check=False,
             timeout=10,
+            env=env,
         )
     except (OSError, subprocess.TimeoutExpired) as error:
         print(f"watchdog: notify-send failed: {error}", file=sys.stderr)

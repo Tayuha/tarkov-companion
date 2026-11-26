@@ -939,17 +939,17 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 27,
+      "position": 28,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
+      "sessionID": "ses_de7cb820dffeBteHM54bTCN0EH",
       "notes": "Completed 2026-11-26 in session ses_de7cb820dffeBteHM54bTCN0EH. Pure-Dart scheduler with injected clock/timers/network/visibility/state store. Policy order: auto-update off, background, offline, metered, backoff, 6h interval; manual bypasses preferences but requires online. Backoff 15/30/60 min then 6h, cap 3. Event-driven due checks on foreground+online. 32 scheduler tests (215 data). CI 45838143336 green. Commit 061ca66.",
       "createdAt": 1795702401024,
       "updatedAt": 1795703164511,
-      "archived": false,
-      "sessionID": "ses_de7cb820dffeBteHM54bTCN0EH"
+      "archived": false
     },
     {
       "id": "task_impl_4_7",
@@ -961,14 +961,14 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 28,
+      "position": 29,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Completed 2026-11-26 in session ses_de7c05c6affeFYn0KPZN4zFggp. Schema v4 items.priceObservedAt (migration 3->4) populated by ingestion; FreshnessPolicy with strict age > threshold (24h fresh, +1s stale), unknown for null, future clamped; repository query and settings-derived threshold. 15 tests (230 data). CI 45847616886 green. Commit 7c3a543.",
       "sessionID": "ses_de7c05c6affeFYn0KPZN4zFggp",
+      "notes": "Completed 2026-11-26 in session ses_de7c05c6affeFYn0KPZN4zFggp. Schema v4 items.priceObservedAt (migration 3->4) populated by ingestion; FreshnessPolicy with strict age > threshold (24h fresh, +1s stale), unknown for null, future clamped; repository query and settings-derived threshold. 15 tests (230 data). CI 45847616886 green. Commit 7c3a543.",
       "createdAt": 1795703164511,
       "updatedAt": 1795706618965,
       "archived": false
@@ -990,10 +990,10 @@
         "tag_data"
       ],
       "notes": "In progress in a linked child session. Acceptance: commit the real full items .jsonl.zst fixture (~1.4 MB), benchmark test tagged benchmark with Timeout.none asserting compressed < 10 MiB, ingest wall-clock and RSS delta budgets, row count/checksum correctness; run on windows-latest CI; docs with measured numbers; task 4.8 checked.",
-      "sessionID": "ses_pending_48",
       "createdAt": 1795706618965,
-      "updatedAt": 1795706618965,
-      "archived": false
+      "updatedAt": 1795706663369,
+      "archived": false,
+      "sessionID": "ses_de78b339dffetxvxX27ctBtgiK"
     }
   ]
 }
