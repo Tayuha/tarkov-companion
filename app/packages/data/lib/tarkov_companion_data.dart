@@ -11,6 +11,7 @@ export 'src/bundle/game_mode.dart';
 export 'src/bundle/manifest.dart';
 export 'src/catalog/catalog_query.dart';
 export 'src/catalog/catalog_repository.dart';
+export 'src/catalog/item_detail.dart';
 export 'src/catalog/items_repository.dart';
 export 'src/catalog/price_freshness.dart';
 export 'src/database/app_database.dart';
