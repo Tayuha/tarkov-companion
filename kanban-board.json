@@ -1024,16 +1024,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 5,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "Document the sync protocol, failure semantics, and offline behavior in `docs/sync.md`, verified by each documented state being reproducible from the sync test suite",
+      "notes": "In progress in worktree /home/lucas/.local/share/opencode/worktree/faf097/t49-sync-docs on branch t49-sync-docs. Writing docs/sync.md and mapping each documented state to an existing sync test, adding tests only where a state is not reproducible. Parallel with T4.8 and T5.1; branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795707005267,
+      "archived": false,
+      "sessionID": "ses_de785dd6effepYqbtvNKy3xZEL"
     },
     {
       "id": "task_impl_5_1",
@@ -1044,17 +1045,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 6,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination",
+      "notes": "In progress in worktree /home/lucas/.local/share/opencode/worktree/faf097/t51-catalog-queries on branch t51-catalog-queries. Building CatalogQuery with search, category/type/flea filters, sorting, pagination; adds schema v5 indexed columns if needed plus migration/snapshot/ingestor updates. Parallel with T4.8 and T4.9; branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795707005267,
+      "archived": false,
+      "sessionID": "ses_de785dd6dffew8mfUWURx9bW2U"
     },
     {
       "id": "task_impl_5_2",
