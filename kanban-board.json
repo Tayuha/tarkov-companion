@@ -794,16 +794,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 21,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: AppSettings (activeProfileId null, autoUpdate true, allowMetered false, freshness 24h in 1..168), SettingsRepository over appSettings with JSON values, corrupt/missing fallback, transactional write, obsolete-key cleanup, reset, reopen persistence tests, docs/settings.md, CI green, task 3.7 checked.",
+      "notes": "Completed 2026-11-26 in session ses_de7fdb2e1ffexfhI0JTztk3QQS. AppSettings with defaults and range validation, JSON-encoded settings.* keys, transactional write with obsolete-key cleanup, corrupt/missing fallback with onWarning, reset, reopen persistence. 138 data tests. CI 45828484870 green. Commit 153de85. Group 3 complete.",
       "sessionID": "ses_de7fdb2e1ffexfhI0JTztk3QQS",
       "createdAt": 1795699144988,
-      "updatedAt": 1795699144988,
+      "updatedAt": 1795699651658,
+      "archived": false
+    },
+    {
+      "id": "task_impl_4_1",
+      "title": "T4.1 Conditional manifest fetch",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: schema v2 remoteManifest with real 1->2 migration and snapshot/backup tests, ManifestRepository with content hash and clock, ManifestFetcher sending If-None-Match/If-Modified-Since, 304 returns cached manifest and downloads no datasets, typed 404/invalid/mode-mismatch, per-mode isolation, docs/client-sync.md, CI green, task 4.1 checked.",
+      "sessionID": "ses_de7f5f922ffeGp0xBmlNELhtw5",
+      "createdAt": 1795699651658,
+      "updatedAt": 1795699651658,
       "archived": false
     }
   ]
