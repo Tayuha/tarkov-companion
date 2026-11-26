@@ -15,3 +15,6 @@ export 'src/database/fts.dart';
 export 'src/database/migration_runner.dart';
 export 'src/database/tables.dart';
 export 'src/dataset_kind.dart';
+export 'src/net/allowlisted_http_client.dart';
+export 'src/net/host_allowlist.dart';
+export 'src/net/http_errors.dart';

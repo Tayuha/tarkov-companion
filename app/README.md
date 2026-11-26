@@ -165,6 +165,15 @@ dart run build_runner build
 UPDATE_GOLDENS=1 dart test        # rewrites test/goldens/schema.sql
 ```
 
+## Network access
+
+The client is local-first and sends no telemetry or analytics. Every request goes through
+`AllowlistedHttpClient` in `tarkov_companion_data`, which permits only HTTPS requests to a documented set
+of hosts (`github.com` and its release-asset CDN hosts for bundles, `assets.tarkov.dev` for images),
+re-validates every redirect hop, and relies on `dart:io` certificate validation without any insecure
+override. The policy, rationale, redirect rules, TLS stance, and typed errors are documented in
+[`docs/network.md`](../docs/network.md).
+
 ## Adding dependencies
 
 Keep the dependency set minimal. Every runtime package must work on Windows and stay compatible

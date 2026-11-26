@@ -10,6 +10,7 @@ resolution: workspace
 
 dependencies:
   drift: ^2.35.4
+  http: ^1.6.0
   sqlite3: ^3.9.2
   tarkov_companion_core:
     path: ../core
