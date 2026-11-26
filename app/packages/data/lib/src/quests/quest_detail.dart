@@ -119,6 +119,54 @@ final class QuestDetail {
 
   /// Quests in the current dataset whose requirements name this quest.
   final List<QuestUnlock> unlocks;
+
+  /// Every item id referenced by an objective, in objective order.
+  ///
+  /// Includes the objective's item list, its quest item and the keys it
+  /// requires, deduplicated while preserving first-seen order. The bundle
+  /// contract is unchanged: this only reads fields the objective payload
+  /// already carries.
+  List<String> get objectiveItemIds => _unique([
+    for (final objective in objectives) ...objective.itemIds,
+    for (final objective in objectives) ?objective.questItemId,
+    for (final objective in objectives) ...objective.requiredKeyItemIds,
+  ]);
+
+  /// Item ids the player hands in for this quest.
+  ///
+  /// The bundle models turn-in as `giveItem`/`giveQuestItem` objectives rather
+  /// than a top-level collection, so this projects those objectives.
+  List<String> get turnInItemIds => _unique([
+    for (final objective in objectives)
+      if (_turnInObjectiveTypes.contains(objective.type)) ...objective.itemIds,
+    for (final objective in objectives)
+      if (_turnInObjectiveTypes.contains(objective.type))
+        ?objective.questItemId,
+  ]);
+
+  /// Item ids granted by the completion rewards, in reward order.
+  List<String> get rewardItemIds =>
+      _unique([for (final item in rewards.items) item.itemId]);
+
+  /// Item ids granted by a trader offer, hideout craft or customization.
+  ///
+  /// Kept separate from [rewardItemIds] because these are unlocks rather than
+  /// direct item stacks.
+  List<String> get unlockItemIds => _unique([
+    for (final offer in rewards.offerUnlocks) ?offer.itemId,
+    for (final craft in rewards.craftUnlocks) ?craft.itemId,
+  ]);
+}
+
+/// Objective types whose item references are a hand-in requirement.
+const _turnInObjectiveTypes = <String>{'giveItem', 'giveQuestItem'};
+
+List<String> _unique(Iterable<String> values) {
+  final seen = <String>{};
+  return List.unmodifiable([
+    for (final value in values)
+      if (value.isNotEmpty && seen.add(value)) value,
+  ]);
 }
 
 /// One objective as the detail view and the progress tracker read it.

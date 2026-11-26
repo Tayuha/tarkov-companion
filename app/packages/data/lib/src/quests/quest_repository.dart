@@ -512,6 +512,41 @@ final class QuestRepository {
   }
 
   // -------------------------------------------------------------------------
+  // Labels
+  // -------------------------------------------------------------------------
+
+  /// Display name for [traderId] from the local `traders` table.
+  ///
+  /// Falls back to the id when the trader dataset is absent or has no matching
+  /// row, so a quest screen never hides the reference. Returns `null` only for
+  /// a null or blank id, which means "no trader recorded".
+  Future<String?> traderName(String? traderId) async {
+    final id = _nonBlank(traderId);
+    if (id == null) {
+      return null;
+    }
+    final row = await (_database.select(
+      _database.traders,
+    )..where((row) => row.id.equals(id))).getSingleOrNull();
+    return row?.name ?? id;
+  }
+
+  /// Display name for [mapId] from the local `maps` table.
+  ///
+  /// Falls back to the id when the map dataset is absent or has no matching
+  /// row. Returns `null` only for a null or blank id.
+  Future<String?> mapName(String? mapId) async {
+    final id = _nonBlank(mapId);
+    if (id == null) {
+      return null;
+    }
+    final row = await (_database.select(
+      _database.maps,
+    )..where((row) => row.id.equals(id))).getSingleOrNull();
+    return row?.name ?? id;
+  }
+
+  // -------------------------------------------------------------------------
   // Internals
   // -------------------------------------------------------------------------
 
@@ -533,6 +568,9 @@ final class QuestRepository {
     )..where((row) => row.id.equals(id))).getSingleOrNull();
   }
 
+  /// Display name from `traders`, without the id fallback used by the screen
+  /// lookup: [QuestDetail.traderName] documents `null` when the dataset has no
+  /// such trader, so the detail read model keeps that contract.
   Future<String?> _traderName(String? traderId) async {
     if (traderId == null) {
       return null;
@@ -543,6 +581,7 @@ final class QuestRepository {
     return row?.name;
   }
 
+  /// Display name from `maps`; see [_traderName] for the null contract.
   Future<String?> _mapName(String? mapId) async {
     if (mapId == null) {
       return null;
