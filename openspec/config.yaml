@@ -6,7 +6,8 @@ context: |
   Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
   Project: Tarkov Companion, an open-source, local-first companion app for Escape from Tarkov.
-  Client: Flutter (Dart) with drift/SQLite; Windows desktop at launch, Android and iOS kept buildable.
+  Client: Flutter (Dart) with drift/SQLite. Linux desktop is the first release target; Windows desktop,
+  Android, and iOS stay buildable but their packaging/release work is deferred until a Linux build is approved.
   Data: a Node/TypeScript pipeline normalizes json.tarkov.dev JSON into versioned JSONL.zst bundles
   published as GitHub Releases assets. The app never calls upstream directly and never ships a
   prebuilt database; it ingests bundles into its own schema.

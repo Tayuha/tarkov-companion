@@ -1,7 +1,7 @@
 # Tarkov Companion — Flutter client
 
-The desktop client for Tarkov Companion. Windows is the launch target; Linux is the development
-host; Android stays buildable for a later release.
+The desktop client for Tarkov Companion. **Linux is the first release target**; Windows and mobile stay
+buildable and CI-checked, but their packaging is deferred until a Linux build is tested and approved.
 
 ## Toolchain
 
@@ -11,7 +11,7 @@ host; Android stays buildable for a later release.
 
 Platform folders for `windows`, `linux`, and `android` are checked in.
 
-## Linux (development host)
+## Linux (first release target)
 
 ```bash
 flutter pub get
@@ -19,13 +19,17 @@ flutter analyze
 flutter test
 flutter run -d linux
 flutter build linux --debug
+flutter build linux --release
 ```
 
-The Linux debug bundle is written to `build/linux/x64/debug/bundle/`.
+The debug bundle is written to `build/linux/x64/debug/bundle/` and the release bundle to
+`build/linux/x64/release/bundle/`. Linux packaging (AppImage/.deb) is tracked as task 8.9.
 
-## Windows (CI only)
+## Windows and mobile (deferred)
 
-Windows builds are verified in GitHub Actions because the development host is Linux. The `app` job in
+Windows and mobile stay buildable so they do not rot, but no packaging or release work happens until the
+Linux build is approved. Windows builds are verified in GitHub Actions because the development host is
+Linux. The `app` job in
 `.github/workflows/ci.yml` runs on a `windows-latest` runner pinned to Flutter 3.50.1 and executes
 `flutter pub get`, `flutter analyze`, `flutter test`, and `flutter build windows --debug`. The Windows
 runner sources are generated and tracked, but they cannot be compiled or launched locally. On a Windows
@@ -110,8 +114,7 @@ and no `sqlite3_flutter_libs`.
 
 A `benchmark`-tagged test ingests the full published items dataset and asserts
 the 10 MiB compressed budget, the record counts, FTS, an ingest time budget and
-a coarse RSS ceiling. It runs on the Windows CI runner; the normal Linux suite
-excludes the tag. Measured numbers, budget rationale and fixture provenance are
+a coarse RSS ceiling. It runs on both Linux and Windows CI; the normal fast suite excludes the tag. Measured numbers, budget rationale and fixture provenance are
 in [`docs/benchmark.md`](../docs/benchmark.md).
 
 ```bash
@@ -241,5 +244,5 @@ documented in [`docs/logging.md`](../docs/logging.md).
 
 ## Adding dependencies
 
-Keep the dependency set minimal. Every runtime package must work on Windows and stay compatible
-with Android/iOS later; prefer pure-Dart packages so logic remains testable without a UI.
+Keep the dependency set minimal. Every runtime package must work on Linux and stay compatible with
+Windows/Android/iOS later; prefer pure-Dart packages so logic remains testable without a UI.

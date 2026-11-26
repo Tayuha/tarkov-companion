@@ -36,7 +36,7 @@ json.tarkov.dev  --(scheduled GitHub Action)-->  normalized JSONL.zst bundles
                                             manifest + changed datasets
                                                         |
                                                         v
-                                   Flutter app (Windows, later Android/iOS)
+                                   Flutter app (Linux first; Windows/Android/iOS later)
                                        drift/SQLite = single read path
 ```
 
@@ -49,7 +49,7 @@ dataset by SHA-256 and ingests it transactionally into its own schema. See
 
 | Path | Purpose |
 |---|---|
-| `app/` | Flutter client (Windows target at launch) |
+| `app/` | Flutter client (Linux target at launch) |
 | `pipeline/` | Node/TypeScript data pipeline and bundle publisher |
 | `test/fixtures/` | Trimmed upstream fixtures used by tests |
 | `docs/` | Data bundle contract, sync protocol, local schema, progress format |
@@ -64,7 +64,7 @@ git clone git@github.com:Tayuha/tarkov-companion.git
 cd tarkov-companion
 
 cd pipeline && npm ci && npm test && npm run build
-cd ../app && flutter pub get && flutter test && flutter run -d windows
+cd ../app && flutter pub get && flutter test && flutter run -d linux
 ```
 
 The pipeline can run against committed fixtures without network access or secrets:

@@ -61,8 +61,8 @@ keys are reported individually so the pipeline can fail a build when coverage re
 ## Goals / Non-Goals
 
 **Goals:**
-- One Dart codebase that builds for Windows now and Android/iOS later, with all shared logic in pure Dart
-  packages that can be unit-tested without a UI.
+- One Dart codebase that builds for Linux now and Windows/Android/iOS later, with all shared logic in
+  pure Dart packages that can be unit-tested without a UI.
 - A deterministic, reproducible data pipeline where the app never interprets raw upstream JSON.
 - Local SQLite as the only read path, so every screen works offline and search is sub-100 ms.
 - Progress data that is impossible to lose silently: transactional writes, versioned migrations, verified
@@ -82,8 +82,9 @@ keys are reported individually so the pipeline can fail a build when coverage re
 
 **Chosen:** Flutter (Dart) with `drift` over SQLite.
 
-- Windows, Linux, macOS, Android, and iOS from one codebase; Windows is the launch target and Android is the
-  likely second.
+- Windows, Linux, macOS, Android, and iOS from one codebase. **Linux desktop is the first release target**;
+  Windows and mobile stay buildable and CI-checked but their packaging is deferred until a Linux build is
+  tested and approved.
 - `drift` gives typed queries, migrations, and the same SQLite engine on every platform.
 - Custom-painted dense tables and slivers handle a 5,500-row catalog and ammo-style grids well.
 - Export/import is ordinary file I/O with the platform file picker.
@@ -237,11 +238,17 @@ Checksum is computed over the document with `checksum` removed, canonical JSON (
 whitespace). Import is validated fully before any write, then applied in one transaction. Merge conflicts
 are resolved per quest by the user with explicit choices; replace mode is opt-in and never the default.
 
-### D9. Platform-appropriate packaging
+### D9. Platform sequencing and packaging
 
-- Windows: per-user installer built in CI (Inno Setup or MSIX; decided during implementation by signing
-  feasibility), checksums published, signing optional and disclosed.
-- Android (later): signed APK/AAB with the same release workflow.
+**Decision (2026-11-26): Linux first.** The next release milestone is a Linux desktop build that can be
+run and approved. Windows and mobile remain buildable, unit-tested, and covered by CI so they do not rot,
+but no packaging, signing, or release work happens for them until the Linux build is approved.
+
+- Linux (first): AppImage preferred for a no-install test build, with `.deb` as an installable option;
+  checksums published; unsigned initially and disclosed. Verified by running on a clean Linux environment.
+- Windows (deferred): per-user installer (Inno Setup or MSIX), signing optional; resumes after Linux
+  approval.
+- Android/iOS (deferred): signed APK/AAB and the mobile shell after the desktop build is proven.
 - Data updates and app updates are separate concerns: data is a bundle fetch, app updates are a version
   check that opens the release page (no silent self-updater in v1).
 
@@ -249,7 +256,7 @@ are resolved per quest by the user with explicit choices; replace mode is opt-in
 
 - MIT license, `NOTICE` with upstream attribution, trademark disclaimer, and a code of conduct.
 - Workflows: `ci.yml` (format, analyze, test, build), `data-sync.yml` (scheduled pipeline + release of
-  bundles), `release-app.yml` (tag-triggered Windows installer).
+  bundles), `release-app.yml` (tag-triggered Linux package; Windows/mobile jobs added later).
 - Contributions: issue templates, `good first issue` labeling, generated data fixtures for tests, and a
   documented local pipeline run that does not require secrets.
 - The app never depends on contributor credentials; the pipeline uses the default `GITHUB_TOKEN`.
@@ -272,10 +279,11 @@ are resolved per quest by the user with explicit choices; replace mode is opt-in
   ingestion off the UI isolate.
 - **Trademark and branding** → use a neutral project name in public listings, avoid official logos, include
   a clear "not affiliated with Battlestate Games" disclaimer, and never monetize.
-- **Unsigned Windows installer triggers SmartScreen** → publish checksums, document the warning, and add
-  signing when a certificate is available.
-- **Flutter desktop maturity on Windows** → target the stable channel, test on a clean VM per release, and
-  keep platform-specific code behind narrow interfaces.
+- **Unsigned Linux artifact warnings** → publish checksums, document how to verify, and add signing/publishing
+  setup after the first approved build.
+- **Flutter desktop maturity on Linux** → target the stable channel, test on a clean environment per release,
+  and keep platform-specific code behind narrow interfaces. Windows-specific behavior is re-validated when
+  that platform resumes.
 - **`pvp-season` semantics are undocumented** → treat it as an independent mode with its own dataset;
   confirm behavior before enabling its profile in a release.
 

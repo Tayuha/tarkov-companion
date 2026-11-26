@@ -74,7 +74,7 @@ content usable and offers a retry.
 
 ### Requirement: Desktop window behavior
 
-The Windows application SHALL enforce a minimum usable window size, remember size and position between
+The desktop application SHALL enforce a minimum usable window size, remember size and position between
 sessions, allow a single running instance to be focused rather than duplicated, and support keyboard
 navigation of the primary lists.
 
@@ -95,13 +95,14 @@ navigation of the primary lists.
 
 ### Requirement: Release packaging
 
-The project SHALL produce a versioned Windows installer that installs per-user without administrator
-rights, registers an uninstaller, and displays the application version in the UI.
+The project SHALL produce a versioned Linux artifact for the first release: an AppImage that runs without
+installation, or a `.deb` that installs and registers an uninstaller, and SHALL display the application
+version in the UI. Windows and mobile packaging are deferred until the Linux build is approved.
 
 #### Scenario: Per-user install
 
-- **WHEN** a user without administrator rights runs the installer
-- **THEN** installation completes into a per-user location and the app launches
+- **WHEN** a user runs the AppImage on a clean Linux system
+- **THEN** the app launches without installation or administrator rights
 
 #### Scenario: Version visibility
 
@@ -116,7 +117,7 @@ users can verify the installer's origin, and the release notes SHALL state wheth
 #### Scenario: Signature not configured
 
 - **WHEN** a release is produced without code signing
-- **THEN** the release notes state that the installer is unsigned and warn about the expected SmartScreen prompt
+- **THEN** the release notes state that the artifact is unsigned and explain how to verify its checksum
 
 #### Scenario: Checksum published
 

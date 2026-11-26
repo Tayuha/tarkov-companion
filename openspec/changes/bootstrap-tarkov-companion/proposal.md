@@ -17,8 +17,8 @@ data pipeline and a vertical slice (quests + items) that proves the architecture
 
 ## What Changes
 
-- Create a new cross-platform application (Flutter) targeting Windows desktop at launch, with Android
-  and iOS kept buildable for later.
+- Create a new cross-platform application (Flutter) targeting Linux desktop at launch, with Windows
+  desktop, Android, and iOS kept buildable and deferred until the Linux build is tested and approved.
 - Add an offline-first data layer: a scheduled pipeline normalizes upstream JSON into versioned,
   compressed bundles published as release assets; the client downloads only what changed and keeps a
   local SQLite database as the single read path.
@@ -27,8 +27,8 @@ data pipeline and a vertical slice (quests + items) that proves the architecture
   completion state.
 - Add local player profiles: one profile per game mode (PvP, PvE, season), export/import as a portable
   JSON file, and forward-only schema migrations.
-- Add a desktop application shell: first-run data bootstrap, background update checks, packaging and
-  signing for Windows, and a privacy stance of "no telemetry, no accounts, no network calls beyond data
+- Add a desktop application shell: first-run data bootstrap, background update checks, Linux packaging
+  (AppImage or .deb), and a privacy stance of "no telemetry, no accounts, no network calls beyond data
   and update fetches".
 - Add open-source project scaffolding: MIT license, README, contributing guide, code of conduct,
   NOTICE with upstream attribution and a trademark disclaimer, CI for lint/test/build.
@@ -62,8 +62,8 @@ None. This is the initial capability set for the project.
 - **External systems**: `json.tarkov.dev` JSON endpoints (read-only), `assets.tarkov.dev` for item
   images, GitHub Releases for bundles and app updates, GitHub Actions for scheduling and CI.
 - **Dependencies**: Flutter/Dart, `drift` + SQLite, an HTTP client with ETag support, a compression
-  library, and a Windows installer toolchain (MSIX or Inno Setup).
+  library, and a Linux packaging toolchain (AppImage or .deb); a Windows installer follows later.
 - **Users**: no accounts, no server-side data. Progress lives only on the device until the user exports
   it.
 - **Risks**: upstream schema and naming changes, placeholder translations observed in the API
-  (`"<id> Name"`), trademark/branding constraints, and Windows code-signing cost.
+  (`"<id> Name"`), trademark/branding constraints, and Linux packaging effort (Windows signing deferred).

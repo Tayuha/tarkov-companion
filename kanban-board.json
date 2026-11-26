@@ -1227,17 +1227,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 15,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement the quest query layer with search, trader/level/map/state filters, and pagination, verified by query tests for each filter and their intersections",
+      "notes": "In progress in worktree t61-quest-queries (branch t61-quest-queries), session ses_de773489affewVfXCuHHwly7rX. QuestQuery/QuestFilters/QuestSummary/QuestPage with search, trader/map/level filters, profile-scoped progress state, sorting, pagination and totals. No availability engine (6.3). Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795708308458,
+      "archived": false,
+      "sessionID": "ses_de773489affewVfXCuHHwly7rX"
     },
     {
       "id": "task_impl_6_2",
@@ -1449,17 +1450,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 26,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement per-mode profile creation, activation, and switching with a single active profile invariant, verified by tests for first launch, explicit creation, and switching",
+      "notes": "In progress in worktree t71-profiles (branch t71-profiles), session ses_de7734899fferplwbjv8e9WuU9. ProfileRepository: first-launch regular profile, per-mode creation, activation/switching, single-active invariant, repair of a missing active id, injected clock/ids, transactional writes. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795708308458,
+      "archived": false,
+      "sessionID": "ses_de7734899fferplwbjv8e9WuU9"
     },
     {
       "id": "task_impl_7_2",
@@ -1751,7 +1753,7 @@
     },
     {
       "id": "task_impl_8_6",
-      "title": "T8.6 Implement single-instance focusing on Windows,",
+      "title": "T8.6 Single-instance focusing on Linux",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1765,9 +1767,9 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement single-instance focusing on Windows, verified by a manual test launching twice and observing one window is focused",
+      "notes": "Linux-first (2026-11-26): implement single-instance focusing on Linux; Windows/mobile equivalents deferred. Original task text adjusted.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
+      "updatedAt": 1795708308458,
       "archived": false
     },
     {
@@ -1814,7 +1816,7 @@
     },
     {
       "id": "task_impl_8_9",
-      "title": "T8.9 Build the per-user Windows installer in CI with an uninstaller and ver",
+      "title": "T8.9 Build and approve the Linux package",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1828,14 +1830,14 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Build the per-user Windows installer in CI with an uninstaller and version metadata, verified by installing on a clean Windows VM without administrator rights and launching the app",
+      "notes": "Gate for Windows/mobile work: AppImage preferred (.deb optional), version metadata and checksums, run on a clean Linux environment, smoke-test launch/sync/browse. Windows installer deferred until this is approved.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
+      "updatedAt": 1795708308458,
       "archived": false
     },
     {
       "id": "task_impl_8_10",
-      "title": "T8.10 Publish installer checksums with release notes that state signing stat",
+      "title": "T8.10 Publish Linux artifact checksums",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1849,9 +1851,9 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Publish installer checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text",
+      "notes": "Publish Linux checksums and release notes with signing status; Windows/mobile artifacts follow after approval.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
+      "updatedAt": 1795708308458,
       "archived": false
     },
     {
@@ -1877,7 +1879,7 @@
     },
     {
       "id": "task_impl_9_2",
-      "title": "T9.2 Verify offline behavior end to end with the network disabled after an ",
+      "title": "T9.2 Offline end-to-end on clean Linux",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1891,9 +1893,9 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Verify offline behavior end to end with the network disabled after an initial sync, verified by a manual checklist run on a clean Windows VM covering every primary screen",
+      "notes": "Manual checklist on a clean Linux environment after an initial sync; Windows VM checklist deferred.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
+      "updatedAt": 1795708308458,
       "archived": false
     },
     {
@@ -1961,7 +1963,7 @@
     },
     {
       "id": "task_impl_9_6",
-      "title": "T9.6 Tag `v0.1.0` and publish the first Windows release with bundles, insta",
+      "title": "T9.6 First Linux v0.1.0 release",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/lucas/Projetos/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1975,9 +1977,9 @@
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Tag `v0.1.0` and publish the first Windows release with bundles, installer, checksums, and release notes, verified by downloading the artifacts from the public release page and installing",
+      "notes": "Publish the first Linux release with bundles, package, checksums and notes; Windows/mobile releases follow only after the Linux build is approved.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
+      "updatedAt": 1795708308458,
       "archived": false
     },
     {

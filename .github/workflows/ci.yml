@@ -98,10 +98,13 @@ jobs:
         working-directory: app
         run: flutter test
 
-      # Full items dataset: asserts the 10 MiB compressed budget, the record
-      # counts, FTS, the ingest time budget and the RSS ceiling. It reads only
-      # the committed fixture, but it is excluded from the Linux fast loop, so
-      # this is the only place it runs. See docs/benchmark.md.
+      - name: Ingest benchmark (full items dataset)
+        working-directory: app
+        run: dart test packages/data -t benchmark -j 1
+
+      # Secondary platform check. The primary benchmark runs on Linux; this
+      # job keeps Windows compilation and ingestion honest while Windows
+      # packaging is deferred. See docs/benchmark.md.
       - name: Ingest benchmark (full items dataset)
         working-directory: app
         run: dart test packages/data -t benchmark -j 1
@@ -117,8 +120,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
-    # Duplicates the analyze/test half of the Windows job for fast feedback on
-    # Dart-only changes; the Windows job remains the gate for the app.
+    # Primary gate for the app while Linux is the release target. The Windows
+    # job is a compatibility check until that platform resumes.
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -91,20 +91,20 @@
 - [ ] 8.3 Implement update check controls (schedule, manual check, last check time/outcome) with non-modal indicators, verified by widget tests for each outcome and preference combination
 - [ ] 8.4 Implement offline and upstream-error states across catalog, quests, and history views with retry, verified by widget tests with a failing network layer
 - [ ] 8.5 Implement window geometry persistence with display clamping and a minimum size, verified by tests for restored geometry and an off-screen saved position
-- [ ] 8.6 Implement single-instance focusing on Windows, verified by a manual test launching twice and observing one window is focused
+- [ ] 8.6 Implement single-instance focusing on Linux, verified by a manual test launching twice and observing one window is focused
 - [ ] 8.7 Implement keyboard navigation and visible focus for the catalog and quest lists, verified by widget tests driving focus traversal without pointer input
 - [ ] 8.8 Implement the about screen showing app version, data bundle version, dataset age, license, and attribution, verified by a golden widget test
-- [ ] 8.9 Build the per-user Windows installer in CI with an uninstaller and version metadata, verified by installing on a clean Windows VM without administrator rights and launching the app
-- [ ] 8.10 Publish installer checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text
+- [ ] 8.9 Build the Linux package (AppImage preferred, .deb optional) in CI with version metadata and checksums, verified by running it on a clean Linux environment and launching, syncing, and browsing; this is the gate before Windows/mobile packaging resumes
+- [ ] 8.10 Publish Linux artifact checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text
 
 ## 9. Integration and release readiness
 
 - [ ] 9.1 Add an end-to-end test covering first run, catalog browse, item detail, quest completion, export, and re-import, verified by the test passing against the fixture-backed build
-- [ ] 9.2 Verify offline behavior end to end with the network disabled after an initial sync, verified by a manual checklist run on a clean Windows VM covering every primary screen
+- [ ] 9.2 Verify offline behavior end to end with the network disabled after an initial sync, verified by a manual checklist run on a clean Linux environment covering every primary screen
 - [ ] 9.3 Verify the read-only recovery path by corrupting a copy of the database, verified by the app opening in recovery mode, offering export, and refusing writes
 - [ ] 9.4 Audit all network destinations against the documented allowlist, verified by a captured-request review with no hosts outside the list
 - [ ] 9.5 Finalize README with screenshots, build-from-source steps, data attribution, and contribution paths, verified by a contributor following it on a clean machine
-- [ ] 9.6 Tag `v0.1.0` and publish the first Windows release with bundles, installer, checksums, and release notes, verified by downloading the artifacts from the public release page and installing
+- [ ] 9.6 Tag `v0.1.0` and publish the first Linux release with bundles, the Linux package, checksums, and release notes, verified by downloading the artifacts and running them on a clean Linux environment; Windows/mobile releases follow after approval
 - [ ] 9.7 Add issue and pull-request templates plus a roadmap issue, verified by opening a test issue that renders both templates
 
 ## Workflow follow-up
