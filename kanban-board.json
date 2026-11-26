@@ -773,16 +773,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 20,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de807c699ffed7kqJVdyknmpxD. JSONL rotating sink (1 MiB x 5 defaults), rotate-before-write, serialized appends with flush, no handle held, best-effort no-throw logger. Export ZIP with logs/ + metadata.json, works empty. 22 logging tests (118 data). CI 45827082197 green. Commit 041bef5.",
+      "sessionID": "ses_de807c699ffed7kqJVdyknmpxD",
+      "createdAt": 1795698485492,
+      "updatedAt": 1795699144988,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_7",
+      "title": "T3.7 Typed app settings with defaults",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: JSONL rotating file sink with maxBytes/maxFiles, serialized writes, no-throw best effort, level filtering, zip export with logs+metadata, rotation/pruning/export/no-log tests, docs/logging.md privacy rules, CI green, task 3.6 checked.",
-      "sessionID": "ses_de807c699ffed7kqJVdyknmpxD",
-      "createdAt": 1795698485492,
-      "updatedAt": 1795698485492,
+      "notes": "In progress in a linked child session. Acceptance: AppSettings (activeProfileId null, autoUpdate true, allowMetered false, freshness 24h in 1..168), SettingsRepository over appSettings with JSON values, corrupt/missing fallback, transactional write, obsolete-key cleanup, reset, reopen persistence tests, docs/settings.md, CI green, task 3.7 checked.",
+      "sessionID": "ses_de7fdb2e1ffexfhI0JTztk3QQS",
+      "createdAt": 1795699144988,
+      "updatedAt": 1795699144988,
       "archived": false
     }
   ]
