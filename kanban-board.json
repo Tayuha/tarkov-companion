@@ -2062,16 +2062,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 38,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in worktree t811-nav-shell. Replaces the button landing page with a rail/bottom bar, IndexedStack state preservation, catalog and quest tabs, item detail navigation, and a quest selection callback ready for T6.5. Plain Material.",
+      "notes": "Completed 2026-11-26 in worktree t811-nav-shell (session ses_de713692fffejg6rtPzucQHER3), merged as 8f4b22d. HomeShell: NavigationRail >=700px, NavigationBar below, IndexedStack preserving search/filter/scroll, Items->Catalog->ItemDetail, Quests->QuestList with active profile and selection callback, Escape pops. HomePlaceholder removed. 23 app tests, 41 features, linux debug build. Branch 387d508.",
       "sessionID": "ses_de713692fffejg6rtPzucQHER3",
       "createdAt": 1795714499951,
-      "updatedAt": 1795714499951,
+      "updatedAt": 1795715000563,
       "archived": false
     }
   ]

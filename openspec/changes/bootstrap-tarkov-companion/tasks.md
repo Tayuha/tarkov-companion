@@ -101,7 +101,7 @@
 - [ ] 8.9 Build the Linux package (AppImage preferred, .deb optional) in CI with version metadata and checksums, verified by running it on a clean Linux environment and launching, syncing, and browsing; this is the gate before Windows/mobile packaging resumes
 - [ ] 8.10 Publish Linux artifact checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text
 
-- [ ] 8.11 Build the persistent navigation shell (Items/Quests) with state-preserving tabs and a narrow-window bottom bar, verified by widget tests for switching, state retention, and item-detail navigation
+- [x] 8.11 Build the persistent navigation shell (Items/Quests) with state-preserving tabs and a narrow-window bottom bar, verified by widget tests for switching, state retention, and item-detail navigation
 
 ## 9. Integration and release readiness
 
