@@ -153,6 +153,51 @@ void main() {
       );
       expect(counting.calls, 0);
     });
+
+    test(
+      'rejects plain HTTP loopback unless the test-only option is on',
+      () async {
+        final counting = buildCounting((_) async {
+          fail('the inner client must not be called without the test opt-in');
+        });
+        final client = AllowlistedHttpClient(
+          innerClient: counting,
+          allowlist: const {'127.0.0.1'},
+        );
+        addTearDown(client.close);
+
+        await expectLater(
+          client.get(Uri.parse('http://127.0.0.1:8080/manifest.json')),
+          throwsA(isA<InsecureSchemeException>()),
+        );
+        expect(counting.calls, 0);
+      },
+    );
+
+    test('the test-only option permits only explicit loopback hosts', () async {
+      final counting = buildCounting((request) async {
+        expect(request.url.host, '127.0.0.1');
+        return http.Response('local-manifest', 200);
+      });
+      final client = AllowlistedHttpClient(
+        innerClient: counting,
+        allowlist: const {'127.0.0.1'},
+        allowInsecureLocalhost: true,
+      );
+      addTearDown(client.close);
+
+      final response = await client.get(
+        Uri.parse('http://127.0.0.1:8080/manifest.json'),
+      );
+      expect(response.bodyText, 'local-manifest');
+      expect(counting.calls, 1);
+
+      await expectLater(
+        client.get(Uri.parse('http://example.com/manifest.json')),
+        throwsA(isA<InsecureSchemeException>()),
+      );
+      expect(counting.calls, 1);
+    });
   });
 
   group('requests', () {
