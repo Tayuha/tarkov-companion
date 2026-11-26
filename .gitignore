@@ -4,7 +4,9 @@ app/.flutter-plugins
 app/.flutter-plugins-dependencies
 app/build/
 app/.packages
-app/pubspec.lock
+# The workspace has one lockfile at app/pubspec.lock; it IS committed for
+# reproducible app builds. Member packages must not carry their own.
+app/packages/*/pubspec.lock
 *.iml
 .pub-cache/
 .pub/
