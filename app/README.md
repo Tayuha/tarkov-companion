@@ -165,6 +165,16 @@ dart run build_runner build
 UPDATE_GOLDENS=1 dart test        # rewrites test/goldens/schema.sql
 ```
 
+## App settings
+
+`SettingsRepository` in `tarkov_companion_data` stores typed preferences in the
+`appSettings` table: the active profile, automatic update checks, metered
+downloads, and the data freshness threshold. Values are JSON-encoded strings
+under a `settings.` prefix, defaults apply to missing keys, and corrupt values
+fall back to the default with a warning instead of throwing. Settings are
+local-only and hold no progress or secrets. The keys, defaults, ranges, and
+reset semantics are documented in [`docs/settings.md`](../docs/settings.md).
+
 ## Network access
 
 The client is local-first and sends no telemetry or analytics. Every request goes through

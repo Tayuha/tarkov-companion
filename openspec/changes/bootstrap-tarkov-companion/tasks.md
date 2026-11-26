@@ -31,7 +31,7 @@
 - [x] 3.4 Implement `dataset_state` bookkeeping (applied version, checksum, applied_at) and the manifest model, verified by unit tests for first apply, idempotent re-apply, and newer-schema refusal
 - [x] 3.5 Implement an HTTP client confined to a documented host allowlist with certificate validation and no redirects to unknown hosts, verified by tests that a disallowed host is rejected before any request is sent
 - [x] 3.6 Implement rotating local logging plus an export-logs action, verified by a test that exceeds the rotation threshold and asserts old entries are dropped and the exported archive opens
-- [ ] 3.7 Implement app settings storage (active profile, auto-update preference, metered behavior, data freshness threshold) with defaults, verified by tests for defaults, persistence across restart, and reset
+- [x] 3.7 Implement app settings storage (active profile, auto-update preference, metered behavior, data freshness threshold) with defaults, verified by tests for defaults, persistence across restart, and reset
 
 ## 4. Sync and ingestion
 
