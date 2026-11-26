@@ -1251,15 +1251,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 36,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in worktree t62-quest-screen (branch t62-quest-screen). QuestListScreen with debounced search, trader/map/level/state filters, state badges, pagination and empty/reset states. Plain Material, no app wiring. Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t62-quest-screen (session ses_de753bfeefferKWXkyNr01ULep), merged as 913ad15. QuestListScreen with 300ms debounce, trader/map/level(at-or-below)/state filters, removable chips, reset, colored state badges, ListView.builder + load more, total, loading/error/empty states, profile-scoped badges, row callback. 12 widget tests (28 features), 17 app, linux debug build. Branch f23e6ee. Gap: trader/map labels are caller-supplied (ids only), tracked as 6.12.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710284167,
+      "updatedAt": 1795710691454,
       "archived": false,
       "sessionID": "ses_de753bfeefferKWXkyNr01ULep"
     },
@@ -2026,6 +2026,27 @@
       "notes": "Discovered during T5.2: the catalog filter bar ships a starter category set because the query layer does not expose bundle category labels. Read itemCategory/handbookCategory records from gameRecords (or a dedicated query), return id/name pairs, and feed the filter bar. Tests: category query + widget using loaded options.",
       "createdAt": 1795709662442,
       "updatedAt": 1795709662442,
+      "archived": false
+    },
+    {
+      "id": "task_impl_6_12",
+      "title": "T6.12 Load real trader/map labels for quest filters",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "backlog",
+      "position": 61,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "Discovered during T6.2: the quest filter bar accepts caller-supplied trader/map options because the query layer exposes ids only. Add a label query (traders and maps tables/gameRecords), feed the filter bar, and test the loaded labels.",
+      "createdAt": 1795710691454,
+      "updatedAt": 1795710691454,
       "archived": false
     }
   ]

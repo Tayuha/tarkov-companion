@@ -62,7 +62,7 @@
 ## 6. Quest tracker
 
 - [x] 6.1 Implement the quest query layer with search, trader/level/map/state filters, and pagination, verified by query tests for each filter and their intersections
-- [ ] 6.2 Build the quest catalog screen with state badges and filter controls, verified by widget tests covering search, filtering, and empty results
+- [x] 6.2 Build the quest catalog screen with state badges and filter controls, verified by widget tests covering search, filtering, and empty results
 - [ ] 6.3 Implement the availability engine deriving locked/available/in-progress/completed from prerequisites, level, and progress, verified by table-driven unit tests including chains of prerequisites and cycles in malformed data
 - [ ] 6.4 Implement the locked-reason model and its presentation on quests, verified by widget tests naming level, prerequisite quest, and trader loyalty reasons
 - [ ] 6.5 Build the quest detail view with objectives, requirements, rewards, unlocks, maps, and wiki link, verified by golden widget tests for quests with item, kill, and visit objectives
@@ -72,6 +72,8 @@
 - [ ] 6.9 Implement the available-quests view with selectable ordering and an explanatory empty state, verified by widget tests for a populated list and for a profile with nothing available
 - [ ] 6.10 Implement game-mode scoping so the tracker reads only the active mode's quest dataset, verified by a test asserting a PvE-only quest is absent under the regular profile
 - [ ] 6.11 Document quest state semantics and override behavior in `docs/quest-tracking.md`, verified by the documented state table matching the implementation tests
+
+- [ ] 6.12 Expose trader and map labels for the quest filters from the traders/maps tables (or gameRecords) instead of caller-supplied options, verified by a label query test and a widget test using the loaded labels
 
 ## 7. Profiles and portability
 
