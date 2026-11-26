@@ -47,7 +47,7 @@
 
 ## 5. Item catalog
 
-- [ ] 5.1 Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination
+- [x] 5.1 Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination
 - [ ] 5.2 Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset
 - [ ] 5.3 Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item
 - [ ] 5.4 Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships

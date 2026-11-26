@@ -1045,16 +1045,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 2,
+      "categoryID": "done",
+      "position": 31,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in worktree /home/lucas/.local/share/opencode/worktree/faf097/t51-catalog-queries on branch t51-catalog-queries. Building CatalogQuery with search, category/type/flea filters, sorting, pagination; adds schema v5 indexed columns if needed plus migration/snapshot/ingestor updates. Parallel with T4.8 and T4.9; branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t51-catalog-queries (session ses_de785dd6dffew8mfUWURx9bW2U), merged as 351d502. Schema v5: items.minLevelForFlea/fleaEligible plus indexed itemTypes and itemCategories (game-data FK, cascade; no player->game FK). CatalogQuery/CatalogFilters/ItemSummary/CatalogPage with AND-combined search/category/type/flea/price filters, 5 sort fields both directions, nulls last, pagination clamp 1..200. Ingestor populates and clears the new tables. 31 query tests + v5 migrations; p95 1.00 ms on the fixture. 274 data tests incl. benchmark (1.96s). Branch commit ad5b569.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795707005267,
+      "updatedAt": 1795708124579,
       "archived": false,
       "sessionID": "ses_de785dd6dffew8mfUWURx9bW2U"
     },
