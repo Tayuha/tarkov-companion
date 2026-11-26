@@ -131,9 +131,14 @@ Future<AppSession> openAppSession({
     final profiles = ProfileRepository(database);
     final activeProfile = await profiles.ensureFirstLaunch();
 
+    // The first-run gate must stay visible until the whole mode is present:
+    // a failed sync can leave one or two datasets applied, and until the
+    // update controls exist a partial install has no way to resume.
+    final complete = applied.length >= DatasetKind.values.length;
+
     return AppSessionReady(
       sync: coordinator,
-      hasAppliedDatasets: applied.isNotEmpty,
+      hasAppliedDatasets: complete,
       catalog: CatalogRepository(database),
       quests: QuestRepository(database),
       activeProfileId: activeProfile.id,
