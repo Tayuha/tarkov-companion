@@ -538,17 +538,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 10,
       "tagIDs": [
         "tag_implementation",
         "tag_data",
         "tag_infra"
       ],
-      "notes": "In progress in a linked child session. Builds the missing production orchestration (fetch -> validate -> normalize -> bundle -> publish) with conditional-cache reuse, then the 6-hour workflow with concurrency, Actions cache, and failure issue lifecycle. First dispatch creates the three real data-<mode>-latest releases; second dispatch must no-op. Task 2.9 checked.",
+      "notes": "Completed 2026-11-26 in session ses_debc9307cffeZjp8XBkW5muRiC. Sync CLI: fetch -> zod -> normalize -> bundle -> publish with conditional cache and normalized JSONL reuse; 304 without cache forces one refetch; validation failure blocks the mode. Workflow: cron 0 */6 * * *, dispatch, contents/issues write, concurrency, 30 min, Actions cache, failure issue #1 lifecycle. Live: run 45801870719 initial publish (8050/8048/8018 records), 45802212812 republished volatile items/traders, 45802439739 true no-op (0 uploads, 7 skips). Releases data-{regular,pve,pvp-season}-latest verified by manifest/asset sha256. 195 tests. Commits 5ec0857, 15b66ef.",
       "sessionID": "ses_debc9307cffeZjp8XBkW5muRiC",
       "createdAt": 1795635475815,
-      "updatedAt": 1795635475815,
+      "updatedAt": 1795689349262,
       "archived": false
     }
   ]
