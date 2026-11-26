@@ -159,6 +159,34 @@ instead of being opened or downgraded.
 - `appSettings` is a string key/value table; values stay strings so a preference
   keeps its meaning across app versions.
 
+## Bundle manifest compatibility and dataset state
+
+The data package exposes the client side of the bundle contract:
+`BundleManifest.parse` for a decoded `manifest.json`, `BundleContract` for the
+supported versions, and `DatasetStateRepository` for `datasetState`. The parser
+is pure Dart and does no I/O; the sync layer owns the HTTP request.
+
+`BundleContract` currently declares `manifestVersion` 1, bundle schema 1 and app
+data schema 1. `BundleManifest.checkCompatibility` returns `bundleUnsupported`
+when the manifest's bundle schema is newer, `appUpdateRequired` when its
+`minAppSchemaVersion` is newer than the app data schema, and `compatible`
+otherwise. The caller must not start a sync on a non-compatible result, so the
+database stays at its last complete bundle.
+
+`DatasetStateRepository.recordApplied` is the only writer of `datasetState`:
+
+| Situation | Result | Write |
+|---|---|---|
+| No row for `(mode, dataset)` | `inserted` | Insert |
+| Checksum, `schemaVersion` and `records` all equal | `unchanged` | **None** |
+| Any of those three differs | `updated` | Update, replacing `appliedAt` |
+| Dataset `schemaVersion` newer than `BundleContract.appDataSchemaVersion` | `rejected` | **None** |
+
+Source metadata (`ETag`, `Last-Modified`, fetch time, sizes) is diagnostics
+only: a change there alone is `unchanged`. On `unchanged` the whole row,
+including `appliedAt`, is left exactly as it was, so a repeated sync is
+idempotent. `clearMode` deletes rows for one mode only.
+
 ## Item search (FTS5)
 
 `items_fts` is an FTS5 **external-content** table over `items`: it stores only the

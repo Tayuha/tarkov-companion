@@ -5,8 +5,12 @@
 /// The rule is enforced by `app/tool/check_architecture.dart`.
 library;
 
+export 'src/bundle/bundle_contract.dart';
+export 'src/bundle/game_mode.dart';
+export 'src/bundle/manifest.dart';
 export 'src/database/app_database.dart';
 export 'src/database/connection.dart';
+export 'src/database/dataset_state_repository.dart';
 export 'src/database/fts.dart';
 export 'src/database/migration_runner.dart';
 export 'src/database/tables.dart';

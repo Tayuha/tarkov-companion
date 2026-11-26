@@ -1,0 +1,50 @@
+{
+  "bundleSchemaVersion": 1,
+  "datasets": [
+    {
+      "compressedBytes": 1433154,
+      "dataset": "items",
+      "path": "items-ed751dcd264d.jsonl.zst",
+      "records": 6015,
+      "schemaVersion": 1,
+      "sha256": "ed751dcd264d08fceeea2029ba47b5e03a07e8674a094f3ada562a776a188195",
+      "source": {
+        "etag": "W/\"c1708b692be362f22f764dbbb7603b70\"",
+        "fetchedAt": "2026-11-26T10:32:16.375Z",
+        "lastModified": "Thu, 26 Nov 2026 10:30:24 GMT",
+        "url": "https://json.tarkov.dev/regular/items"
+      },
+      "uncompressedBytes": 17417643
+    },
+    {
+      "compressedBytes": 239400,
+      "dataset": "tasks",
+      "path": "tasks-8fc7c11e0264.jsonl.zst",
+      "records": 778,
+      "schemaVersion": 1,
+      "sha256": "8fc7c11e026408029610b204e103b6f8392b2c8faa93adfb1069ca36c40a4926",
+      "source": {
+        "etag": "\"5b38d6ef0836a98ce2e5faa7ae3215fe\"",
+        "fetchedAt": "2026-11-26T10:30:09.640Z",
+        "lastModified": "Thu, 26 Nov 2026 08:23:15 GMT",
+        "url": "https://json.tarkov.dev/regular/tasks"
+      },
+      "uncompressedBytes": 2144811
+    }
+  ],
+  "generatedAt": "2026-11-26T10:32:14.883Z",
+  "manifestVersion": 1,
+  "minAppSchemaVersion": 1,
+  "mode": "regular",
+  "skipped": [],
+  "source": {
+    "baseUrl": "https://json.tarkov.dev",
+    "capturedAt": "2026-11-26T10:30:09.640Z"
+  },
+  "totals": {
+    "compressedBytes": 1672554,
+    "datasets": 2,
+    "records": 6793,
+    "uncompressedBytes": 19562454
+  }
+}

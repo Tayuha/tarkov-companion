@@ -101,6 +101,61 @@ only by an explicit `restoreFromBackup` user action.
 SQLite itself is bundled by `package:sqlite3` 3.x through Dart build hooks — no plugin or system library,
 and no `sqlite3_flutter_libs`.
 
+## Bundle manifests and dataset state
+
+`tarkov_companion_data` parses the public manifest contract (`docs/data-bundles.md`) from decoded JSON.
+The sync layer owns HTTP; the data package only validates and models the document:
+
+```dart
+final manifest = BundleManifest.parse(jsonDecode(responseBody));
+final compatibility = manifest.checkCompatibility();
+if (!compatibility.isCompatible) {
+  // Keep the current database and surface compatibility.reason.
+}
+```
+
+`BundleManifest.parse` validates every required field (`manifestVersion`, both schema versions, mode,
+`generatedAt`, source, datasets, totals and `skipped`) and rejects unsafe dataset paths, malformed
+SHA-256 values, duplicate datasets and non-positive versions. A failure is a `ManifestFormatException`
+whose `path` names the offending field (`datasets[0].path`), so it can be logged without dumping the
+document.
+
+The versions the client implements live in `BundleContract`:
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `manifestVersion` | 1 | Manifest document shape the parser understands |
+| `supportedBundleSchemaVersion` | 1 | Newest bundle layout accepted |
+| `appDataSchemaVersion` | 1 | Newest dataset record schema ingestible |
+
+`checkCompatibility` applies the rule from `docs/data-bundles.md`:
+`bundleSchemaVersion <= supportedBundleSchemaVersion` and
+`minAppSchemaVersion <= appDataSchemaVersion`. It returns:
+
+| Status | When |
+|---|---|
+| `compatible` | Both conditions hold; an older bundle version is accepted |
+| `bundleUnsupported` | `bundleSchemaVersion` is newer than the client supports |
+| `appUpdateRequired` | `minAppSchemaVersion` needs a newer app data schema |
+
+`DatasetStateRepository` is the only writer of `datasetState` bookkeeping:
+
+- `appliedForMode(mode)` returns the applied checksum, schema version, record count, `appliedAt` and
+  upstream timestamp per dataset.
+- `recordApplied(dataset, mode: ..., appliedAt: ...)` returns `inserted`, `updated` or `unchanged`.
+  The same checksum + schema version + record count is `unchanged` and performs no write, so `appliedAt`
+  never moves on a no-op. Source metadata (ETag, timestamps, sizes) is diagnostic and does not count as
+  a change.
+- A dataset whose `schemaVersion` is newer than `BundleContract.appDataSchemaVersion` is refused with a
+  `DatasetApplyRejected` and nothing is written, even if a row already exists.
+- `isCurrent` and `clearMode` support the “download only changed datasets” and future full-refresh
+  flows.
+
+Manifest download, SHA-256 verification, zstd decompression and ingestion are task 4.x; this layer
+deliberately performs no I/O and no network access. The tests parse
+`packages/data/test/fixtures/manifest-regular.json`, a real `data-regular-latest` manifest trimmed to
+`items` and `tasks` (provenance in `packages/data/test/fixtures/README.md`), without fetching anything.
+
 Regenerate the drift code after changing a table (the generated file is committed; CI does not run
 codegen):
 
