@@ -7,16 +7,20 @@ import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
-/// The committed ingestion bundle at `test/fixtures/bundle/`.
-Future<Directory> bundleFixtureDirectory() async {
+/// A committed fixture directory under `test/fixtures/`, resolved from this
+/// package rather than from the working directory.
+Future<Directory> fixtureDirectory(String name) async {
   final libraryUri = await Isolate.resolvePackageUri(
     Uri.parse('package:tarkov_companion_data/tarkov_companion_data.dart'),
   );
   if (libraryUri == null) {
     throw StateError('Could not resolve the data package URI.');
   }
-  return Directory.fromUri(libraryUri.resolve('../test/fixtures/bundle/'));
+  return Directory.fromUri(libraryUri.resolve('../test/fixtures/$name/'));
 }
+
+/// The committed ingestion bundle at `test/fixtures/bundle/`.
+Future<Directory> bundleFixtureDirectory() => fixtureDirectory('bundle');
 
 /// Parses the committed fixture manifest.
 Future<BundleManifest> readBundleFixtureManifest() async {

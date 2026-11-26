@@ -106,6 +106,19 @@ only by an explicit `restoreFromBackup` user action.
 SQLite itself is bundled by `package:sqlite3` 3.x through Dart build hooks — no plugin or system library,
 and no `sqlite3_flutter_libs`.
 
+## Ingestion benchmark
+
+A `benchmark`-tagged test ingests the full published items dataset and asserts
+the 10 MiB compressed budget, the record counts, FTS, an ingest time budget and
+a coarse RSS ceiling. It runs on the Windows CI runner; the normal Linux suite
+excludes the tag. Measured numbers, budget rationale and fixture provenance are
+in [`docs/benchmark.md`](../docs/benchmark.md).
+
+```bash
+cd app
+dart test packages/data -t benchmark -j 1
+```
+
 ## Bundle manifests and dataset state
 
 `tarkov_companion_data` parses the public manifest contract (`docs/data-bundles.md`) from decoded JSON.

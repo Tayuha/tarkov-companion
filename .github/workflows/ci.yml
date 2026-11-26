@@ -98,6 +98,14 @@ jobs:
         working-directory: app
         run: flutter test
 
+      # Full items dataset: asserts the 10 MiB compressed budget, the record
+      # counts, FTS, the ingest time budget and the RSS ceiling. It reads only
+      # the committed fixture, but it is excluded from the Linux fast loop, so
+      # this is the only place it runs. See docs/benchmark.md.
+      - name: Ingest benchmark (full items dataset)
+        working-directory: app
+        run: dart test packages/data -t benchmark -j 1
+
       # The development host is Linux, so this is the only place the Windows
       # runner sources are compiled.
       - name: Build Windows app (debug)
@@ -136,7 +144,7 @@ jobs:
         working-directory: app
         run: |
           dart test packages/core
-          dart test packages/data
+          dart test packages/data --exclude-tags benchmark
           flutter test packages/features
 
       - name: Analyze

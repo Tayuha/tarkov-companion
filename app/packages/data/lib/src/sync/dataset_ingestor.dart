@@ -551,7 +551,7 @@ Insertable<Item> _itemRow(
   return ItemsCompanion.insert(
     id: id,
     name: _requiredString(record, 'name', line),
-    shortName: _requiredString(record, 'shortName', line),
+    shortName: _requiredString(record, 'shortName', line, allowEmpty: true),
     normalizedName: _requiredString(record, 'normalizedName', line),
     weight: Value(_optionalDouble(record, 'weight', line)),
     width: Value(_optionalInt(record, 'width', line)),
@@ -587,9 +587,14 @@ Insertable<Task> _taskRow(
   );
 }
 
-String _requiredString(Map<String, Object?> record, String field, int line) {
+String _requiredString(
+  Map<String, Object?> record,
+  String field,
+  int line, {
+  bool allowEmpty = false,
+}) {
   final value = record[field];
-  if (value is String && value.isNotEmpty) {
+  if (value is String && (allowEmpty || value.isNotEmpty)) {
     return value;
   }
   throw IngestError(

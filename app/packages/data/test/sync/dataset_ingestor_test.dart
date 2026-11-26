@@ -172,6 +172,26 @@ void main() {
     expect(await searchItems(db, 'cafe'), ['item-accent']);
   });
 
+  test('accepts an item whose shortName is empty', () async {
+    // The published items bundle contains "Sealed weapon case" with an empty
+    // upstream shortName. The pipeline contract keeps it as a string, so the
+    // ingestor must store "" instead of rejecting the whole dataset.
+    final synthetic = writeSyntheticDataset(temporary, DatasetKind.items, [
+      '{"id":"item-empty-short","kind":"item","name":"Sealed weapon case",'
+          '"shortName":"","normalizedName":"sealed-weapon-case"}',
+    ]);
+
+    await DatasetIngestor(db, clock: () => appliedAt).ingest(
+      mode: GameMode.regular,
+      dataset: synthetic.dataset,
+      compressedFile: synthetic.file,
+    );
+
+    final row = await db.select(db.items).getSingle();
+    expect(row.id, 'item-empty-short');
+    expect(row.shortName, isEmpty);
+  });
+
   test('a corrupt line rolls back the partial insert, the deletes and '
       'datasetState', () async {
     final directory = await bundleFixtureDirectory();

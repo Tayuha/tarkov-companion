@@ -255,7 +255,10 @@ sorted recursively). Dedicated columns are mapped from the documented fields;
 `price.avg24h`, `price.lastLow` and `price.change48hPercent` feed the item price
 columns. A missing required field, a wrong type, invalid UTF-8, malformed JSON
 or a duplicate record is a typed `IngestError`; it never falls back to a null
-column silently.
+column silently. One field is deliberately permissive: `item.shortName` is
+required but may be empty, because the published bundle carries upstream items
+with no short display name; the empty string is stored as-is instead of
+rejecting the whole items dataset.
 
 ### One transaction, batched, whole-dataset replacement
 
