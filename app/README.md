@@ -174,6 +174,15 @@ re-validates every redirect hop, and relies on `dart:io` certificate validation 
 override. The policy, rationale, redirect rules, TLS stance, and typed errors are documented in
 [`docs/network.md`](../docs/network.md).
 
+## Local diagnostics
+
+`tarkov_companion_data` writes rotating, line-delimited JSON logs under the shell-provided log
+directory: `app.log` plus `app.1.log` … `app.4.log`, 1 MiB each by default, with the oldest file dropped.
+Exporting produces one ZIP containing the log files under `logs/` and a `metadata.json` with the export
+time and app version. Logging is best effort — a broken sink never throws — and nothing is uploaded
+automatically. The guarantees, the fields, what is deliberately never logged, and the archive layout are
+documented in [`docs/logging.md`](../docs/logging.md).
+
 ## Adding dependencies
 
 Keep the dependency set minimal. Every runtime package must work on Windows and stay compatible

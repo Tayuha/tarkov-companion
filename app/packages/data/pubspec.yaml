@@ -9,8 +9,10 @@ environment:
 resolution: workspace
 
 dependencies:
+  archive: ^4.0.7
   drift: ^2.35.4
   http: ^1.6.0
+  path: ^1.9.1
   sqlite3: ^3.9.2
   tarkov_companion_core:
     path: ../core
