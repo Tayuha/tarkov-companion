@@ -730,17 +730,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 18,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: BundleManifest/ManifestDataset parsing with typed errors and strict path/sha validation, GameMode enum, compatibility rule, dataset-state repository with inserted/updated/unchanged outcomes and newer-schema refusal, real manifest fixture, tests for all invalid shapes, docs, CI green, task 3.4 checked.",
+      "notes": "Completed 2026-11-26 in session ses_de821755fffe8ILg2pUJcjF62H. BundleManifest/ManifestDataset with typed ManifestFormatException paths, GameMode enum, BundleContract compatibility (bundleUnsupported/appUpdateRequired/compatible), DatasetStateRepository with inserted/updated/unchanged (unchanged performs no write) and newer-schema refusal. Real manifest fixture trimmed to items+tasks. 79 data tests. CI 45823002464 green. Commit 78aee18. Contract fix b364648/c845bb7: producer manifest now enforces the closed seven-dataset enum and a non-empty list, matching the client and docs; tests repaired.",
       "sessionID": "ses_de821755fffe8ILg2pUJcjF62H",
       "createdAt": 1795696802363,
-      "updatedAt": 1795696802363,
+      "updatedAt": 1795697801523,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_5",
+      "title": "T3.5 Allowlisted HTTP client",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: pure-Dart http wrapper with exact host allowlist, HTTPS-only, no userinfo, manual redirect validation (github asset hosts allowed, downgrade and unknown hosts rejected), typed errors, TLS defaults untouched, MockClient tests proving zero requests to disallowed hosts, docs/network.md, CI green, task 3.5 checked.",
+      "sessionID": "ses_de8123dd7ffeiw9IQUr7LgH59E",
+      "createdAt": 1795697801523,
+      "updatedAt": 1795697801523,
       "archived": false
     }
   ]
