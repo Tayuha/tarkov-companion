@@ -1024,15 +1024,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 30,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in worktree /home/lucas/.local/share/opencode/worktree/faf097/t49-sync-docs on branch t49-sync-docs. Writing docs/sync.md and mapping each documented state to an existing sync test, adding tests only where a state is not reproducible. Parallel with T4.8 and T5.1; branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t49-sync-docs (session ses_de785dd6effepYqbtvNKy3xZEL), merged as 280a4ba. docs/sync.md (562 lines): startup, manifest/compat, download/verify, ingest/activation, failure and backoff, offline, catalog vs price freshness, recovery. 72-state table mapped to exact test file/name. Added 8 tests for implemented states previously untested (offline/5xx/timeout manifest, stalled download cleanup, newer schema/duplicate/invalid UTF-8/missing field rollback). 241 data tests after merge, analyze/architecture/strict validate green. Branch commit b472fec.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795707005267,
+      "updatedAt": 1795707535829,
       "archived": false,
       "sessionID": "ses_de785dd6effepYqbtvNKy3xZEL"
     },
