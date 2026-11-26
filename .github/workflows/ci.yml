@@ -84,6 +84,12 @@ jobs:
         working-directory: app
         run: flutter pub get
 
+      # Cheap and platform-independent: catches a broken package edge before
+      # the slower analyzer and build steps.
+      - name: Check package architecture
+        working-directory: app
+        run: dart run tool/check_architecture.dart
+
       - name: Analyze
         working-directory: app
         run: flutter analyze
@@ -119,6 +125,19 @@ jobs:
       - name: Install dependencies
         working-directory: app
         run: flutter pub get
+
+      # Import boundaries are checked on both desktop runners; package tests
+      # run here once because they are platform-independent.
+      - name: Check package architecture
+        working-directory: app
+        run: dart run tool/check_architecture.dart
+
+      - name: Test workspace packages
+        working-directory: app
+        run: |
+          dart test packages/core
+          dart test packages/data
+          flutter test packages/features
 
       - name: Analyze
         working-directory: app

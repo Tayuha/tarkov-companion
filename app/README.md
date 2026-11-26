@@ -38,6 +38,52 @@ flutter run -d windows
 flutter build windows --debug
 ```
 
+## Package structure
+
+`app/pubspec.yaml` is the root of a Dart pub workspace. All four packages resolve against one lockfile
+(`app/pubspec.lock`); the package folders do not have their own lockfiles.
+
+```
+app/                          Flutter shell: UI composition, navigation, platform wiring
+  lib/
+  packages/
+    core/                     tarkov_companion_core   pure Dart primitives, no dependencies
+    data/                     tarkov_companion_data   bundles, SQLite, repositories (pure Dart for now)
+    features/                 tarkov_companion_features  Flutter feature modules
+```
+
+Dependency rules, enforced by `tool/check_architecture.dart`, a unit test, and CI:
+
+| Package | May import | Must not import |
+|---|---|---|
+| `core` | `core` | Flutter, `dart:ui`, `data`, `features`, `app` |
+| `data` | `core`, `data` | Flutter, `dart:ui`, `features`, `app` |
+| `features` | `core`, `data`, `features` | `app` |
+| `app` | `core`, `data`, `features`, `app` | — (the shell composes everything) |
+
+No package may import `app`, no feature may import another feature (there is only one features package so
+far), and relative imports may not cross a package's `lib/` boundary. Use `package:` imports across
+packages.
+
+Run the checker from `app/`:
+
+```bash
+dart run tool/check_architecture.dart
+```
+
+It scans `lib/` and `packages/*/lib/`, prints every violation as `file:line: directive 'uri': reason`, and
+exits 1 on failure. The rule engine is a pure function over source text; `test/check_architecture_test.dart`
+proves that a core-to-data import, a data-to-features import, a features-to-app import, and a
+cross-package relative import (among others) are each rejected.
+
+The app's own tests run with `flutter test`. The package tests run from `app/` too:
+
+```bash
+dart test packages/core
+dart test packages/data
+flutter test packages/features
+```
+
 ## Adding dependencies
 
 Keep the dependency set minimal. Every runtime package must work on Windows and stay compatible

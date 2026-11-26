@@ -4,6 +4,13 @@ description: "Local-first Escape from Tarkov companion for Windows, Linux and An
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
+# Dart pub workspace: the app and the three client packages resolve against
+# this lockfile. `resolution: workspace` is set in each member's pubspec.
+workspace:
+  - packages/core
+  - packages/data
+  - packages/features
+
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
@@ -31,6 +38,14 @@ dependencies:
   flutter:
     sdk: flutter
   material_ui: ^1.1.0
+
+  # In-repo packages. `app` may import all of them; see `tool/check_architecture.dart`.
+  tarkov_companion_core:
+    path: packages/core
+  tarkov_companion_data:
+    path: packages/data
+  tarkov_companion_features:
+    path: packages/features
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
