@@ -624,16 +624,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 13,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: flutter create with windows/linux/android, display name Tarkov Companion, app README, flutter_lints, analyze/test/linux build pass; tasks.md 1.4 marked with the Windows CI caveat.",
+      "notes": "Completed 2026-11-26 in session ses_de854269effeAE1RR3fEqQirHX. Flutter 3.50.1 / Dart 3.14. Generated windows, linux and android runners (Windows runner generated on Linux; only compile delegated to CI). Display name set in main.cpp, Runner.rc, GTK title, Android label and MaterialApp.title. analyze clean, 1/1 tests, linux debug bundle built. tasks.md 1.4 checked with the Windows caveat. Commit b4446f1.",
       "sessionID": "ses_de854269effeAE1RR3fEqQirHX",
       "createdAt": 1795693478390,
-      "updatedAt": 1795693478390,
+      "updatedAt": 1795693641828,
+      "archived": false
+    },
+    {
+      "id": "task_impl_1_6",
+      "title": "T1.6 CI with Windows app build",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "inprogress",
+      "position": 0,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_infra",
+        "tag_app"
+      ],
+      "notes": "In progress in a linked child session. Acceptance: ci.yml on push/PR/dispatch with read-only permissions and concurrency; pipeline lint/test/build/fixtures/bundle/gate on ubuntu; Flutter 3.50.1 analyze/test/windows debug build on windows-latest; badges; task 1.6 checked only after a green run with Windows compile evidence.",
+      "sessionID": "ses_de851ab55ffeEUY6AhvRSU2xXS",
+      "createdAt": 1795693641828,
+      "updatedAt": 1795693641828,
       "archived": false
     }
   ]
