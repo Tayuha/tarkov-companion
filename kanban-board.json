@@ -815,6 +815,28 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 22,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de7f5f922ffeGp0xBmlNELhtw5. Schema v2 remoteManifest with a real 1->2 migration inside the backup/recovery lifecycle; v1 rows survive and the backup is pre-migration. ManifestRepository with content hash and injected clock; ManifestFetcher sends If-None-Match/If-Modified-Since, 304 returns cached manifest and requests zero datasets, typed 404/invalid/mode-mismatch. 157 data tests. CI 45830785394 green. Commit 0796f44.",
+      "sessionID": "ses_de7f5f922ffeGp0xBmlNELhtw5",
+      "createdAt": 1795699651658,
+      "updatedAt": 1795700496202,
+      "archived": false
+    },
+    {
+      "id": "task_impl_4_2",
+      "title": "T4.2 Streaming download with checksum",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
@@ -822,10 +844,10 @@
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: schema v2 remoteManifest with real 1->2 migration and snapshot/backup tests, ManifestRepository with content hash and clock, ManifestFetcher sending If-None-Match/If-Modified-Since, 304 returns cached manifest and downloads no datasets, typed 404/invalid/mode-mismatch, per-mode isolation, docs/client-sync.md, CI green, task 4.1 checked.",
-      "sessionID": "ses_de7f5f922ffeGp0xBmlNELhtw5",
-      "createdAt": 1795699651658,
-      "updatedAt": 1795699651658,
+      "notes": "In progress in a linked child session. Acceptance: streaming send() preserving allowlist/redirect rules, chunked download to .part with monotonic progress, cancellation between chunks, SHA-256 and size verification, atomic replace keeping the old file on failure, typed errors, offline chunked tests, docs, CI green, task 4.2 checked.",
+      "sessionID": "ses_de7e91c2cffe53n6LNv1f6E7LR",
+      "createdAt": 1795700496202,
+      "updatedAt": 1795700496202,
       "archived": false
     }
   ]
