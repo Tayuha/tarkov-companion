@@ -7,7 +7,8 @@
 ///
 /// This is a read/query layer only. It reports the recorded progress state; it
 /// does not derive locked/available availability from prerequisites, level and
-/// progress (that is the availability engine, task 6.3).
+/// progress. The availability engine (`quest_availability.dart` and
+/// `QuestRepository.statuses`) owns that derivation.
 library;
 
 /// A sortable quest field.
