@@ -48,7 +48,7 @@ app/                          Flutter shell: UI composition, navigation, platfor
   lib/
   packages/
     core/                     tarkov_companion_core   pure Dart primitives, no dependencies
-    data/                     tarkov_companion_data   bundles, SQLite, repositories (pure Dart for now)
+    data/                     tarkov_companion_data   bundles, drift/SQLite schema, repositories
     features/                 tarkov_companion_features  Flutter feature modules
 ```
 
@@ -82,6 +82,26 @@ The app's own tests run with `flutter test`. The package tests run from `app/` t
 dart test packages/core
 dart test packages/data
 flutter test packages/features
+```
+
+## Local database
+
+`tarkov_companion_data` owns persistence: the drift schema, the FTS5 item index, and the connection
+factory. Game data (`items`, `tasks`, ...) is replaceable and written by bundle ingestion; player data
+(`profiles`, `questProgress`, ...) is durable and has **no foreign key onto game data**, so a dataset
+refresh cannot delete progress. `docs/schema.md` documents the split, the WAL/FTS setup, and the
+no-cascade rule.
+
+SQLite itself is bundled by `package:sqlite3` 3.x through Dart build hooks — no plugin or system library,
+and no `sqlite3_flutter_libs`.
+
+Regenerate the drift code after changing a table (the generated file is committed; CI does not run
+codegen):
+
+```bash
+cd packages/data
+dart run build_runner build
+UPDATE_GOLDENS=1 dart test        # rewrites test/goldens/schema.sql
 ```
 
 ## Adding dependencies

@@ -52,7 +52,7 @@ dataset by SHA-256 and ingests it transactionally into its own schema. See
 | `app/` | Flutter client (Windows target at launch) |
 | `pipeline/` | Node/TypeScript data pipeline and bundle publisher |
 | `test/fixtures/` | Trimmed upstream fixtures used by tests |
-| `docs/` | Data bundle contract, sync protocol, progress format |
+| `docs/` | Data bundle contract, sync protocol, local schema, progress format |
 | `openspec/` | Specifications, design, and implementation plan |
 
 ## Building
