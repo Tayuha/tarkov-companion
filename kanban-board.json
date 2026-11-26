@@ -837,6 +837,28 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 23,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_data"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de7e91c2cffe53n6LNv1f6E7LR. Allowlisted streaming send() preserving policy, manual redirects and draining; chunked download to .part with monotonic progress, cancellation between chunks, size+SHA-256 verification, atomic replace keeping the old dataset on failure. Typed errors. 9 downloader + 4 streaming tests (170 data). CI 45832947945 green. Commit 03dc687.",
+      "sessionID": "ses_de7e91c2cffe53n6LNv1f6E7LR",
+      "createdAt": 1795700496202,
+      "updatedAt": 1795701301293,
+      "archived": false
+    },
+    {
+      "id": "task_impl_4_3",
+      "title": "T4.3 Transactional JSONL ingestion",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
@@ -844,10 +866,10 @@
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: streaming send() preserving allowlist/redirect rules, chunked download to .part with monotonic progress, cancellation between chunks, SHA-256 and size verification, atomic replace keeping the old file on failure, typed errors, offline chunked tests, docs, CI green, task 4.2 checked.",
-      "sessionID": "ses_de7e91c2cffe53n6LNv1f6E7LR",
-      "createdAt": 1795700496202,
-      "updatedAt": 1795700496202,
+      "notes": "In progress in a linked child session. Acceptance: zstd decoder chosen and Windows-safe, schema v3 gameRecords catch-all with migration/snapshot, kind routing to dedicated tables plus gameRecords, single-transaction replace with datasetState update and full rollback, batch inserts, FTS via triggers, offline item fixture integration test asserting counts/checksum/FTS, rollback and unknown kind tests, docs, CI green, task 4.3 checked.",
+      "sessionID": "ses_de7dccd9effeKq9uliIvmkyXPL",
+      "createdAt": 1795701301293,
+      "updatedAt": 1795701301293,
       "archived": false
     }
   ]
