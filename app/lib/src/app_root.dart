@@ -96,7 +96,11 @@ class _AppRootState extends State<AppRoot> {
         },
       );
     }
-    return HomePlaceholder(catalog: session.catalog);
+    return HomePlaceholder(
+      catalog: session.catalog,
+      quests: session.quests,
+      activeProfileId: session.activeProfileId,
+    );
   }
 }
 
@@ -215,18 +219,30 @@ class _RecoveryScreen extends StatelessWidget {
 
 /// Landing screen once data is available.
 ///
-/// The catalog is reachable when a real database is open; the quest list and
-/// the final navigation shell arrive in later tasks.
+/// The catalog and quest list are reachable when a real database is open; the
+/// final navigation shell arrives in a later task.
 class HomePlaceholder extends StatelessWidget {
-  const HomePlaceholder({super.key, this.catalog});
+  const HomePlaceholder({
+    super.key,
+    this.catalog,
+    this.quests,
+    this.activeProfileId,
+  });
 
   /// Query facade for the catalog. Null in shell tests that build a session
   /// without SQLite.
   final CatalogRepository? catalog;
 
+  /// Query facade for the quest list. Null in shell tests without SQLite.
+  final QuestRepository? quests;
+
+  /// Profile whose progress supplies quest state badges.
+  final String? activeProfileId;
+
   @override
   Widget build(BuildContext context) {
     final catalog = this.catalog;
+    final quests = this.quests;
     return Scaffold(
       appBar: AppBar(title: const Text('Tarkov Companion')),
       body: Center(
@@ -250,19 +266,52 @@ class HomePlaceholder extends StatelessWidget {
                   'list and the full navigation shell arrive in later tasks.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                if (catalog != null) ...[
+                if (catalog != null || quests != null) ...[
                   const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) =>
-                              CatalogScreen(repository: catalog),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      if (catalog != null)
+                        FilledButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => CatalogScreen(
+                                  repository: catalog,
+                                  onItemSelected: (id) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => ItemDetailScreen(
+                                          repository: catalog,
+                                          itemId: id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.inventory_2_outlined),
+                          label: const Text('Browse items'),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.inventory_2_outlined),
-                    label: const Text('Browse items'),
+                      if (quests != null)
+                        FilledButton.tonalIcon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => QuestListScreen(
+                                  repository: quests,
+                                  profileId: activeProfileId,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.checklist_outlined),
+                          label: const Text('Quests'),
+                        ),
+                    ],
                   ),
                 ],
               ],

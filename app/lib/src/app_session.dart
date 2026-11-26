@@ -20,6 +20,8 @@ final class AppSessionReady extends AppSession {
     required this.sync,
     required this.hasAppliedDatasets,
     this.catalog,
+    this.quests,
+    this.activeProfileId,
     required super.close,
   });
 
@@ -35,6 +37,12 @@ final class AppSessionReady extends AppSession {
   /// Optional so shell widget tests can build a session without SQLite; the
   /// production session always provides it.
   final CatalogRepository? catalog;
+
+  /// Query facade for the quest list. Optional for the same reason.
+  final QuestRepository? quests;
+
+  /// Active profile id used for quest progress badges, when available.
+  final String? activeProfileId;
 }
 
 /// The database could not be opened and is available read-only.
@@ -120,10 +128,15 @@ Future<AppSession> openAppSession({
       },
     );
 
+    final profiles = ProfileRepository(database);
+    final activeProfile = await profiles.ensureFirstLaunch();
+
     return AppSessionReady(
       sync: coordinator,
       hasAppliedDatasets: applied.isNotEmpty,
       catalog: CatalogRepository(database),
+      quests: QuestRepository(database),
+      activeProfileId: activeProfile.id,
       close: () async {
         client.close();
         await opened.close();
