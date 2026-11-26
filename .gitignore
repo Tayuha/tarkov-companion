@@ -57,3 +57,6 @@ logs/
 kanban-board.json.bak
 kanban-board.backup.json
 kanban-board.json.tmp-*
+
+# Local handoff bundle (session export + board snapshot). Never commit.
+homework/
