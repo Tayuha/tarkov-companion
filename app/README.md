@@ -168,6 +168,16 @@ and leaves the previous dataset and version readable. The flow, cache fields,
 download/atomic-replace rules, kind routing, transaction and typed failures are
 documented in [`docs/client-sync.md`](../docs/client-sync.md).
 
+`SyncScheduler` (task 4.6) decides *when* a check may run. It is pure Dart with
+injected settings, clock, timers, network and visibility monitors, and a
+`SyncRunner`; it never touches a platform channel. Automatic checks require the
+auto-update preference, the foreground, connectivity and an unmetered
+connection unless the user allows metered updates; they respect the 6-hour
+interval and a 15/30/60-minute failure backoff. Network and visibility changes
+trigger a due check immediately. The full policy table, backoff, and the
+Flutter-shell wiring that will supply real monitors are documented in
+[`docs/sync-scheduler.md`](../docs/sync-scheduler.md).
+
 The remaining manifest work is pure data: the parser and compatibility check
 perform no I/O. The tests parse
 `packages/data/test/fixtures/manifest-regular.json`, a real

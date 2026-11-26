@@ -32,3 +32,4 @@ export 'src/sync/dataset_ingestor.dart';
 export 'src/sync/jsonl_reader.dart';
 export 'src/sync/manifest_fetcher.dart';
 export 'src/sync/manifest_repository.dart';
+export 'src/sync/scheduler.dart';
