@@ -1067,16 +1067,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 7,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset",
+      "notes": "In progress in worktree t52-catalog-screen (session ses_de765a0aaffe61gnsoFUV1fXZx). CatalogScreen with debounced search, category/type/flea chips, sort, virtualized rows, pagination, empty/reset states, and an onItemSelected callback. No app wiring; plain Material. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795709107061,
+      "archived": false,
+      "sessionID": "ses_de765a0aaffe61gnsoFUV1fXZx"
     },
     {
       "id": "task_impl_5_3",
@@ -1655,17 +1656,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 36,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement the first-run bootstrap flow with size estimate, progress, cancel, retry, and resume, verified by widget tests for each state and an integration test against a local mock manifest server",
+      "notes": "In progress in worktree t81-first-run (session ses_de765a0acffe1D3uFdzHLls9TV). Sync coordinator (manifest -> compat -> download -> ingest, skip applied, cancel/resume, progress) plus the first-run gate UI and app wiring. Plain Material, Linux-first. Integration test against a loopback manifest server. Branch merged after review.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795709107061,
+      "archived": false,
+      "sessionID": "ses_de765a0acffe1D3uFdzHLls9TV"
     },
     {
       "id": "task_impl_8_2",
