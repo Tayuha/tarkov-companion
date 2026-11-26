@@ -667,16 +667,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 15,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de849c807ffewBbdpV0kkoGzR1. Pub workspace rooted at app/pubspec.yaml with core (pure Dart Result), data (DatasetKind, core dep), features (Flutter SectionHeader), app. tool/check_architecture.dart enforces layer and Flutter bans with synthetic violation tests plus a real-tree regression test. 11 app tests, core 3/data 2/features 2, linux build green, CI run 45815874587 all jobs success. Commit 4852e41. Review fix 6417590: commit app/pubspec.lock and ignore only member lockfiles.",
+      "sessionID": "ses_de849c807ffewBbdpV0kkoGzR1",
+      "createdAt": 1795694158638,
+      "updatedAt": 1795694907782,
+      "archived": false
+    },
+    {
+      "id": "task_impl_3_2",
+      "title": "T3.2 Drift schema for game and player data",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in a linked child session. Acceptance: pub workspace or path deps for core (pure Dart), data (pure Dart, core only), features (Flutter), app; import-boundary checker with synthetic violation tests; regression test on the real tree; CI step; analyze/test/linux build and CI green; task 3.1 checked.",
-      "sessionID": "ses_de849c807ffewBbdpV0kkoGzR1",
-      "createdAt": 1795694158638,
-      "updatedAt": 1795694158638,
+      "notes": "In progress in a linked child session. Acceptance: game tables (datasetState, items+FTS, tasks, objectives, traders, hideout, crafts, barters, maps, price history) and player tables (profiles, quest/objective progress, settings) with no player->game FK/cascade; WAL; schema v1 with committed codegen; sqlite_master snapshot golden; WAL/persistence/no-cascade/FTS tests; docs/schema.md; CI green; task 3.2 checked.",
+      "sessionID": "ses_de83e5b24ffeVgr5porfzQ057W",
+      "createdAt": 1795694907782,
+      "updatedAt": 1795694907782,
       "archived": false
     }
   ]
