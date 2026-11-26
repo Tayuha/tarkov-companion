@@ -1272,16 +1272,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 39,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Availability engine: locked/available/inProgress/completed, level/prerequisite reasons, cycle safety, available list. Part of the bundled quest-engine session.",
+      "notes": "Availability engine merged as 0214618: locked/available/inProgress/completed, level/prerequisite reasons, unmet-edge cycle detection, deterministic available ordering, failed-quest restartable rule. 83 quest tests total (388 data).",
       "createdAt": 1795706841847,
-      "updatedAt": 1795714499951,
+      "updatedAt": 1795715263217,
       "archived": false,
       "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
@@ -1294,17 +1294,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
+      "categoryID": "ready",
       "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Locked-reason model (level, missing prerequisite, malformed/cycle, trader loyalty advisory) exposed for the detail UI. Part of the bundled quest-engine session.",
+      "notes": "Model implemented by the quest engine: structured lock reasons for level, missing prerequisite, malformed/cycle, and trader loyalty advisory. Presentation on quests is the remaining work and is now owned by T6.5; will close with its widget tests.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795714499951,
-      "archived": false,
-      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
+      "updatedAt": 1795715263217,
+      "archived": false
     },
     {
       "id": "task_impl_6_5",
@@ -1335,15 +1334,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 3,
+      "categoryID": "done",
+      "position": 40,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Quest state transitions (notStarted/inProgress/completed/failed), transactional persistence, revert recomputation and manual override. Part of the bundled session.",
+      "notes": "State transitions merged with the engine: notStarted/inProgress/completed/failed, transactional persistence, revert dependency recomputation, failed-vs-restartable handling.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795714499951,
+      "updatedAt": 1795715263217,
       "archived": false,
       "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
@@ -1356,15 +1355,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 4,
+      "categoryID": "done",
+      "position": 41,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Objective counters with validation, derived completion and a manual override that does not alter counts. Part of the bundled session.",
+      "notes": "Objective counters merged: 0..requiredCount validation, auto-start on first count, derived completion readiness, explicit completion, manual override flagged without altering counts.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795714499951,
+      "updatedAt": 1795715263217,
       "archived": false,
       "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
     },
