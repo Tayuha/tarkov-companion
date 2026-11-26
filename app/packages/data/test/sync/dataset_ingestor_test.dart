@@ -97,6 +97,33 @@ void main() {
     );
     expect(m4a1.iconLink, contains('5447a9cd4bdc2dbd208b4567-icon'));
     expect(m4a1.gridImageLink, contains('5447a9cd4bdc2dbd208b4567-grid'));
+    expect(m4a1.minLevelForFlea, 25);
+    expect(m4a1.fleaEligible, isTrue);
+
+    final m4a1Types = await (db.select(
+      db.itemTypes,
+    )..where((row) => row.itemId.equals(m4a1.id))).get();
+    expect(m4a1Types.map((row) => row.type).toSet(), {'gun', 'wearable'});
+
+    final m4a1Categories = await (db.select(
+      db.itemCategories,
+    )..where((row) => row.itemId.equals(m4a1.id))).get();
+    expect(
+      m4a1Categories.map((row) => row.categoryId).toSet(),
+      contains('5422acb9af1c889c16000029'),
+    );
+    expect(
+      m4a1Categories
+          .where((row) => row.categoryKind == 'handbook')
+          .map((row) => row.categoryId),
+      isNotEmpty,
+    );
+
+    final ammoPack = items.singleWhere(
+      (row) => row.id == '5447ac644bdc2d6c208b4567',
+    );
+    expect(ammoPack.minLevelForFlea, 25);
+    expect(ammoPack.fleaEligible, isTrue);
 
     final payload = jsonDecode(m4a1.payload) as Map<String, Object?>;
     expect(payload['kind'], 'item');
@@ -151,6 +178,8 @@ void main() {
     expect(second.stateOutcome, DatasetApplyOutcome.unchanged);
     expect(await db.select(db.items).get(), hasLength(2));
     expect(await db.select(db.gameRecords).get(), hasLength(5));
+    expect(await db.select(db.itemTypes).get(), hasLength(3));
+    expect(await db.select(db.itemCategories).get(), hasLength(11));
 
     final state = (await DatasetStateRepository(db)
         .appliedForMode(GameMode.regular))[DatasetKind.items]!;

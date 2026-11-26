@@ -1217,6 +1217,31 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _minLevelForFleaMeta = const VerificationMeta(
+    'minLevelForFlea',
+  );
+  @override
+  late final GeneratedColumn<int> minLevelForFlea = GeneratedColumn<int>(
+    'minLevelForFlea',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fleaEligibleMeta = const VerificationMeta(
+    'fleaEligible',
+  );
+  @override
+  late final GeneratedColumn<bool> fleaEligible = GeneratedColumn<bool>(
+    'fleaEligible',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("fleaEligible" IN (0, 1))',
+    ),
+  );
   static const VerificationMeta _payloadMeta = const VerificationMeta(
     'payload',
   );
@@ -1244,6 +1269,8 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     priceObservedAt,
     iconLink,
     gridImageLink,
+    minLevelForFlea,
+    fleaEligible,
     payload,
   ];
   @override
@@ -1365,6 +1392,24 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         ),
       );
     }
+    if (data.containsKey('minLevelForFlea')) {
+      context.handle(
+        _minLevelForFleaMeta,
+        minLevelForFlea.isAcceptableOrUnknown(
+          data['minLevelForFlea']!,
+          _minLevelForFleaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fleaEligible')) {
+      context.handle(
+        _fleaEligibleMeta,
+        fleaEligible.isAcceptableOrUnknown(
+          data['fleaEligible']!,
+          _fleaEligibleMeta,
+        ),
+      );
+    }
     if (data.containsKey('payload')) {
       context.handle(
         _payloadMeta,
@@ -1438,6 +1483,14 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         DriftSqlType.string,
         data['${effectivePrefix}gridImageLink'],
       ),
+      minLevelForFlea: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minLevelForFlea'],
+      ),
+      fleaEligible: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}fleaEligible'],
+      ),
       payload: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}payload'],
@@ -1499,6 +1552,22 @@ class Item extends DataClass implements Insertable<Item> {
   /// Grid image URL.
   final String? gridImageLink;
 
+  /// Minimum player level the flea market requires for this item.
+  ///
+  /// The bundle's `minLevelForFlea`; `0` means no level requirement. Nullable
+  /// because a row migrated from schema v4 has no value until the next `items`
+  /// bundle is applied. Eligibility itself is [fleaEligible], not this number:
+  /// a level-gated item is still sellable on the flea market.
+  final int? minLevelForFlea;
+
+  /// Whether the item may appear on the flea market (`types` excludes
+  /// `noFlea`).
+  ///
+  /// Nullable for the same reason as [minLevelForFlea]: a row migrated from
+  /// schema v4 is "unknown" rather than silently guessed as eligible. Catalog
+  /// filters only match rows with an explicit `true`/`false`.
+  final bool? fleaEligible;
+
   /// The complete bundle record as canonical JSON.
   final String payload;
   const Item({
@@ -1516,6 +1585,8 @@ class Item extends DataClass implements Insertable<Item> {
     this.priceObservedAt,
     this.iconLink,
     this.gridImageLink,
+    this.minLevelForFlea,
+    this.fleaEligible,
     required this.payload,
   });
   @override
@@ -1554,6 +1625,12 @@ class Item extends DataClass implements Insertable<Item> {
     }
     if (!nullToAbsent || gridImageLink != null) {
       map['gridImageLink'] = Variable<String>(gridImageLink);
+    }
+    if (!nullToAbsent || minLevelForFlea != null) {
+      map['minLevelForFlea'] = Variable<int>(minLevelForFlea);
+    }
+    if (!nullToAbsent || fleaEligible != null) {
+      map['fleaEligible'] = Variable<bool>(fleaEligible);
     }
     map['payload'] = Variable<String>(payload);
     return map;
@@ -1595,6 +1672,12 @@ class Item extends DataClass implements Insertable<Item> {
       gridImageLink: gridImageLink == null && nullToAbsent
           ? const Value.absent()
           : Value(gridImageLink),
+      minLevelForFlea: minLevelForFlea == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minLevelForFlea),
+      fleaEligible: fleaEligible == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fleaEligible),
       payload: Value(payload),
     );
   }
@@ -1621,6 +1704,8 @@ class Item extends DataClass implements Insertable<Item> {
       priceObservedAt: serializer.fromJson<DateTime?>(json['priceObservedAt']),
       iconLink: serializer.fromJson<String?>(json['iconLink']),
       gridImageLink: serializer.fromJson<String?>(json['gridImageLink']),
+      minLevelForFlea: serializer.fromJson<int?>(json['minLevelForFlea']),
+      fleaEligible: serializer.fromJson<bool?>(json['fleaEligible']),
       payload: serializer.fromJson<String>(json['payload']),
     );
   }
@@ -1642,6 +1727,8 @@ class Item extends DataClass implements Insertable<Item> {
       'priceObservedAt': serializer.toJson<DateTime?>(priceObservedAt),
       'iconLink': serializer.toJson<String?>(iconLink),
       'gridImageLink': serializer.toJson<String?>(gridImageLink),
+      'minLevelForFlea': serializer.toJson<int?>(minLevelForFlea),
+      'fleaEligible': serializer.toJson<bool?>(fleaEligible),
       'payload': serializer.toJson<String>(payload),
     };
   }
@@ -1661,6 +1748,8 @@ class Item extends DataClass implements Insertable<Item> {
     Value<DateTime?> priceObservedAt = const Value.absent(),
     Value<String?> iconLink = const Value.absent(),
     Value<String?> gridImageLink = const Value.absent(),
+    Value<int?> minLevelForFlea = const Value.absent(),
+    Value<bool?> fleaEligible = const Value.absent(),
     String? payload,
   }) => Item(
     id: id ?? this.id,
@@ -1683,6 +1772,10 @@ class Item extends DataClass implements Insertable<Item> {
     gridImageLink: gridImageLink.present
         ? gridImageLink.value
         : this.gridImageLink,
+    minLevelForFlea: minLevelForFlea.present
+        ? minLevelForFlea.value
+        : this.minLevelForFlea,
+    fleaEligible: fleaEligible.present ? fleaEligible.value : this.fleaEligible,
     payload: payload ?? this.payload,
   );
   Item copyWithCompanion(ItemsCompanion data) {
@@ -1713,6 +1806,12 @@ class Item extends DataClass implements Insertable<Item> {
       gridImageLink: data.gridImageLink.present
           ? data.gridImageLink.value
           : this.gridImageLink,
+      minLevelForFlea: data.minLevelForFlea.present
+          ? data.minLevelForFlea.value
+          : this.minLevelForFlea,
+      fleaEligible: data.fleaEligible.present
+          ? data.fleaEligible.value
+          : this.fleaEligible,
       payload: data.payload.present ? data.payload.value : this.payload,
     );
   }
@@ -1734,6 +1833,8 @@ class Item extends DataClass implements Insertable<Item> {
           ..write('priceObservedAt: $priceObservedAt, ')
           ..write('iconLink: $iconLink, ')
           ..write('gridImageLink: $gridImageLink, ')
+          ..write('minLevelForFlea: $minLevelForFlea, ')
+          ..write('fleaEligible: $fleaEligible, ')
           ..write('payload: $payload')
           ..write(')'))
         .toString();
@@ -1755,6 +1856,8 @@ class Item extends DataClass implements Insertable<Item> {
     priceObservedAt,
     iconLink,
     gridImageLink,
+    minLevelForFlea,
+    fleaEligible,
     payload,
   );
   @override
@@ -1775,6 +1878,8 @@ class Item extends DataClass implements Insertable<Item> {
           other.priceObservedAt == this.priceObservedAt &&
           other.iconLink == this.iconLink &&
           other.gridImageLink == this.gridImageLink &&
+          other.minLevelForFlea == this.minLevelForFlea &&
+          other.fleaEligible == this.fleaEligible &&
           other.payload == this.payload);
 }
 
@@ -1793,6 +1898,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<DateTime?> priceObservedAt;
   final Value<String?> iconLink;
   final Value<String?> gridImageLink;
+  final Value<int?> minLevelForFlea;
+  final Value<bool?> fleaEligible;
   final Value<String> payload;
   final Value<int> rowid;
   const ItemsCompanion({
@@ -1810,6 +1917,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.priceObservedAt = const Value.absent(),
     this.iconLink = const Value.absent(),
     this.gridImageLink = const Value.absent(),
+    this.minLevelForFlea = const Value.absent(),
+    this.fleaEligible = const Value.absent(),
     this.payload = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1828,6 +1937,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.priceObservedAt = const Value.absent(),
     this.iconLink = const Value.absent(),
     this.gridImageLink = const Value.absent(),
+    this.minLevelForFlea = const Value.absent(),
+    this.fleaEligible = const Value.absent(),
     required String payload,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -1850,6 +1961,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Expression<DateTime>? priceObservedAt,
     Expression<String>? iconLink,
     Expression<String>? gridImageLink,
+    Expression<int>? minLevelForFlea,
+    Expression<bool>? fleaEligible,
     Expression<String>? payload,
     Expression<int>? rowid,
   }) {
@@ -1869,6 +1982,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       if (priceObservedAt != null) 'priceObservedAt': priceObservedAt,
       if (iconLink != null) 'iconLink': iconLink,
       if (gridImageLink != null) 'gridImageLink': gridImageLink,
+      if (minLevelForFlea != null) 'minLevelForFlea': minLevelForFlea,
+      if (fleaEligible != null) 'fleaEligible': fleaEligible,
       if (payload != null) 'payload': payload,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1889,6 +2004,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Value<DateTime?>? priceObservedAt,
     Value<String?>? iconLink,
     Value<String?>? gridImageLink,
+    Value<int?>? minLevelForFlea,
+    Value<bool?>? fleaEligible,
     Value<String>? payload,
     Value<int>? rowid,
   }) {
@@ -1907,6 +2024,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       priceObservedAt: priceObservedAt ?? this.priceObservedAt,
       iconLink: iconLink ?? this.iconLink,
       gridImageLink: gridImageLink ?? this.gridImageLink,
+      minLevelForFlea: minLevelForFlea ?? this.minLevelForFlea,
+      fleaEligible: fleaEligible ?? this.fleaEligible,
       payload: payload ?? this.payload,
       rowid: rowid ?? this.rowid,
     );
@@ -1959,6 +2078,12 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     if (gridImageLink.present) {
       map['gridImageLink'] = Variable<String>(gridImageLink.value);
     }
+    if (minLevelForFlea.present) {
+      map['minLevelForFlea'] = Variable<int>(minLevelForFlea.value);
+    }
+    if (fleaEligible.present) {
+      map['fleaEligible'] = Variable<bool>(fleaEligible.value);
+    }
     if (payload.present) {
       map['payload'] = Variable<String>(payload.value);
     }
@@ -1985,7 +2110,505 @@ class ItemsCompanion extends UpdateCompanion<Item> {
           ..write('priceObservedAt: $priceObservedAt, ')
           ..write('iconLink: $iconLink, ')
           ..write('gridImageLink: $gridImageLink, ')
+          ..write('minLevelForFlea: $minLevelForFlea, ')
+          ..write('fleaEligible: $fleaEligible, ')
           ..write('payload: $payload, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ItemTypesTable extends ItemTypes
+    with TableInfo<$ItemTypesTable, ItemType> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ItemTypesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<String> itemId = GeneratedColumn<String>(
+    'itemId',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES items (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [itemId, type];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'itemTypes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ItemType> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('itemId')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['itemId']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {itemId, type};
+  @override
+  ItemType map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ItemType(
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}itemId'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+    );
+  }
+
+  @override
+  $ItemTypesTable createAlias(String alias) {
+    return $ItemTypesTable(attachedDatabase, alias);
+  }
+}
+
+class ItemType extends DataClass implements Insertable<ItemType> {
+  /// Owning item.
+  final String itemId;
+
+  /// Bundle `types[]` value.
+  final String type;
+  const ItemType({required this.itemId, required this.type});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['itemId'] = Variable<String>(itemId);
+    map['type'] = Variable<String>(type);
+    return map;
+  }
+
+  ItemTypesCompanion toCompanion(bool nullToAbsent) {
+    return ItemTypesCompanion(itemId: Value(itemId), type: Value(type));
+  }
+
+  factory ItemType.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ItemType(
+      itemId: serializer.fromJson<String>(json['itemId']),
+      type: serializer.fromJson<String>(json['type']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'itemId': serializer.toJson<String>(itemId),
+      'type': serializer.toJson<String>(type),
+    };
+  }
+
+  ItemType copyWith({String? itemId, String? type}) =>
+      ItemType(itemId: itemId ?? this.itemId, type: type ?? this.type);
+  ItemType copyWithCompanion(ItemTypesCompanion data) {
+    return ItemType(
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      type: data.type.present ? data.type.value : this.type,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemType(')
+          ..write('itemId: $itemId, ')
+          ..write('type: $type')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(itemId, type);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ItemType &&
+          other.itemId == this.itemId &&
+          other.type == this.type);
+}
+
+class ItemTypesCompanion extends UpdateCompanion<ItemType> {
+  final Value<String> itemId;
+  final Value<String> type;
+  final Value<int> rowid;
+  const ItemTypesCompanion({
+    this.itemId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ItemTypesCompanion.insert({
+    required String itemId,
+    required String type,
+    this.rowid = const Value.absent(),
+  }) : itemId = Value(itemId),
+       type = Value(type);
+  static Insertable<ItemType> custom({
+    Expression<String>? itemId,
+    Expression<String>? type,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (itemId != null) 'itemId': itemId,
+      if (type != null) 'type': type,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ItemTypesCompanion copyWith({
+    Value<String>? itemId,
+    Value<String>? type,
+    Value<int>? rowid,
+  }) {
+    return ItemTypesCompanion(
+      itemId: itemId ?? this.itemId,
+      type: type ?? this.type,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (itemId.present) {
+      map['itemId'] = Variable<String>(itemId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemTypesCompanion(')
+          ..write('itemId: $itemId, ')
+          ..write('type: $type, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ItemCategoriesTable extends ItemCategories
+    with TableInfo<$ItemCategoriesTable, ItemCategory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ItemCategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<String> itemId = GeneratedColumn<String>(
+    'itemId',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES items (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
+    'categoryId',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryKindMeta = const VerificationMeta(
+    'categoryKind',
+  );
+  @override
+  late final GeneratedColumn<String> categoryKind = GeneratedColumn<String>(
+    'categoryKind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [itemId, categoryId, categoryKind];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'itemCategories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ItemCategory> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('itemId')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['itemId']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('categoryId')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['categoryId']!, _categoryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryIdMeta);
+    }
+    if (data.containsKey('categoryKind')) {
+      context.handle(
+        _categoryKindMeta,
+        categoryKind.isAcceptableOrUnknown(
+          data['categoryKind']!,
+          _categoryKindMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryKindMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {itemId, categoryId, categoryKind};
+  @override
+  ItemCategory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ItemCategory(
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}itemId'],
+      )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}categoryId'],
+      )!,
+      categoryKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}categoryKind'],
+      )!,
+    );
+  }
+
+  @override
+  $ItemCategoriesTable createAlias(String alias) {
+    return $ItemCategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class ItemCategory extends DataClass implements Insertable<ItemCategory> {
+  /// Owning item.
+  final String itemId;
+
+  /// Category id from the bundle's `categoryIds` or `handbookCategoryIds`.
+  final String categoryId;
+
+  /// `item` for `categoryIds`, `handbook` for `handbookCategoryIds`.
+  final String categoryKind;
+  const ItemCategory({
+    required this.itemId,
+    required this.categoryId,
+    required this.categoryKind,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['itemId'] = Variable<String>(itemId);
+    map['categoryId'] = Variable<String>(categoryId);
+    map['categoryKind'] = Variable<String>(categoryKind);
+    return map;
+  }
+
+  ItemCategoriesCompanion toCompanion(bool nullToAbsent) {
+    return ItemCategoriesCompanion(
+      itemId: Value(itemId),
+      categoryId: Value(categoryId),
+      categoryKind: Value(categoryKind),
+    );
+  }
+
+  factory ItemCategory.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ItemCategory(
+      itemId: serializer.fromJson<String>(json['itemId']),
+      categoryId: serializer.fromJson<String>(json['categoryId']),
+      categoryKind: serializer.fromJson<String>(json['categoryKind']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'itemId': serializer.toJson<String>(itemId),
+      'categoryId': serializer.toJson<String>(categoryId),
+      'categoryKind': serializer.toJson<String>(categoryKind),
+    };
+  }
+
+  ItemCategory copyWith({
+    String? itemId,
+    String? categoryId,
+    String? categoryKind,
+  }) => ItemCategory(
+    itemId: itemId ?? this.itemId,
+    categoryId: categoryId ?? this.categoryId,
+    categoryKind: categoryKind ?? this.categoryKind,
+  );
+  ItemCategory copyWithCompanion(ItemCategoriesCompanion data) {
+    return ItemCategory(
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
+      categoryKind: data.categoryKind.present
+          ? data.categoryKind.value
+          : this.categoryKind,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemCategory(')
+          ..write('itemId: $itemId, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('categoryKind: $categoryKind')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(itemId, categoryId, categoryKind);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ItemCategory &&
+          other.itemId == this.itemId &&
+          other.categoryId == this.categoryId &&
+          other.categoryKind == this.categoryKind);
+}
+
+class ItemCategoriesCompanion extends UpdateCompanion<ItemCategory> {
+  final Value<String> itemId;
+  final Value<String> categoryId;
+  final Value<String> categoryKind;
+  final Value<int> rowid;
+  const ItemCategoriesCompanion({
+    this.itemId = const Value.absent(),
+    this.categoryId = const Value.absent(),
+    this.categoryKind = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ItemCategoriesCompanion.insert({
+    required String itemId,
+    required String categoryId,
+    required String categoryKind,
+    this.rowid = const Value.absent(),
+  }) : itemId = Value(itemId),
+       categoryId = Value(categoryId),
+       categoryKind = Value(categoryKind);
+  static Insertable<ItemCategory> custom({
+    Expression<String>? itemId,
+    Expression<String>? categoryId,
+    Expression<String>? categoryKind,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (itemId != null) 'itemId': itemId,
+      if (categoryId != null) 'categoryId': categoryId,
+      if (categoryKind != null) 'categoryKind': categoryKind,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ItemCategoriesCompanion copyWith({
+    Value<String>? itemId,
+    Value<String>? categoryId,
+    Value<String>? categoryKind,
+    Value<int>? rowid,
+  }) {
+    return ItemCategoriesCompanion(
+      itemId: itemId ?? this.itemId,
+      categoryId: categoryId ?? this.categoryId,
+      categoryKind: categoryKind ?? this.categoryKind,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (itemId.present) {
+      map['itemId'] = Variable<String>(itemId.value);
+    }
+    if (categoryId.present) {
+      map['categoryId'] = Variable<String>(categoryId.value);
+    }
+    if (categoryKind.present) {
+      map['categoryKind'] = Variable<String>(categoryKind.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemCategoriesCompanion(')
+          ..write('itemId: $itemId, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('categoryKind: $categoryKind, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6220,6 +6843,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $ItemsTable items = $ItemsTable(this);
+  late final $ItemTypesTable itemTypes = $ItemTypesTable(this);
+  late final $ItemCategoriesTable itemCategories = $ItemCategoriesTable(this);
   late final $TasksTable tasks = $TasksTable(this);
   late final $TaskObjectivesTable taskObjectives = $TaskObjectivesTable(this);
   late final $TradersTable traders = $TradersTable(this);
@@ -6247,6 +6872,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index itemsAvg24hPrice = Index(
     'itemsAvg24hPrice',
     'CREATE INDEX itemsAvg24hPrice ON items (avg24hPrice)',
+  );
+  late final Index itemTypesType = Index(
+    'itemTypesType',
+    'CREATE INDEX itemTypesType ON itemTypes (type)',
+  );
+  late final Index itemCategoriesCategory = Index(
+    'itemCategoriesCategory',
+    'CREATE INDEX itemCategoriesCategory ON itemCategories (categoryKind, categoryId)',
   );
   late final Index tasksTraderId = Index(
     'tasksTraderId',
@@ -6304,6 +6937,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     datasetStates,
     remoteManifests,
     items,
+    itemTypes,
+    itemCategories,
     tasks,
     taskObjectives,
     traders,
@@ -6320,6 +6955,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     itemsNormalizedName,
     itemsLastLowPrice,
     itemsAvg24hPrice,
+    itemTypesType,
+    itemCategoriesCategory,
     tasksTraderId,
     tasksMapId,
     tasksMinPlayerLevel,
@@ -6335,6 +6972,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('itemTypes', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('itemCategories', kind: UpdateKind.delete)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'tasks',
@@ -6915,6 +7566,8 @@ typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
   Value<DateTime?> priceObservedAt,
   Value<String?> iconLink,
   Value<String?> gridImageLink,
+  Value<int?> minLevelForFlea,
+  Value<bool?> fleaEligible,
   required String payload,
   Value<int> rowid,
 });
@@ -6933,9 +7586,52 @@ typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
   Value<DateTime?> priceObservedAt,
   Value<String?> iconLink,
   Value<String?> gridImageLink,
+  Value<int?> minLevelForFlea,
+  Value<bool?> fleaEligible,
   Value<String> payload,
   Value<int> rowid,
 });
+
+final class $$ItemsTableReferences
+    extends BaseReferences<_$AppDatabase, $ItemsTable, Item> {
+  $$ItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ItemTypesTable, List<ItemType>>
+  _itemTypesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.itemTypes,
+    aliasName: 'items__id__itemTypes__itemId',
+  );
+
+  $$ItemTypesTableProcessedTableManager get itemTypesRefs {
+    final manager = $$ItemTypesTableTableManager(
+      $_db,
+      $_db.itemTypes,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_itemTypesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ItemCategoriesTable, List<ItemCategory>>
+  _itemCategoriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.itemCategories,
+    aliasName: 'items__id__itemCategories__itemId',
+  );
+
+  $$ItemCategoriesTableProcessedTableManager get itemCategoriesRefs {
+    final manager = $$ItemCategoriesTableTableManager(
+      $_db,
+      $_db.itemCategories,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_itemCategoriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$ItemsTableFilterComposer extends Composer<_$AppDatabase, $ItemsTable> {
   $$ItemsTableFilterComposer({
@@ -7015,10 +7711,70 @@ class $$ItemsTableFilterComposer extends Composer<_$AppDatabase, $ItemsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get minLevelForFlea => $composableBuilder(
+    column: $table.minLevelForFlea,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get fleaEligible => $composableBuilder(
+    column: $table.fleaEligible,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get payload => $composableBuilder(
     column: $table.payload,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> itemTypesRefs(
+    Expression<bool> Function($$ItemTypesTableFilterComposer f) f,
+  ) {
+    final $$ItemTypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itemTypes,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemTypesTableFilterComposer(
+            $db: $db,
+            $table: $db.itemTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> itemCategoriesRefs(
+    Expression<bool> Function($$ItemCategoriesTableFilterComposer f) f,
+  ) {
+    final $$ItemCategoriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itemCategories,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemCategoriesTableFilterComposer(
+            $db: $db,
+            $table: $db.itemCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ItemsTableOrderingComposer
@@ -7100,6 +7856,16 @@ class $$ItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get minLevelForFlea => $composableBuilder(
+    column: $table.minLevelForFlea,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get fleaEligible => $composableBuilder(
+    column: $table.fleaEligible,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get payload => $composableBuilder(
     column: $table.payload,
     builder: (column) => ColumnOrderings(column),
@@ -7169,8 +7935,68 @@ class $$ItemsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get minLevelForFlea => $composableBuilder(
+    column: $table.minLevelForFlea,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get fleaEligible => $composableBuilder(
+    column: $table.fleaEligible,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get payload =>
       $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  Expression<T> itemTypesRefs<T extends Object>(
+    Expression<T> Function($$ItemTypesTableAnnotationComposer a) f,
+  ) {
+    final $$ItemTypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itemTypes,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemTypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.itemTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> itemCategoriesRefs<T extends Object>(
+    Expression<T> Function($$ItemCategoriesTableAnnotationComposer a) f,
+  ) {
+    final $$ItemCategoriesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itemCategories,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemCategoriesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.itemCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ItemsTableTableManager
@@ -7184,9 +8010,9 @@ class $$ItemsTableTableManager
           $$ItemsTableAnnotationComposer,
           $$ItemsTableCreateCompanionBuilder,
           $$ItemsTableUpdateCompanionBuilder,
-          (Item, BaseReferences<_$AppDatabase, $ItemsTable, Item>),
+          (Item, $$ItemsTableReferences),
           Item,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool itemTypesRefs, bool itemCategoriesRefs})
         > {
   $$ItemsTableTableManager(_$AppDatabase db, $ItemsTable table)
     : super(
@@ -7215,6 +8041,8 @@ class $$ItemsTableTableManager
                 Value<DateTime?> priceObservedAt = const Value.absent(),
                 Value<String?> iconLink = const Value.absent(),
                 Value<String?> gridImageLink = const Value.absent(),
+                Value<int?> minLevelForFlea = const Value.absent(),
+                Value<bool?> fleaEligible = const Value.absent(),
                 Value<String> payload = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ItemsCompanion(
@@ -7232,6 +8060,8 @@ class $$ItemsTableTableManager
                 priceObservedAt: priceObservedAt,
                 iconLink: iconLink,
                 gridImageLink: gridImageLink,
+                minLevelForFlea: minLevelForFlea,
+                fleaEligible: fleaEligible,
                 payload: payload,
                 rowid: rowid,
               ),
@@ -7251,6 +8081,8 @@ class $$ItemsTableTableManager
                 Value<DateTime?> priceObservedAt = const Value.absent(),
                 Value<String?> iconLink = const Value.absent(),
                 Value<String?> gridImageLink = const Value.absent(),
+                Value<int?> minLevelForFlea = const Value.absent(),
+                Value<bool?> fleaEligible = const Value.absent(),
                 required String payload,
                 Value<int> rowid = const Value.absent(),
               }) => ItemsCompanion.insert(
@@ -7268,6 +8100,8 @@ class $$ItemsTableTableManager
                 priceObservedAt: priceObservedAt,
                 iconLink: iconLink,
                 gridImageLink: gridImageLink,
+                minLevelForFlea: minLevelForFlea,
+                fleaEligible: fleaEligible,
                 payload: payload,
                 rowid: rowid,
               ),
@@ -7275,15 +8109,65 @@ class $$ItemsTableTableManager
               .map(
                 (e) => (
                   e.readTable<$ItemsTable, Item>(table),
-                  BaseReferences<_$AppDatabase, $ItemsTable, Item>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  $$ItemsTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback:
+              ({itemTypesRefs = false, itemCategoriesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (itemTypesRefs) db.itemTypes,
+                    if (itemCategoriesRefs) db.itemCategories,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (itemTypesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Item,
+                          $ItemsTable,
+                          ItemType,
+                          $ItemTypesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ItemsTableReferences
+                              ._itemTypesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).itemTypesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'itemId',
+                          typedResults: items,
+                        ),
+                      if (itemCategoriesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Item,
+                          $ItemsTable,
+                          ItemCategory,
+                          $ItemCategoriesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ItemsTableReferences
+                              ._itemCategoriesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).itemCategoriesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'itemId',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
         ),
       );
 }
@@ -7298,9 +8182,547 @@ typedef $$ItemsTableProcessedTableManager =
       $$ItemsTableAnnotationComposer,
       $$ItemsTableCreateCompanionBuilder,
       $$ItemsTableUpdateCompanionBuilder,
-      (Item, BaseReferences<_$AppDatabase, $ItemsTable, Item>),
+      (Item, $$ItemsTableReferences),
       Item,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool itemTypesRefs, bool itemCategoriesRefs})
+    >;
+typedef $$ItemTypesTableCreateCompanionBuilder = ItemTypesCompanion Function({
+  required String itemId,
+  required String type,
+  Value<int> rowid,
+});
+typedef $$ItemTypesTableUpdateCompanionBuilder = ItemTypesCompanion Function({
+  Value<String> itemId,
+  Value<String> type,
+  Value<int> rowid,
+});
+
+final class $$ItemTypesTableReferences
+    extends BaseReferences<_$AppDatabase, $ItemTypesTable, ItemType> {
+  $$ItemTypesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ItemsTable _itemIdTable(_$AppDatabase db) =>
+      db.items.createAlias('itemTypes__itemId__items__id');
+
+  $$ItemsTableProcessedTableManager get itemId {
+    final $_column = $_itemColumn<String>('itemId')!;
+
+    final manager = $$ItemsTableTableManager(
+      $_db,
+      $_db.items,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_itemIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ItemTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $ItemTypesTable> {
+  $$ItemTypesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ItemsTableFilterComposer get itemId {
+    final $$ItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ItemTypesTable> {
+  $$ItemTypesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ItemsTableOrderingComposer get itemId {
+    final $$ItemsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableOrderingComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ItemTypesTable> {
+  $$ItemTypesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  $$ItemsTableAnnotationComposer get itemId {
+    final $$ItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemTypesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ItemTypesTable,
+          ItemType,
+          $$ItemTypesTableFilterComposer,
+          $$ItemTypesTableOrderingComposer,
+          $$ItemTypesTableAnnotationComposer,
+          $$ItemTypesTableCreateCompanionBuilder,
+          $$ItemTypesTableUpdateCompanionBuilder,
+          (ItemType, $$ItemTypesTableReferences),
+          ItemType,
+          PrefetchHooks Function({bool itemId})
+        > {
+  $$ItemTypesTableTableManager(_$AppDatabase db, $ItemTypesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ItemTypesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ItemTypesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ItemTypesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> itemId = const Value.absent(),
+            Value<String> type = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => ItemTypesCompanion(itemId: itemId, type: type, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String itemId,
+                required String type,
+                Value<int> rowid = const Value.absent(),
+              }) => ItemTypesCompanion.insert(
+                itemId: itemId,
+                type: type,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ItemTypesTable, ItemType>(table),
+                  $$ItemTypesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({itemId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (itemId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.itemId,
+                        referencedTable: $$ItemTypesTableReferences
+                            ._itemIdTable(db),
+                        referencedColumn: $$ItemTypesTableReferences
+                            ._itemIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ItemTypesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ItemTypesTable,
+      ItemType,
+      $$ItemTypesTableFilterComposer,
+      $$ItemTypesTableOrderingComposer,
+      $$ItemTypesTableAnnotationComposer,
+      $$ItemTypesTableCreateCompanionBuilder,
+      $$ItemTypesTableUpdateCompanionBuilder,
+      (ItemType, $$ItemTypesTableReferences),
+      ItemType,
+      PrefetchHooks Function({bool itemId})
+    >;
+typedef $$ItemCategoriesTableCreateCompanionBuilder =
+    ItemCategoriesCompanion Function({
+      required String itemId,
+      required String categoryId,
+      required String categoryKind,
+      Value<int> rowid,
+    });
+typedef $$ItemCategoriesTableUpdateCompanionBuilder =
+    ItemCategoriesCompanion Function({
+      Value<String> itemId,
+      Value<String> categoryId,
+      Value<String> categoryKind,
+      Value<int> rowid,
+    });
+
+final class $$ItemCategoriesTableReferences
+    extends BaseReferences<_$AppDatabase, $ItemCategoriesTable, ItemCategory> {
+  $$ItemCategoriesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ItemsTable _itemIdTable(_$AppDatabase db) =>
+      db.items.createAlias('itemCategories__itemId__items__id');
+
+  $$ItemsTableProcessedTableManager get itemId {
+    final $_column = $_itemColumn<String>('itemId')!;
+
+    final manager = $$ItemsTableTableManager(
+      $_db,
+      $_db.items,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_itemIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ItemCategoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $ItemCategoriesTable> {
+  $$ItemCategoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryKind => $composableBuilder(
+    column: $table.categoryKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ItemsTableFilterComposer get itemId {
+    final $$ItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemCategoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ItemCategoriesTable> {
+  $$ItemCategoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryKind => $composableBuilder(
+    column: $table.categoryKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ItemsTableOrderingComposer get itemId {
+    final $$ItemsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableOrderingComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemCategoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ItemCategoriesTable> {
+  $$ItemCategoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get categoryKind => $composableBuilder(
+    column: $table.categoryKind,
+    builder: (column) => column,
+  );
+
+  $$ItemsTableAnnotationComposer get itemId {
+    final $$ItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.items,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.items,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItemCategoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ItemCategoriesTable,
+          ItemCategory,
+          $$ItemCategoriesTableFilterComposer,
+          $$ItemCategoriesTableOrderingComposer,
+          $$ItemCategoriesTableAnnotationComposer,
+          $$ItemCategoriesTableCreateCompanionBuilder,
+          $$ItemCategoriesTableUpdateCompanionBuilder,
+          (ItemCategory, $$ItemCategoriesTableReferences),
+          ItemCategory,
+          PrefetchHooks Function({bool itemId})
+        > {
+  $$ItemCategoriesTableTableManager(
+    _$AppDatabase db,
+    $ItemCategoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ItemCategoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ItemCategoriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ItemCategoriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> itemId = const Value.absent(),
+                Value<String> categoryId = const Value.absent(),
+                Value<String> categoryKind = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ItemCategoriesCompanion(
+                itemId: itemId,
+                categoryId: categoryId,
+                categoryKind: categoryKind,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String itemId,
+                required String categoryId,
+                required String categoryKind,
+                Value<int> rowid = const Value.absent(),
+              }) => ItemCategoriesCompanion.insert(
+                itemId: itemId,
+                categoryId: categoryId,
+                categoryKind: categoryKind,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ItemCategoriesTable, ItemCategory>(table),
+                  $$ItemCategoriesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({itemId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (itemId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.itemId,
+                        referencedTable: $$ItemCategoriesTableReferences
+                            ._itemIdTable(db),
+                        referencedColumn: $$ItemCategoriesTableReferences
+                            ._itemIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ItemCategoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ItemCategoriesTable,
+      ItemCategory,
+      $$ItemCategoriesTableFilterComposer,
+      $$ItemCategoriesTableOrderingComposer,
+      $$ItemCategoriesTableAnnotationComposer,
+      $$ItemCategoriesTableCreateCompanionBuilder,
+      $$ItemCategoriesTableUpdateCompanionBuilder,
+      (ItemCategory, $$ItemCategoriesTableReferences),
+      ItemCategory,
+      PrefetchHooks Function({bool itemId})
     >;
 typedef $$TasksTableCreateCompanionBuilder = TasksCompanion Function({
   required String id,
@@ -10433,6 +11855,10 @@ class $AppDatabaseManager {
       $$RemoteManifestsTableTableManager(_db, _db.remoteManifests);
   $$ItemsTableTableManager get items =>
       $$ItemsTableTableManager(_db, _db.items);
+  $$ItemTypesTableTableManager get itemTypes =>
+      $$ItemTypesTableTableManager(_db, _db.itemTypes);
+  $$ItemCategoriesTableTableManager get itemCategories =>
+      $$ItemCategoriesTableTableManager(_db, _db.itemCategories);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
   $$TaskObjectivesTableTableManager get taskObjectives =>

@@ -14,6 +14,8 @@ const expectedTables = <String>{
   // Sync cache.
   'remoteManifest',
   'items',
+  'itemTypes',
+  'itemCategories',
   'tasks',
   'taskObjectives',
   'traders',
@@ -41,6 +43,8 @@ const expectedIndexes = <String>{
   'itemsNormalizedName',
   'itemsLastLowPrice',
   'itemsAvg24hPrice',
+  'itemTypesType',
+  'itemCategoriesCategory',
   'tasksTraderId',
   'tasksMapId',
   'tasksMinPlayerLevel',
@@ -125,7 +129,7 @@ void main() {
     test(
       'records the schema version and enables the expected pragmas',
       () async {
-        expect(await readPragma(db, 'PRAGMA user_version'), 4);
+        expect(await readPragma(db, 'PRAGMA user_version'), 5);
         expect(await readPragma(db, 'PRAGMA foreign_keys'), 1);
         expect(await readPragma(db, 'PRAGMA synchronous'), 1); // NORMAL
       },

@@ -279,6 +279,11 @@ final class DatasetIngestor {
   Future<void> _clearDataset(DatasetKind dataset) async {
     switch (dataset) {
       case DatasetKind.items:
+        // Explicit, rather than relying only on the foreign-key cascade, so a
+        // stale join row can never survive a replacement if enforcement is
+        // ever relaxed.
+        await _database.delete(_database.itemCategories).go();
+        await _database.delete(_database.itemTypes).go();
         await _database.delete(_database.items).go();
       case DatasetKind.tasks:
         // `taskObjectives.taskId` cascades from `tasks`, so this also removes
@@ -338,6 +343,14 @@ final class _IngestSinks {
   final AppDatabase _database;
 
   late final _items = _BatchSink<Items, Item>(_database, _database.items);
+  late final _itemTypes = _BatchSink<ItemTypes, ItemType>(
+    _database,
+    _database.itemTypes,
+  );
+  late final _itemCategories = _BatchSink<ItemCategories, ItemCategory>(
+    _database,
+    _database.itemCategories,
+  );
   late final _tasks = _BatchSink<Tasks, Task>(_database, _database.tasks);
   late final _objectives = _BatchSink<TaskObjectives, TaskObjective>(
     _database,
@@ -366,6 +379,8 @@ final class _IngestSinks {
 
   int get pending =>
       _items.length +
+      _itemTypes.length +
+      _itemCategories.length +
       _tasks.length +
       _objectives.length +
       _traders.length +
@@ -385,6 +400,7 @@ final class _IngestSinks {
     switch (kind) {
       case 'item':
         _items.add(_itemRow(record, id: id, payload: payload, line: line));
+        _addItemTags(record, itemId: id, line: line);
       case 'task':
         _tasks.add(_taskRow(record, id: id, payload: payload, line: line));
         _addObjectives(record, taskId: id, line: line);
@@ -457,13 +473,51 @@ final class _IngestSinks {
     // Tasks must exist before their objectives for the immediate foreign key.
     await _tasks.flush();
     await _objectives.flush();
+    // Items must exist before their type/category rows for the same reason.
     await _items.flush();
+    await _itemTypes.flush();
+    await _itemCategories.flush();
     await _traders.flush();
     await _hideout.flush();
     await _crafts.flush();
     await _barters.flush();
     await _maps.flush();
     await _gameRecords.flush();
+  }
+
+  /// Buffers the multi-valued `types`, `categoryIds` and
+  /// `handbookCategoryIds` arrays as indexed rows.
+  ///
+  /// The fields are optional only for hand-written test records; a published
+  /// item record always carries them. A missing field yields no rows, and a
+  /// present non-array or non-string entry is a contract violation.
+  void _addItemTags(
+    Map<String, Object?> record, {
+    required String itemId,
+    required int line,
+  }) {
+    for (final type
+        in _optionalStringList(record, 'types', line) ?? const <String>[]) {
+      _itemTypes.add(ItemTypesCompanion.insert(itemId: itemId, type: type));
+    }
+    for (final (field, kind) in const [
+      ('categoryIds', 'item'),
+      ('handbookCategoryIds', 'handbook'),
+    ]) {
+      final ids = _optionalStringList(record, field, line);
+      if (ids == null) {
+        continue;
+      }
+      for (final categoryId in ids) {
+        _itemCategories.add(
+          ItemCategoriesCompanion.insert(
+            itemId: itemId,
+            categoryId: categoryId,
+            categoryKind: kind,
+          ),
+        );
+      }
+    }
   }
 
   void _addObjectives(
@@ -548,6 +602,8 @@ Insertable<Item> _itemRow(
           line: line,
         );
 
+  final types = _optionalStringList(record, 'types', line);
+
   return ItemsCompanion.insert(
     id: id,
     name: _requiredString(record, 'name', line),
@@ -565,6 +621,11 @@ Insertable<Item> _itemRow(
     priceObservedAt: Value(_optionalDateTime(priceMap, 'observedAt', line)),
     iconLink: Value(_optionalString(record, 'iconLink', line)),
     gridImageLink: Value(_optionalString(record, 'gridImageLink', line)),
+    minLevelForFlea: Value(_optionalInt(record, 'minLevelForFlea', line)),
+    // `noFlea` is the bundle's marker for an item that cannot be traded on the
+    // flea market; `minLevelForFlea` is a level gate, not a ban. No `types`
+    // field means the record is too old to know, so eligibility stays null.
+    fleaEligible: Value(types == null ? null : !types.contains('noFlea')),
     payload: payload,
   );
 }
@@ -648,6 +709,40 @@ bool? _optionalBool(Map<String, Object?> record, String field, int line) {
     'Field "$field" must be a boolean or null.',
     line: line,
   );
+}
+
+/// Reads an optional array of strings. `null` means the field is absent.
+///
+/// An empty array is meaningful (the item has no tags) and returns an empty
+/// list, distinct from the `null` an old record may have.
+List<String>? _optionalStringList(
+  Map<String, Object?> record,
+  String field,
+  int line,
+) {
+  final value = record[field];
+  if (value == null) {
+    return null;
+  }
+  if (value is! List<Object?>) {
+    throw IngestError(
+      IngestFailure.invalidRecord,
+      'Field "$field" must be an array of strings or null.',
+      line: line,
+    );
+  }
+  final entries = <String>[];
+  for (final entry in value) {
+    if (entry is! String || entry.isEmpty) {
+      throw IngestError(
+        IngestFailure.invalidRecord,
+        'Field "$field" must contain only non-empty strings.',
+        line: line,
+      );
+    }
+    entries.add(entry);
+  }
+  return entries;
 }
 
 /// Parses an ISO 8601 timestamp (the bundle's `observedAt` shape) into UTC.

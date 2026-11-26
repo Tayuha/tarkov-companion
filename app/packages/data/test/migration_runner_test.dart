@@ -268,10 +268,10 @@ void main() {
       addTearDown(result.close);
 
       expect(result.fromVersion, 0);
-      expect(result.toVersion, 4);
+      expect(result.toVersion, 5);
       expect(result.backup, isNull);
       expect(backupDirectoryFor(path).existsSync(), isFalse);
-      expect(await readPragma(result.database, 'PRAGMA user_version'), 4);
+      expect(await readPragma(result.database, 'PRAGMA user_version'), 5);
     });
 
     test(
