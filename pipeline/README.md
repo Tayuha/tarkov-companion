@@ -31,6 +31,9 @@ Implemented so far:
   live fetch with the conditional cache, schema validation, normalization, normalized-JSONL cache,
   bundling, publication, per-mode failure isolation, and a single `Data sync failing` issue lifecycle.
   Operational guide: [`../docs/data-sync.md`](../docs/data-sync.md).
+- Bundle contract validation (`npm run validate:bundle`): manifest schema, file presence, compressed
+  size and SHA-256, zstd decompression, JSONL records and ids, record counts, placeholder strings and
+  path traversal. It also passes the hand-built example in `test/fixtures/handbuilt-bundle/`.
 
 Bundle writing uses zstd from `node:zlib`, so the pipeline requires **Node 24 or newer** (declared in
 `engines`); no native module or WASM dependency is involved.
@@ -49,6 +52,11 @@ npm run bundle               # offline: write dist/bundles/regular/
 npm run bundle -- --mode pve
 npm run bundle -- --all      # every mode with fixtures
 npm run bundle -- --mode regular --out /tmp/bundles
+
+# Check a bundle directory against the published contract (offline)
+npm run validate:bundle -- --dir dist/bundles/regular
+npm run validate:bundle -- --dir dist/bundles/regular --json
+npm run validate:bundle -- --dir ../test/fixtures/handbuilt-bundle
 
 # Compare with a published bundle and skip writing when nothing changed
 npm run bundle -- --mode regular --previous /tmp/bundles
@@ -180,10 +188,12 @@ pipeline/src/bundle/
   zstd.ts       deterministic zstd wrapper (built-in node:zlib)
   writer.ts     buildBundle() (no I/O) and writeBundle() (atomic files)
   compare.ts    compareBundles(), manifest loading, no-op classification
+  validate.ts   pure contract validator (manifest, bytes, JSONL, paths)
   index.ts      public exports
 pipeline/src/fixtures/bundle-set.ts   fixtures -> normalized bundle input
 pipeline/src/cli/bundle.ts            npm run bundle (with --previous)
 pipeline/src/cli/compare.ts           npm run compare
+pipeline/src/cli/validate-bundle.ts   npm run validate:bundle
 ```
 
 Output layout (relative to `--out`, default `dist/bundles`):
@@ -216,6 +226,14 @@ for the trimmed `pve`/`pvp-season` fixture sets, which only carry item markers).
 supplied with zero records **fails the build**, because an empty file would erase the client's rows.
 The writer removes stale `*.jsonl.zst` files from the mode directory and writes the manifest last, each
 through a temporary file plus rename.
+
+**Contract validation.** `npm run validate:bundle -- --dir <bundle-dir>` reads `manifest.json` and
+every file next to it, then checks the manifest schema, file presence, compressed size, SHA-256,
+zstd decompression, UTF-8 JSONL, `kind`/`id`, duplicate ids, record counts, placeholder strings and
+flat traversal-free paths. Unknown extra files are warnings; any error exits 1. `--json` prints the
+machine-readable report. The implementation is `src/bundle/validate.ts` (pure) plus
+`src/cli/validate-bundle.ts`, and the documented hand-built example lives in
+`test/fixtures/handbuilt-bundle/`.
 
 **Comparison and no-op builds.** `src/bundle/compare.ts` compares two manifests by dataset presence and
 `sha256`: only in current is `added`, only in previous is `removed`, a different checksum is `changed`,

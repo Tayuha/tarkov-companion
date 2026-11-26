@@ -43,3 +43,11 @@ export {
   resolveManifestPath,
 } from "./compare.js";
 export type { BundleComparison, ManifestErrorKind } from "./compare.js";
+export { isSafeBundlePath, validateBundle } from "./validate.js";
+export type {
+  BundleValidationCode,
+  BundleValidationInput,
+  BundleValidationIssue,
+  BundleValidationResult,
+  DatasetValidation,
+} from "./validate.js";

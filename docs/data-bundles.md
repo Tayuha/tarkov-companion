@@ -1,14 +1,18 @@
 # Data bundles
 
-> OpenSpec task 2.6 implements the bundle writer (zstd data files + manifest),
-> task 2.7 the comparison/no-op gate, and task 2.8 publication to GitHub
-> Releases. Task 2.10 finalizes the public contract. This document already
-> describes the exact bytes and manifest fields the writer produces and the
-> release layout the publisher uses; treat changes here as a contract change.
+> This is the public data contract. Tasks 2.6–2.8 implement the writer, the
+> no-op comparison and publication to GitHub Releases; task 2.10 finalizes the
+> document and adds `npm run validate:bundle`. Every statement below is
+> enforced by code or by a test, so a change here is a contract change.
 
 The pipeline turns each validated, localized upstream dataset into **JSONL**:
 one JSON object per line, one record kind per line. The app ingests the records
 into its own SQLite schema; it never interprets raw `json.tarkov.dev` payloads.
+
+A reader can reproduce the layout with the
+[hand-build tutorial](#build-one-by-hand), and check any bundle — local or
+hand-built — with `npm run validate:bundle -- --dir <bundle-dir>`
+([what it checks](#validating-a-bundle)).
 
 ## Bundle layout
 
@@ -32,14 +36,18 @@ dist/bundles/
 ```
 
 - One directory per game mode. A client fetches only the mode it needs.
-- `manifest.json` `path` values are file names relative to the manifest's own
-  directory (`items.jsonl.zst`), so the client concatenates its bundle base URL
-  with the path.
-- The design sketch in `design.md` (D2) showed one root `manifest.json` plus
-  `bundles/<mode>/…`. The writer keeps a manifest **inside each mode directory**
-  instead: the mode is part of the bundle identity, and a client downloads a
-  single self-describing document for its active mode. Publication maps this
-  layout to release assets under `bundles/<mode>/`.
+- `manifest.json` `path` values are flat file names relative to the manifest's
+  own directory (`items.jsonl.zst`). A flat name contains no `/` or `\` and is
+  not `.` or `..`, so resolving it can never escape the bundle directory.
+- Design decision D2 specifies one self-describing manifest **per mode**
+  rather than a single root pointer: the mode is part of the bundle identity
+  and a client downloads exactly one document for its active mode.
+- Publication maps this layout to one flat GitHub release per mode (see
+  [Publication](#publication-to-github-releases)). The stable URL is
+  `https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json`;
+  the released manifest keeps `path` relative, but rewrites it to the
+  content-addressed asset name, so the same resolution rule works locally and
+  remotely.
 - `pvp-season/season` has a fixture and an upstream schema but no normalizer, so
   it is not part of a bundle yet. Only datasets in `pipeline/src/normalize/`
   can appear in a bundle.
@@ -77,18 +85,87 @@ downloads; `uncompressedBytes` describes the JSONL payload.
 - Records are sorted by `kind`, then `id`, using UTF-16 code-unit order.
 - Object keys are sorted recursively (canonical key order). Array order is
   preserved because it is meaningful upstream.
-- The file ends with a single trailing newline. The same validated input always
-  produces byte-identical output.
+- The file ends with a single trailing newline. With a fixed compressor version,
+  the same validated input always produces byte-identical output.
 - Text is English (`en`) only for now. Localization is resolved before
-  normalization; a placeholder-shaped string is a normalization failure.
+  normalization; see [Localization](#localization-contract). Any
+  placeholder-shaped string that survives into a record field is a
+  normalization failure.
 - Unknown upstream fields are dropped rather than passed through. The
   normalizer counts them per dataset (`droppedFields`, `droppedFieldPaths`) so
   a contract change is visible in the build log.
 
+## Localization contract
+
+Upstream serves text as unresolved keys plus JSONPath pointers describing which
+fields hold them:
+
+```json
+{
+  "data": {
+    "5447a9cd4bdc2dbd208b4567": { "id": "5447a9cd4bdc2dbd208b4567", "name": "5447a9cd4bdc2dbd208b4567 Name" }
+  },
+  "translations": ["$.data.items.*.name"]
+}
+```
+
+The matching `/{mode}/{dataset}_en` document is a flat dictionary keyed by the
+placeholder string itself:
+
+```json
+{ "data": { "5447a9cd4bdc2dbd208b4567 Name": "Colt M4A1 5.56x45 assault rifle" } }
+```
+
+Resolution has three stages, in this order:
+
+1. **Declared pointers** (`localizeInPlace`). The supported JSONPath grammar is
+   `$`, `.key`, `.*`, `[n]`, `[*]`, `..key`, `..*` and `['a','b']`. Every node a
+   pointer selects that is a string with a dictionary entry is replaced in
+   place. A pointer that matches nothing is recorded in
+   `stats.unresolvedPaths`; one outside the grammar is recorded in
+   `stats.failedPaths`. Neither is fatal, because upstream metadata is allowed
+   to be stale.
+2. **Opt-in dictionary fallback** (`resolveDictionaryFallback`). Only the
+   scheduled sync enables it (`resolveUncoveredPlaceholders: true`); fixture
+   localization and its goldens keep the pointer-only contract. It visits the
+   whole localized payload and replaces a string only when it matches the
+   placeholder pattern **and** the dictionary has an exact key for it. Upstream
+   occasionally adds a translatable field before its pointer (observed on
+   top-level task objective `effects`); without the fallback those keys survive
+   and normalization rejects the dataset.
+3. **Normalization gate** (`assertBundleRecords`). Every string in every record
+   is tested against the placeholder pattern; a match fails the build. This is
+   what makes a silently untranslated name impossible in a published bundle.
+
+### Why the fallback is restricted to placeholder-shaped strings
+
+The dictionary is not a general text map. It also contains bare entity ids
+mapped to empty strings. A blind "if this string is a dictionary key, replace
+it" pass over the payload would blank out identity fields such as `item.id`, and
+the resulting record would still be valid JSON — a silent data loss, not a
+caught error. The placeholder pattern is narrow enough to make the lookup safe:
+
+```
+^[0-9a-f]{24} \S      # 24 lowercase hex chars, one space, then non-space text
+```
+
+A string that does not match is never a candidate for the fallback. A string
+that matches but is absent from the dictionary is left untouched, so the
+normalization gate still fails rather than publishing a key. In short: the
+fallback may only turn a key into text; it can never turn text or an id into
+anything.
+
+Text is English (`en`) only for now. A future locale changes the dictionary the
+fetch step requests, not the bundle shape; the JSONL contains resolved text, not
+keys.
+
 ## Manifest
 
 One `manifest.json` per mode, written as canonical JSON (object keys sorted
-recursively, no insignificant whitespace) with a single trailing newline.
+recursively, no insignificant whitespace) with a single trailing newline. The
+canonical form is a writer property, not a client requirement: clients parse
+JSON and never compare manifest bytes, and the validator does not reject a
+hand-built manifest with a different key order.
 
 ```json
 {
@@ -131,26 +208,43 @@ recursively, no insignificant whitespace) with a single trailing newline.
 The `datasets` array is abridged to one entry; `totals` describe the full
 regular fixture bundle (all seven datasets).
 
-| Field | Meaning |
-|---|---|
-| `manifestVersion` | Version of this manifest document (`1`). Bump for a shape change to the manifest itself. |
-| `bundleSchemaVersion` | Version of the bundle layout/contract as a whole (`1`). A client refuses a bundle whose value is newer than it supports. |
-| `minAppSchemaVersion` | Oldest app data-schema version that can ingest every dataset here; currently the maximum of the per-dataset `schemaVersion` values. A client whose supported data schema is lower must update the app instead of applying the bundle. A newer-than-supported `bundleSchemaVersion` is refused the same way. |
-| `mode` | `regular`, `pve`, or `pvp-season`. |
-| `generatedAt` | Wall-clock timestamp of this build. **Intentionally not reproducible**; it is the only manifest field that may differ between two builds of identical data. |
-| `source.baseUrl` | Upstream base URL the fixtures were captured from. |
-| `source.capturedAt` | When the upstream fixture set was captured (`fetchedAt` of the fixture manifest). |
-| `datasets[]` | Present datasets, sorted by `dataset`. |
-| `datasets[].dataset` | Dataset name, e.g. `items`. |
-| `datasets[].path` | File name relative to the manifest directory. |
-| `datasets[].schemaVersion` | Record schema version of that dataset (`1` today). Each dataset can be versioned independently. |
-| `datasets[].sha256` | Lowercase hex SHA-256 of the compressed `.jsonl.zst` file. |
-| `datasets[].compressedBytes` | Exact size of the file on disk. |
-| `datasets[].uncompressedBytes` | Size of the JSONL payload before compression. |
-| `datasets[].records` | Number of JSONL lines (one bundle record per line). |
-| `datasets[].source.url`, `.lastModified`, `.etag`, `.fetchedAt` | Upstream source timestamp(s) and validators recorded in the fixture manifest for this dataset; `null` when unavailable. |
-| `totals` | Sums across `datasets[]`; `records` is the sum of per-dataset line counts. |
-| `skipped[]` | Datasets not written in this build, sorted by `dataset`, each with `reason: "not-supplied"`. No file exists for them; a client must keep its existing rows. |
+All fields are required. `manifestSchema` in `pipeline/src/bundle/manifest.ts`
+is the executable definition (`manifestVersion` is the literal `1`). Unknown
+extra fields in a future manifest are ignored by this schema, which is why a
+shape change must also bump `manifestVersion` rather than rely on a client to
+notice a new field.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `manifestVersion` | integer, literal `1` | Version of this manifest document. Bump when a field is added, removed, renamed or changes meaning. A client refuses a value it does not implement. |
+| `bundleSchemaVersion` | positive integer | Version of the bundle contract as a whole (layout, compression, record envelope). A client refuses a value newer than it supports. See [Versioning policy](#versioning-policy). |
+| `minAppSchemaVersion` | positive integer | Oldest app data-schema version that can ingest every dataset here. Currently `max(1, datasets[].schemaVersion)`. A client whose supported data schema is lower must update the app instead of applying the bundle. |
+| `mode` | string enum | `regular`, `pve` or `pvp-season`. Must match the release tag (`data-<mode>-latest`) and the local mode directory. |
+| `generatedAt` | ISO 8601 UTC string | Wall-clock timestamp of this build, always ending in `Z`. **Intentionally not reproducible**: it is the only field the writer takes from the clock, so two builds from the same captured fixtures differ only here. Live syncs may also change upstream `source` metadata without changing content; comparison ignores both. |
+| `source` | object | Provenance of the whole build. Required; its members are nullable. |
+| `source.baseUrl` | string \| null | Upstream API base URL (`https://json.tarkov.dev`), or `null` for a hand-built bundle. |
+| `source.capturedAt` | ISO 8601 UTC string \| null | Earliest upstream `fetchedAt` in this build, or the fixture set's capture time. `null` when unknown. |
+| `datasets` | array of objects | Datasets present in this bundle, sorted by `dataset`. This array is the complete present set. |
+| `datasets[].dataset` | non-empty string | Dataset name: `items`, `tasks`, `traders`, `hideout`, `crafts`, `barters` or `maps`. Unique within the manifest. |
+| `datasets[].path` | non-empty, flat string | File name relative to the manifest's directory. No `/` or `\`; not `.` or `..`; a client resolves it with `new URL(path, manifestUrl)`. Published bundles use `<dataset>-<sha12>.jsonl.zst`; local bundles use `<dataset>.jsonl.zst`. |
+| `datasets[].schemaVersion` | positive integer | Record schema version for this dataset (`1` today). Each dataset is versioned independently. |
+| `datasets[].sha256` | 64 lowercase hex chars | SHA-256 of the compressed `.jsonl.zst` file — the exact bytes a client downloads, not the JSONL text. |
+| `datasets[].compressedBytes` | non-negative integer | Exact byte length of the compressed file. |
+| `datasets[].uncompressedBytes` | non-negative integer | Byte length of the UTF-8 JSONL payload before compression. |
+| `datasets[].records` | non-negative integer | Number of JSONL lines, one bundle record per line. Never `0` in a writer-produced bundle. |
+| `datasets[].source` | object | Upstream provenance for this dataset. Required; members are nullable. Never used to decide whether to ingest. |
+| `datasets[].source.url` | string \| null | Upstream URL the payload came from. |
+| `datasets[].source.lastModified` | string \| null | Upstream HTTP `Last-Modified` value, verbatim (an HTTP date, not necessarily ISO 8601). |
+| `datasets[].source.etag` | string \| null | Upstream HTTP `ETag`, verbatim (may be weak, e.g. `W/"…"`). |
+| `datasets[].source.fetchedAt` | ISO 8601 UTC string \| null | When this dataset was fetched. |
+| `totals` | object | Sums over `datasets[]`. The validator reports a mismatch as a warning; the writer always keeps them exact. |
+| `totals.datasets` | non-negative integer | Length of `datasets[]`. |
+| `totals.records` | non-negative integer | Sum of `datasets[].records`. |
+| `totals.uncompressedBytes` | non-negative integer | Sum of `datasets[].uncompressedBytes`. |
+| `totals.compressedBytes` | non-negative integer | Sum of `datasets[].compressedBytes`. |
+| `skipped` | array of objects | Datasets deliberately not written in this build, in the fixed registry order `items`, `tasks`, `traders`, `hideout`, `crafts`, `barters`, `maps`. Clients must not depend on order. |
+| `skipped[].dataset` | non-empty string | Dataset name. No file exists for it. |
+| `skipped[].reason` | literal `"not-supplied"` | The caller had no records for the dataset. A client must keep its existing rows. |
 
 ## Missing and empty datasets
 
@@ -173,8 +267,8 @@ Given the same normalized records and the same zstd compressor version:
 - Dataset files are byte-identical, so their SHA-256 checksums are identical.
 - Record order in the caller's array does not matter: the writer sorts by
   `kind` then `id` before serializing, exactly as the normalizer does.
-- Manifest datasets and `skipped` entries are sorted; manifest keys are
-  canonical; the newline ending is fixed.
+- Manifest `datasets` are sorted by `dataset`; `skipped` follows the fixed
+  registry order; manifest keys are canonical; the newline ending is fixed.
 - With the same `generatedAt`, the whole manifest is byte-identical. The CLI
   uses the wall clock, so two real builds differ only in `generatedAt`.
 - Stale dataset files are removed from the mode directory, so a rebuild cannot
@@ -387,7 +481,113 @@ manifest is missing/invalid, a local dataset is missing, or a dataset file does
 not match the manifest's size and SHA-256. Dry-run uses the same validation, so
 a plan either reflects a publishable bundle or fails before any mutation.
 
-## Field conventions
+## Client resolution
+
+The client needs one configuration value per mode: the stable manifest URL. It
+never builds a dataset URL by hand.
+
+```
+base = https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json
+```
+
+Algorithm:
+
+1. **Fetch the manifest.** `GET base` with the stored `ETag`/`Last-Modified`
+   (`If-None-Match` / `If-Modified-Since`). A `304` means the document is
+   unchanged: stop, keep the database as it is. A `200` body is JSON; parse it.
+2. **Check compatibility before touching data.**
+   - `manifestVersion` must be one the client implements (currently `1`).
+   - `mode` must equal the mode the client asked for.
+   - `bundleSchemaVersion` must not be newer than the client supports.
+   - `minAppSchemaVersion` must not be newer than the client's data schema.
+     Also refuse a dataset whose `schemaVersion` is newer than the client
+     supports, even if the aggregate looks acceptable.
+
+   A failed check keeps the existing database and tells the user to update the
+   app; it never partially applies a bundle.
+3. **Compare checksums.** For each `datasets[]` entry, compare its `dataset`
+   and `sha256` with the applied checksum stored in the client's
+   `dataset_state`. Equal checksum → no download and no ingest (idempotent).
+   Different or missing → download. Datasets listed under `skipped` are not in
+   this bundle: keep their existing rows.
+4. **Resolve each download relative to the manifest.** Use URL resolution, not
+   string concatenation:
+
+   ```
+   url = new URL(entry.path, base)
+   ```
+
+   Locally `entry.path` is `items.jsonl.zst`; in a published bundle it is
+   `items-bc330ec05ae3.jsonl.zst`. Both resolve to a sibling of the manifest
+   (`manifest.json` is always the last path segment of `base`).
+5. **Verify the bytes before parsing them.** The downloaded body must have
+   exactly `compressedBytes` bytes and its SHA-256 must equal `sha256`
+   (lowercase hex, computed over the compressed frame). On mismatch, discard
+   the download, keep the old rows, and report a retriable sync error. Never
+   decompress unverified bytes into the database.
+6. **Decompress and read JSONL.** The payload is zstd, then UTF-8, then one
+   JSON object per line. A line without non-empty string `kind` and `id` is a
+   corrupt bundle: abort that dataset, keep the old rows. Ingestion may stream;
+   it must not require the whole file in memory.
+7. **Ingest one dataset atomically.** Inside one transaction: replace that
+   dataset's rows (whole-dataset replacement, D3), write the applied `sha256`
+   and `schemaVersion` to `dataset_state`, commit. Then refresh FTS and
+   invalidate caches. A crash before commit leaves the previous rows and the
+   previous `dataset_state` intact.
+8. **Fail per dataset, not for the whole bundle.** A dataset that fails
+   verification or ingestion keeps its old rows; the other datasets of the same
+   manifest may still be applied. The next sync retries the failed one because
+   its stored checksum still differs.
+
+The manifest is authoritative for *which* datasets exist and *what bytes* they
+are. `generatedAt`, `source.*`, sizes, record counts and `totals` are
+diagnostics; a rebuild that only moves `generatedAt` must not trigger a
+download.
+
+## Versioning policy
+
+Four independent numbers protect compatibility. A change in any of them is
+published exactly like a data change: the release manifest is replaced, and the
+comparison in [Comparison and no-op publishing](#comparison-and-no-op-publishing)
+forces clients to reconsider the bundle even when dataset checksums match.
+
+| Version | Bump when | Client behavior |
+|---|---|---|
+| `manifestVersion` | The manifest document shape changes: a field is added, removed, renamed, or its meaning changes. | Refuse a value it does not implement. Bumping requires a client release that understands the new document. |
+| `bundleSchemaVersion` | The bundle-level contract changes for all datasets: path/asset scheme, compression format, JSONL envelope, or a rule in this document. | Refuse a newer value. A difference from the last applied value means re-check compatibility and re-ingest/revalidate every dataset; do not short-circuit on equal `sha256`. |
+| `minAppSchemaVersion` | Any dataset's record schema becomes incompatible with an older app. The writer sets it to `max(1, datasets[].schemaVersion)`. | A client whose supported data schema is lower refuses the bundle and asks for an app update. Never guess at unknown fields. |
+| `datasets[].schemaVersion` | That dataset's record shape changes incompatibly (field removed/retyped/renamed, new required semantics). | The client must implement it for that dataset. `minAppSchemaVersion` is the aggregate shortcut; a client that inspects per-dataset versions may apply the datasets it supports and skip the others. |
+
+Rules:
+
+- Versions only move forward in a published release. A client must accept a
+  `bundleSchemaVersion` **lower** than its maximum (an older compatible
+  bundle), but never a higher one.
+- A `bundleSchemaVersion` or `minAppSchemaVersion` change reclassifies every
+  dataset present on both sides as `changed` in the publisher's comparison, so
+  a silent no-op cannot strand clients on a different contract.
+- The same normalized record bytes always keep the same `sha256`; a version
+  bump alone does not rename dataset assets. Clients that cached the bytes may
+  reuse them, but must still re-run the compatibility checks.
+- `NORMALIZED_CACHE_VERSION` (documented in
+  [`data-sync.md`](data-sync.md#cache-behavior)) is a pipeline-internal cache
+  key, not part of the bundle manifest. Bump it when the record shape changes
+  so a stale normalized cache entry cannot be reused; it never reaches a
+  client.
+
+## Normalization conventions
+
+Normalization (`pipeline/src/normalize/`) is the boundary between the validated,
+localized upstream payload and the JSONL contract. It is pure: no I/O, no
+clock, no randomness. Each line has this envelope:
+
+```json
+{"id":"5447a9cd4bdc2dbd208b4567","kind":"item","name":"Colt M4A1 5.56x45 assault rifle"}
+```
+
+`kind` selects the record shape and `id` identifies the record within its
+dataset. Fields are projected through an explicit per-kind spec, so an upstream
+addition is dropped and counted rather than silently entering the bundle.
 
 | Concern | Convention |
 |---|---|
@@ -426,11 +626,27 @@ deliberate and do not change the bundle shape:
 - Craft `requiredQuestItems` entries are `{item}`; the bundle stores
   `{itemId}`.
 
-The scheduled sync also applies a dictionary-keyed fallback for
-placeholder-shaped strings that no declared translation pointer selects (for
-example top-level objective `effects`). It only rewrites strings matching the
-placeholder pattern, so identity fields are never touched. A placeholder key
-missing from the dictionary still fails normalization.
+### Dropped denormalized names
+
+Upstream repeats display names next to references. Normalization drops those
+duplicates and keeps the reference, so the client has exactly one source of
+truth per entity and a rename in `items` is visible everywhere without
+re-publishing every dataset:
+
+- Task `wearing` / `notWearing` entries are `{id, name}` objects; the bundle
+  keeps only the ids (`wearingItemIds`, `notWearingItemIds`).
+- `possibleLocations[].map` and `zones[].map` become `mapId`; the map display
+  name is not copied.
+- Trader offers keep `traderId`, not the trader name; `currencyItemId`, not the
+  currency item name.
+- `goonReport` keeps `mapId`, not the map name.
+
+The only intentional display-text exception is the customization fallback in
+[Intentional embedded values](#intentional-embedded-values). Dropped fields are
+counted per dataset in `stats.droppedFields`/`stats.droppedFieldPaths`; the
+committed fixtures drop exactly the denormalized worn-item names plus one
+unmodelled `craftUnlock.trader_name` (see
+[Dropped fields in the fixtures](#dropped-fields-in-the-fixtures)).
 
 ### Price object
 
@@ -555,6 +771,188 @@ price and loyalty fields.
 names) and one upstream `craftUnlock.trader_name` that the schema does not
 model. Every other dataset drops zero fields.
 
+## Build one by hand
+
+This tutorial uses only Node built-ins (Node 24+). It produces the same shape as
+the committed example in `test/fixtures/handbuilt-bundle/`, with one dataset
+and two records.
+
+### 1. Write the JSONL payload
+
+```bash
+mkdir -p /tmp/my-bundle && cd /tmp/my-bundle
+cat > items.jsonl <<'EOF'
+{"id":"example-ammo","kind":"item","name":"Example 5.56x45 cartridge","price":{"avg24h":120,"currency":"RUB","lastLow":110},"shortName":"Example ammo"}
+{"id":"example-rifle","kind":"item","name":"Example 5.56x45 assault rifle","price":{"avg24h":45000,"currency":"RUB","lastLow":41000},"shortName":"Example rifle"}
+EOF
+```
+
+Rules from [File rules](#file-rules): one JSON object per line, every object has
+a non-empty string `kind` and `id`, `kind`+`id` is unique, keys are canonical
+(sorted recursively), records sort by `kind` then `id`, and the file ends with
+one newline. The `heredoc` above already satisfies them for this example.
+
+### 2. Compress, hash and write the manifest
+
+```bash
+cat > build-bundle.mjs <<'EOF'
+import { createHash } from "node:crypto";
+import { readFileSync, writeFileSync } from "node:fs";
+import { constants, zstdCompressSync } from "node:zlib";
+
+const dataset = "items";
+const payload = readFileSync(`${dataset}.jsonl`);
+const frame = zstdCompressSync(payload, {
+  params: {
+    [constants.ZSTD_c_compressionLevel]: 3,
+    [constants.ZSTD_c_nbWorkers]: 0,
+    [constants.ZSTD_c_checksumFlag]: 0,
+  },
+});
+writeFileSync(`${dataset}.jsonl.zst`, frame);
+
+const sha256 = createHash("sha256").update(frame).digest("hex");
+const records = payload.toString("utf8").trimEnd().split("\n").length;
+
+const manifest = {
+  manifestVersion: 1,
+  bundleSchemaVersion: 1,
+  minAppSchemaVersion: 1,
+  mode: "regular",
+  generatedAt: new Date().toISOString(),
+  source: { baseUrl: null, capturedAt: null },
+  totals: {
+    datasets: 1,
+    records,
+    uncompressedBytes: payload.byteLength,
+    compressedBytes: frame.byteLength,
+  },
+  datasets: [{
+    dataset,
+    path: `${dataset}.jsonl.zst`,
+    schemaVersion: 1,
+    sha256,
+    compressedBytes: frame.byteLength,
+    uncompressedBytes: payload.byteLength,
+    records,
+    source: { url: null, lastModified: null, etag: null, fetchedAt: null },
+  }],
+  skipped: [],
+};
+
+const sortKeys = (value) => {
+  if (Array.isArray(value)) return value.map(sortKeys);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, sortKeys(value[key])]),
+  );
+};
+
+writeFileSync("manifest.json", `${JSON.stringify(sortKeys(manifest))}\n`);
+EOF
+node build-bundle.mjs
+rm items.jsonl          # optional: the plain JSONL is not part of the bundle
+```
+
+The key arithmetic is exactly what a client verifies:
+
+- `sha256` covers the **compressed** frame (`frame`), not the JSONL text;
+- `compressedBytes` is `frame.byteLength`;
+- `uncompressedBytes` is the UTF-8 length of the JSONL payload;
+- `records` is the number of JSONL lines (the trailing newline is not a record);
+- `minAppSchemaVersion` is at least every dataset `schemaVersion`.
+
+The manifest built above uses `null` source metadata, which is valid. The
+result is:
+
+```
+/tmp/my-bundle/
+  manifest.json
+  items.jsonl.zst
+```
+
+### 3. Validate it
+
+```bash
+cd /path/to/tarkov-companion/pipeline
+npm run validate:bundle -- --dir /tmp/my-bundle
+```
+
+```
+bundle /tmp/my-bundle
+  mode regular  generatedAt 2026-11-26T...
+  ok   items         2 records       169 B  sha256 51a8d9ea1bae  items.jsonl.zst
+PASS: 1 dataset(s), 0 error(s), 0 warning(s)
+```
+
+The compressed size and checksum will differ if you use a different Node/zlib
+version — the script writes the manifest from the frame it actually produced,
+so the validator still passes. Only the compressor version changes those bytes;
+the JSONL is deterministic.
+
+`test/fixtures/handbuilt-bundle/` is this bundle with a fixed `generatedAt`,
+and `pipeline/src/bundle/validate.test.ts` rebuilds every failure mode from it.
+
+## Validating a bundle
+
+```bash
+cd pipeline
+npm run validate:bundle -- --dir <bundle-dir>          # human summary
+npm run validate:bundle -- --dir <bundle-dir> --json   # machine-readable
+```
+
+`--dir` points at a mode directory (the directory that contains
+`manifest.json`), locally or after unzipping downloaded release assets. The
+command performs no network access. It exits `0` only when there are no errors;
+any error exits `1`. Warnings never change the exit code.
+
+| Check | Error code |
+|---|---|
+| `manifest.json` exists and is valid JSON | `invalid-json` (missing manifest is a CLI error) |
+| Manifest matches `manifestSchema`, including required fields, version literals and `sha256` shape | `invalid-manifest` |
+| A dataset name is listed once | `duplicate-dataset` |
+| `minAppSchemaVersion` is at least every `datasets[].schemaVersion` | `min-app-schema-mismatch` |
+| Every `path` is a flat, traversal-free file name (no `/` or `\`, not `.` or `..`) | `unsafe-path` |
+| Every referenced file exists | `missing-file` |
+| The file's byte length equals `compressedBytes` | `size-mismatch` |
+| SHA-256 of the compressed file equals `sha256` | `sha256-mismatch` |
+| The file decompresses as zstd | `zstd-error` |
+| Decompressed length equals `uncompressedBytes` | `uncompressed-size-mismatch` |
+| The payload is valid UTF-8 | `invalid-utf8` |
+| Every line is a JSON object with non-empty `kind` and `id` | `invalid-jsonl`, `invalid-record` |
+| `kind`+`id` is unique | `duplicate-record` |
+| Line count equals `records` | `record-count-mismatch` |
+| No string value matches the localization placeholder pattern | `placeholder` |
+| The payload is not empty | `empty-dataset` |
+
+Warnings (reported, exit 0): `extra-file` for a file the manifest does not
+reference (directory entries are reported the same way, with a trailing `/`),
+`missing-trailing-newline`, `totals-mismatch`, and `skipped-with-file` (a
+dataset listed under `skipped` still has a file).
+
+`--json` prints one object:
+
+```json
+{
+  "dir": "/tmp/my-bundle",
+  "manifest": "/tmp/my-bundle/manifest.json",
+  "ok": true,
+  "mode": "regular",
+  "generatedAt": "2026-11-26T00:00:00.000Z",
+  "datasets": [
+    { "dataset": "items", "path": "items.jsonl.zst", "ok": true,
+      "records": 2, "compressedBytes": 169,
+      "sha256": "51a8d9ea1baebb73d840ea4229f331f41fbf6d1fa2bc4f3ad12792d94a334926" }
+  ],
+  "errors": [],
+  "warnings": []
+}
+```
+
+The validator is the executable form of this document. `npm test` runs it
+against the hand-built fixture and against a mutated copy for each error code
+above, so a documentation change that the code does not implement fails CI.
+
 ## Produce and verify
 
 ```bash
@@ -577,6 +975,10 @@ npm run publish -- --mode regular --dry-run                  # plan only, no mut
 npm run publish -- --mode regular                            # rolling release
 npm run publish -- --mode regular --prune                    # also drop old assets
 npm run publish -- --mode regular --tag data-test-regular-latest
+
+npm run validate:bundle -- --dir dist/bundles/regular        # contract check
+npm run validate:bundle -- --dir dist/bundles/regular --json
+npm run validate:bundle -- --dir ../test/fixtures/handbuilt-bundle
 
 npm test                                   # golden, bundle, comparison, release and invariant suite
 ```
@@ -638,3 +1040,10 @@ changed/added/removed datasets are classified individually, a
 timestamp-only differences compare as unchanged, and invalid or missing previous
 manifests exit non-zero with an error naming the problem. `npm run compare`
 covers both exit codes and the `--json` shape.
+
+Validator tests run offline: the committed `test/fixtures/handbuilt-bundle/`
+passes, and a copy mutated for each error code (missing file, wrong size, bad
+SHA-256, corrupt zstd, invalid JSONL, missing `kind`/`id`, duplicate `kind`+`id`,
+wrong record count, placeholder text, traversal path, an aggregate schema version
+below a dataset's, schema-invalid manifest) fails with that code. The CLI cases cover the human summary, `--json`, exit `0`,
+exit `1`, and a directory without `manifest.json`.

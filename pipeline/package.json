@@ -20,7 +20,8 @@
     "publish": "tsx src/cli/publish.ts",
     "sync": "tsx src/cli/sync.ts",
     "report:status": "tsx src/ci/report-status.ts",
-    "validate:fixtures": "tsx src/cli/validate-fixtures.ts"
+    "validate:fixtures": "tsx src/cli/validate-fixtures.ts",
+    "validate:bundle": "tsx src/cli/validate-bundle.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
