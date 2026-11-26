@@ -1294,15 +1294,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "ready",
-      "position": 2,
+      "categoryID": "done",
+      "position": 43,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Model implemented by the quest engine: structured lock reasons for level, missing prerequisite, malformed/cycle, and trader loyalty advisory. Presentation on quests is the remaining work and is now owned by T6.5; will close with its widget tests.",
+      "notes": "Model and presentation complete: level, missing prerequisite, malformed/cycle, and trader loyalty advisory are rendered by QuestDetailScreen with widget tests. Closed with T6.5.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795715263217,
+      "updatedAt": 1795716126853,
       "archived": false
     },
     {
@@ -1314,15 +1314,15 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 42,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "In progress in worktree t65-quest-detail (session ses_de7072deaffeNoUd9Pgss9hspQ). QuestDetailScreen: header with trader/map labels, objectives with counters, requirements and locked reasons (closes T6.4 presentation), rewards/turn-in items linked to item detail, unlocks, status controls with override confirmation, orphaned/not-found states. No app wiring here; merged then wired and packaged.",
+      "notes": "Completed 2026-11-26 in worktree t65-quest-detail (session ses_de7072deaffeNoUd9Pgss9hspQ), merged as 80db97f and wired into HomeShell. QuestDetailScreen: header with trader/map labels, state badge, objectives with counters, requirements/lock reasons, rewards/turn-in items, unlocks, status controls with override dialog, orphaned/not-found/read-only states. Reward/turn-in items push ItemDetail; prerequisites/unlocks push another quest detail. Label lookups traderName/mapName. 52 features tests, 24 app. Wiring commit follows.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795715300381,
+      "updatedAt": 1795716126853,
       "archived": false,
       "sessionID": "ses_de7072deaffeNoUd9Pgss9hspQ"
     },

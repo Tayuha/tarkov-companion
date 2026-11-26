@@ -64,8 +64,8 @@
 - [x] 6.1 Implement the quest query layer with search, trader/level/map/state filters, and pagination, verified by query tests for each filter and their intersections
 - [x] 6.2 Build the quest catalog screen with state badges and filter controls, verified by widget tests covering search, filtering, and empty results
 - [x] 6.3 Implement the availability engine deriving locked/available/in-progress/completed from prerequisites, level, and progress, verified by table-driven unit tests including chains of prerequisites and cycles in malformed data
-- [ ] 6.4 Implement the locked-reason model and its presentation on quests, verified by widget tests naming level, prerequisite quest, and trader loyalty reasons
-- [ ] 6.5 Build the quest detail view with objectives, requirements, rewards, unlocks, maps, and wiki link, verified by golden widget tests for quests with item, kill, and visit objectives
+- [x] 6.4 Implement the locked-reason model and its presentation on quests, verified by widget tests naming level, prerequisite quest, and trader loyalty reasons
+- [x] 6.5 Build the quest detail view with objectives, requirements, rewards, unlocks, maps, and wiki link, verified by golden widget tests for quests with item, kill, and visit objectives
 - [x] 6.6 Implement quest state transitions with immediate persistence and dependency recomputation, verified by integration tests for complete, revert, and unaffected-sibling cases
 - [x] 6.7 Implement objective-level counters with derived quest completion and a confirmed manual override, verified by tests for partial progress, derived completion, and override without altering counts
 - [ ] 6.8 Implement separation of progress that references quests missing from the active dataset, verified by a test loading a profile that references a removed quest and asserting it is listed as unavailable and excluded from dependency math
