@@ -4,7 +4,7 @@ The app keeps everything it knows in one local SQLite database. There is no
 server: game data arrives as bundles (`docs/data-bundles.md`), player progress is
 created by the user and never leaves the device. The schema lives in
 `app/packages/data/lib/src/database/` and is versioned by
-`AppDatabase.schemaVersion` (currently **4**).
+`AppDatabase.schemaVersion` (currently **5**).
 
 - Tables: `lib/src/database/tables.dart` (drift table classes)
 - Search schema: `lib/src/database/fts.dart`
@@ -17,7 +17,7 @@ Design D4 splits the file in two halves that are written by different owners.
 
 | Half | Tables | Written by | Replacement |
 |---|---|---|---|
-| Game data | `datasetState`, `items`, `tasks`, `taskObjectives`, `traders`, `hideoutStations`, `crafts`, `barters`, `maps`, `gameRecords`, `priceHistory` | Bundle ingestion (task 4.x); `priceHistory` by the on-demand history cache | Whole-dataset `DELETE` + insert inside one transaction |
+| Game data | `datasetState`, `items`, `itemTypes`, `itemCategories`, `tasks`, `taskObjectives`, `traders`, `hideoutStations`, `crafts`, `barters`, `maps`, `gameRecords`, `priceHistory` | Bundle ingestion (task 4.x); `priceHistory` by the on-demand history cache | Whole-dataset `DELETE` + insert inside one transaction |
 | Sync cache | `remoteManifest` | `ManifestRepository` (task 4.1) | One row per mode, replaced on a changed manifest |
 | Player data | `profiles`, `questProgress`, `objectiveProgress`, `appSettings` | The user, through the app | Never touched by a dataset refresh |
 
@@ -93,6 +93,7 @@ file.
 | 2 | Adds `remoteManifest` for conditional manifest fetching (task 4.1). Existing tables, indexes, triggers and rows are untouched; the upgrade runs inside one transaction after a pre-migration backup. |
 | 3 | Adds `gameRecords` and its `gameRecordsKind` index for bundle kinds without a dedicated table (task 4.3). Existing rows, FTS objects and sync bookkeeping are untouched. |
 | 4 | Adds nullable `items.priceObservedAt`, the bundle's `price.observedAt`, for price-freshness labelling (task 4.7). Existing rows keep their prices and read as an unknown observation until the next `items` bundle is applied; no other table changes. |
+| 5 | Adds nullable `items.minLevelForFlea` and `items.fleaEligible`, plus the `itemTypes` and `itemCategories` filter tables, for the catalog query layer (task 5.1). Existing item rows keep their prices and read as "unknown" for flea filtering, and their type/category filters match nothing, until the next `items` bundle is applied. The new tables carry a cascading foreign key to `items`, both being game data; no player table references them. |
 
 ## Migrations, backups and recovery
 
@@ -225,6 +226,36 @@ outside a migration; the triggers reference it by name.
 
 `FTS5` is compiled into the SQLite library the app ships (see below), so search
 is available on every platform.
+
+## Catalog filtering (schema v5)
+
+`CatalogRepository.query(CatalogQuery)` in
+`lib/src/catalog/catalog_repository.dart` executes the catalog list query. The
+query value object lives in `lib/src/catalog/catalog_query.dart`; it is pure
+data (no Flutter widgets).
+
+| Filter | Storage | Semantics |
+|---|---|---|
+| `text` | `items_fts` | Unicode letter/digit tokens become ANDed prefix terms, so `m4a` matches `M4A1` while typing and FTS5 syntax characters in user input cannot cause an error. Diacritics fold through the tokenizer. |
+| `categoryId` + `categoryKind` | `itemCategories(itemId, categoryId, categoryKind)` | Exact membership in either the in-game (`item`) or handbook (`handbook`) tree. Ancestors are already in the bundle arrays, so no hierarchy walk is needed. |
+| `type` | `itemTypes(itemId, type)` | Exact `types[]` value (`gun`, `ammo`, `noFlea`, ...). |
+| `fleaEligible` | `items.fleaEligible` | Derived as "`types` does not contain `noFlea`". `null` means unknown (a row migrated from v4 before its next items bundle) and matches neither `true` nor `false`. |
+| `minPrice` / `maxPrice` | `items.lastLowPrice` | Inclusive bounds on the latest flea low. Either bound excludes items without an observed flea price. |
+
+Filters combine with **AND**. Each `CatalogFilters` field can be cleared on its
+own with `withText(null)`, `withCategory(null)`, `withType(null)`,
+`withFleaEligible(null)` or `withPriceRange()`, so resetting one chip never
+disturbs the rest.
+
+Sorting is by `name` (case-insensitive), `basePrice`, `fleaPrice` or `weight`,
+ascending or descending. Null values sort last in both directions. Ties break
+by name, then id, so pagination is stable. Without an explicit sort, a text
+search orders by FTS5 relevance and a plain listing orders by name.
+
+Pagination is `limit` + `offset`. `limit` is clamped to `1..200` (default 50)
+and a negative `offset` is clamped to `0`; `CatalogPage` reports the values
+actually used. `total` ignores the page window. `CatalogPage.isEmpty` means the
+filters matched nothing, while `isPageEmpty` means this page is past the end.
 
 ## SQLite runtime
 

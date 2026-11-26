@@ -40,25 +40,39 @@ Future<void> _seedItemAndProgress(AppDatabase db) async {
 
 /// Seeds a real schema-v3 file, before `items.priceObservedAt` existed.
 ///
-/// `onCreate` always builds the shipped (latest) schema, so the column has to
-/// be dropped after creation to leave a genuine v3 file for the migration.
+/// `onCreate` always builds the shipped (latest) schema, so the later columns
+/// and tables have to be dropped after creation to leave a genuine v3 file for
+/// the migration.
 Future<void> _seedV3(String path) async {
   final db = AppDatabase.atPath(path, targetSchemaVersion: 3);
   await _seedItemAndProgress(db);
-  await db.customStatement('ALTER TABLE "items" DROP COLUMN "priceObservedAt"');
+  await _dropLaterSchema(db);
   await db.close();
 }
 
-/// Seeds a schema-v1 file: no `remoteManifest`, no `gameRecords`, and no
-/// `items.priceObservedAt`.
+/// Seeds a schema-v1 file: no `remoteManifest`, no `gameRecords`, and none of
+/// the v4/v5 item columns or filter tables.
 Future<void> _seedV1(String path) async {
   final db = AppDatabase.atPath(path, targetSchemaVersion: 1);
   await _seedItemAndProgress(db);
   await db.customStatement('DROP TABLE "remoteManifest"');
   await db.customStatement('DROP TABLE "gameRecords"');
-  await db.customStatement('ALTER TABLE "items" DROP COLUMN "priceObservedAt"');
+  await _dropLaterSchema(db);
   await db.close();
 }
+
+Future<void> _dropLaterSchema(AppDatabase db) async {
+  await db.customStatement('DROP TABLE "itemCategories"');
+  await db.customStatement('DROP TABLE "itemTypes"');
+  await db.customStatement('ALTER TABLE "items" DROP COLUMN "fleaEligible"');
+  await db.customStatement('ALTER TABLE "items" DROP COLUMN "minLevelForFlea"');
+  await db.customStatement('ALTER TABLE "items" DROP COLUMN "priceObservedAt"');
+}
+
+/// Opens at version 4 so this suite keeps exercising the v3 -> v4 step now that
+/// the shipped schema is v5 (whose own suite covers v4 -> v5).
+AppDatabase _openV4(String path) =>
+    AppDatabase.atPath(path, targetSchemaVersion: 4);
 
 Future<Set<String>> _itemColumns(AppDatabase db) async {
   final columns = await db.customSelect('PRAGMA table_info(items)').get();
@@ -72,7 +86,7 @@ void main() {
     final path = '${directory.path}/tarkov_companion.sqlite';
     await _seedV3(path);
 
-    final result = await openAppDatabase(path);
+    final result = await openAppDatabase(path, open: _openV4);
     expect(result, isA<DatabaseOpened>());
     final opened = result as DatabaseOpened;
     addTearDown(opened.close);
@@ -143,7 +157,7 @@ void main() {
     final path = '${directory.path}/tarkov_companion.sqlite';
     await _seedV1(path);
 
-    final result = await openAppDatabase(path) as DatabaseOpened;
+    final result = await openAppDatabase(path, open: _openV4) as DatabaseOpened;
     addTearDown(result.close);
 
     expect(result.fromVersion, 1);

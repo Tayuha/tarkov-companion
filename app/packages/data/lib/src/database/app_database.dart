@@ -23,9 +23,10 @@ typedef DatabaseUpgrade = Future<void> Function(
 ///
 /// Two data classes share one SQLite file (design D4):
 ///
-/// * game data — [DatasetStates], [Items], [Tasks], [TaskObjectives],
-///   [Traders], [HideoutStations], [Crafts], [Barters], [Maps],
-///   [GameRecords] and [PriceHistory]; replaceable and written by ingestion;
+/// * game data — [DatasetStates], [Items], [ItemTypes], [ItemCategories],
+///   [Tasks], [TaskObjectives], [Traders], [HideoutStations], [Crafts],
+///   [Barters], [Maps], [GameRecords] and [PriceHistory]; replaceable and
+///   written by ingestion;
 /// * player data — [Profiles], [QuestProgress], [ObjectiveProgress] and
 ///   [AppSettings]; durable, and **never** reachable from game data by a
 ///   foreign key. A dataset refresh deletes and re-inserts game rows and cannot
@@ -46,6 +47,8 @@ typedef DatabaseUpgrade = Future<void> Function(
     DatasetStates,
     RemoteManifests,
     Items,
+    ItemTypes,
+    ItemCategories,
     Tasks,
     TaskObjectives,
     Traders,
@@ -69,12 +72,14 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// When [upgrade] is `null`, the built-in forward migrations declared in
   /// [_builtInUpgrade] run. Version 2 adds `remoteManifest`; version 3 adds
-  /// `gameRecords`; version 4 adds `items.priceObservedAt`.
-  AppDatabase(super.e, {this.targetSchemaVersion = 4, this.upgrade});
+  /// `gameRecords`; version 4 adds `items.priceObservedAt`; version 5 adds
+  /// `items.minLevelForFlea`, `items.fleaEligible`, `itemTypes` and
+  /// `itemCategories` for catalog filtering.
+  AppDatabase(super.e, {this.targetSchemaVersion = 5, this.upgrade});
 
   /// An in-memory database, for tests and short-lived tools.
   factory AppDatabase.memory({
-    int targetSchemaVersion = 4,
+    int targetSchemaVersion = 5,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inMemory(),
@@ -85,7 +90,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database at [path]; parent directories are created.
   factory AppDatabase.atPath(
     String path, {
-    int targetSchemaVersion = 4,
+    int targetSchemaVersion = 5,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.atPath(path),
@@ -96,7 +101,7 @@ class AppDatabase extends _$AppDatabase {
   /// A file-backed database whose I/O runs on a background isolate.
   factory AppDatabase.inBackground(
     String path, {
-    int targetSchemaVersion = 4,
+    int targetSchemaVersion = 5,
     DatabaseUpgrade? upgrade,
   }) => AppDatabase(
     TarkovDatabaseConnection.inBackground(path),
@@ -124,6 +129,9 @@ class AppDatabase extends _$AppDatabase {
     // Version 2 adds `remoteManifest` and nothing else; v1 data is untouched.
     // Version 3 adds `gameRecords` and its kind index; v2 data is untouched.
     // Version 4 adds `items.priceObservedAt`; v3 data is untouched.
+    // Version 5 adds `items.minLevelForFlea`/`items.fleaEligible` and the
+    // `itemTypes`/`itemCategories` filter tables; v4 rows are untouched and
+    // read as "unknown" eligibility until the next `items` bundle.
     // Future versions add a `DatabaseUpgrade` callback from the constructor
     // (or a step in `_builtInUpgrade`) while bumping `schemaVersion`. The
     // runner in `migration_runner.dart` decides when an upgrade may run: it
@@ -173,7 +181,7 @@ class AppDatabase extends _$AppDatabase {
   /// v1 straight to the current schema), so the steps run in order inside the
   /// transaction drift already opened.
   DatabaseUpgrade? _builtInUpgrade(int from, int to) {
-    if (to > 4 || from < 1 || from >= to) {
+    if (to > 5 || from < 1 || from >= to) {
       return null;
     }
     return (migrator, fromVersion, toVersion) async {
@@ -185,6 +193,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (fromVersion < 4 && toVersion >= 4) {
         await _upgradeV3ToV4(migrator, fromVersion, 4);
+      }
+      if (fromVersion < 5 && toVersion >= 5) {
+        await _upgradeV4ToV5(migrator, fromVersion, 5);
       }
     };
   }
@@ -214,5 +225,22 @@ class AppDatabase extends _$AppDatabase {
   /// observation until the next `items` bundle is applied.
   Future<void> _upgradeV3ToV4(Migrator migrator, int from, int to) async {
     await migrator.addColumn(items, items.priceObservedAt);
+  }
+
+  /// Version 5: add the columns and tables the catalog query layer filters on.
+  ///
+  /// Two nullable columns keep existing item rows and their prices intact.
+  /// `itemTypes` and `itemCategories` start empty: a v4 row's types and
+  /// categories are not recovered from `payload` here, so filters match
+  /// nothing for it until the next `items` bundle is ingested. That is the
+  /// same "unknown until refreshed" rule as `priceObservedAt` in v4, and it
+  /// avoids a full-table JSON re-parse inside the migration transaction.
+  Future<void> _upgradeV4ToV5(Migrator migrator, int from, int to) async {
+    await migrator.addColumn(items, items.minLevelForFlea);
+    await migrator.addColumn(items, items.fleaEligible);
+    await migrator.createTable(itemTypes);
+    await migrator.createTable(itemCategories);
+    await migrator.create(itemTypesType);
+    await migrator.create(itemCategoriesCategory);
   }
 }

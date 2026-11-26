@@ -169,11 +169,83 @@ class Items extends Table {
   /// Grid image URL.
   TextColumn get gridImageLink => text().named('gridImageLink').nullable()();
 
+  /// Minimum player level the flea market requires for this item.
+  ///
+  /// The bundle's `minLevelForFlea`; `0` means no level requirement. Nullable
+  /// because a row migrated from schema v4 has no value until the next `items`
+  /// bundle is applied. Eligibility itself is [fleaEligible], not this number:
+  /// a level-gated item is still sellable on the flea market.
+  IntColumn get minLevelForFlea =>
+      integer().named('minLevelForFlea').nullable()();
+
+  /// Whether the item may appear on the flea market (`types` excludes
+  /// `noFlea`).
+  ///
+  /// Nullable for the same reason as [minLevelForFlea]: a row migrated from
+  /// schema v4 is "unknown" rather than silently guessed as eligible. Catalog
+  /// filters only match rows with an explicit `true`/`false`.
+  BoolColumn get fleaEligible => boolean().named('fleaEligible').nullable()();
+
   /// The complete bundle record as canonical JSON.
   TextColumn get payload => text().named('payload')();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Item type tags (`gun`, `ammo`, `mods`, `noFlea`, ...), one row per tag.
+///
+/// Types are a multi-valued field, so filtering by one is an indexed join
+/// instead of a `LIKE` over a JSON column or a full-table scan. `type` is the
+/// bundle's `types[]` value verbatim. The key on [itemId] references [Items] and
+/// cascades because both sides are game data replaced by the same `items`
+/// dataset (design D4); no player table references this one.
+@DataClassName('ItemType')
+@TableIndex(name: 'itemTypesType', columns: {#type})
+class ItemTypes extends Table {
+  @override
+  String get tableName => 'itemTypes';
+
+  /// Owning item.
+  TextColumn get itemId => text()
+      .named('itemId')
+      .references(Items, #id, onDelete: KeyAction.cascade)();
+
+  /// Bundle `types[]` value.
+  TextColumn get type => text().named('type')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {itemId, type};
+}
+
+/// Item category memberships from either category tree, one row per pair.
+///
+/// An item carries several `categoryIds` (the in-game hierarchy, including
+/// ancestor categories) and `handbookCategoryIds` (the handbook tree). They are
+/// distinct namespaces, so [categoryKind] selects which one a row belongs to;
+/// a UI category filter must pass the same kind it renders.
+@DataClassName('ItemCategory')
+@TableIndex(
+  name: 'itemCategoriesCategory',
+  columns: {#categoryKind, #categoryId},
+)
+class ItemCategories extends Table {
+  @override
+  String get tableName => 'itemCategories';
+
+  /// Owning item.
+  TextColumn get itemId => text()
+      .named('itemId')
+      .references(Items, #id, onDelete: KeyAction.cascade)();
+
+  /// Category id from the bundle's `categoryIds` or `handbookCategoryIds`.
+  TextColumn get categoryId => text().named('categoryId')();
+
+  /// `item` for `categoryIds`, `handbook` for `handbookCategoryIds`.
+  TextColumn get categoryKind => text().named('categoryKind')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {itemId, categoryId, categoryKind};
 }
 
 /// Quests, one row per `task` record. Objectives are split into

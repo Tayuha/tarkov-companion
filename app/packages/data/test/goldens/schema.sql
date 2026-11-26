@@ -1,4 +1,4 @@
--- AppDatabase schema snapshot (schemaVersion 4).
+-- AppDatabase schema snapshot (schemaVersion 5).
 -- Regenerate: (cd app/packages/data && UPDATE_GOLDENS=1 dart test)
 -- FTS5 shadow tables (items_fts_data, _idx, _docsize,
 -- _config) are omitted; items_fts and its triggers are part
@@ -12,6 +12,12 @@ CREATE INDEX craftsStationId ON crafts (stationId);
 
 index gameRecordsKind
 CREATE INDEX gameRecordsKind ON gameRecords (kind);
+
+index itemCategoriesCategory
+CREATE INDEX itemCategoriesCategory ON itemCategories (categoryKind, categoryId);
+
+index itemTypesType
+CREATE INDEX itemTypesType ON itemTypes (type);
 
 index itemsAvg24hPrice
 CREATE INDEX itemsAvg24hPrice ON items (avg24hPrice);
@@ -67,8 +73,14 @@ CREATE TABLE "gameRecords" ("kind" TEXT NOT NULL, "id" TEXT NOT NULL, "payload" 
 table hideoutStations
 CREATE TABLE "hideoutStations" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
 
+table itemCategories
+CREATE TABLE "itemCategories" ("itemId" TEXT NOT NULL REFERENCES items (id) ON DELETE CASCADE, "categoryId" TEXT NOT NULL, "categoryKind" TEXT NOT NULL, PRIMARY KEY ("itemId", "categoryId", "categoryKind"));
+
+table itemTypes
+CREATE TABLE "itemTypes" ("itemId" TEXT NOT NULL REFERENCES items (id) ON DELETE CASCADE, "type" TEXT NOT NULL, PRIMARY KEY ("itemId", "type"));
+
 table items
-CREATE TABLE "items" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "shortName" TEXT NOT NULL, "normalizedName" TEXT NOT NULL, "weight" REAL NULL, "width" INTEGER NULL, "height" INTEGER NULL, "basePrice" INTEGER NULL, "avg24hPrice" INTEGER NULL, "lastLowPrice" INTEGER NULL, "changeLast48hPercent" REAL NULL, "priceObservedAt" INTEGER NULL, "iconLink" TEXT NULL, "gridImageLink" TEXT NULL, "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
+CREATE TABLE "items" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "shortName" TEXT NOT NULL, "normalizedName" TEXT NOT NULL, "weight" REAL NULL, "width" INTEGER NULL, "height" INTEGER NULL, "basePrice" INTEGER NULL, "avg24hPrice" INTEGER NULL, "lastLowPrice" INTEGER NULL, "changeLast48hPercent" REAL NULL, "priceObservedAt" INTEGER NULL, "iconLink" TEXT NULL, "gridImageLink" TEXT NULL, "minLevelForFlea" INTEGER NULL, "fleaEligible" INTEGER NULL CHECK ("fleaEligible" IN (0, 1)), "payload" TEXT NOT NULL, PRIMARY KEY ("id"));
 
 table items_fts
 CREATE VIRTUAL TABLE items_fts USING fts5(
