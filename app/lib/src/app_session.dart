@@ -19,6 +19,7 @@ final class AppSessionReady extends AppSession {
   AppSessionReady({
     required this.sync,
     required this.hasAppliedDatasets,
+    this.catalog,
     required super.close,
   });
 
@@ -28,6 +29,12 @@ final class AppSessionReady extends AppSession {
 
   /// Whether the active mode already has at least one applied dataset.
   final bool hasAppliedDatasets;
+
+  /// Query facade for the catalog, when a real database is open.
+  ///
+  /// Optional so shell widget tests can build a session without SQLite; the
+  /// production session always provides it.
+  final CatalogRepository? catalog;
 }
 
 /// The database could not be opened and is available read-only.
@@ -116,6 +123,7 @@ Future<AppSession> openAppSession({
     return AppSessionReady(
       sync: coordinator,
       hasAppliedDatasets: applied.isNotEmpty,
+      catalog: CatalogRepository(database),
       close: () async {
         client.close();
         await opened.close();

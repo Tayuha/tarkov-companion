@@ -96,7 +96,7 @@ class _AppRootState extends State<AppRoot> {
         },
       );
     }
-    return const HomePlaceholder();
+    return HomePlaceholder(catalog: session.catalog);
   }
 }
 
@@ -213,15 +213,20 @@ class _RecoveryScreen extends StatelessWidget {
   }
 }
 
-/// Placeholder for the catalog and quest screens.
+/// Landing screen once data is available.
 ///
-/// Task 8.2 and later tasks replace this with the real shell; the first-run
-/// gate only needs to hand over to a working, non-empty app.
+/// The catalog is reachable when a real database is open; the quest list and
+/// the final navigation shell arrive in later tasks.
 class HomePlaceholder extends StatelessWidget {
-  const HomePlaceholder({super.key});
+  const HomePlaceholder({super.key, this.catalog});
+
+  /// Query facade for the catalog. Null in shell tests that build a session
+  /// without SQLite.
+  final CatalogRepository? catalog;
 
   @override
   Widget build(BuildContext context) {
+    final catalog = this.catalog;
     return Scaffold(
       appBar: AppBar(title: const Text('Tarkov Companion')),
       body: Center(
@@ -236,15 +241,30 @@ class HomePlaceholder extends StatelessWidget {
                 const SectionHeader(
                   title: 'Game data is ready',
                   subtitle:
-                      'The local dataset is installed. The catalog and quest '
-                      'screens replace this placeholder in a later task.',
+                      'The local dataset is installed. Everything here is '
+                      'served from the local database.',
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Everything on this screen is served from the local '
-                  'database, so it opens without a network connection.',
+                  'This build opens without a network connection. The quest '
+                  'list and the full navigation shell arrive in later tasks.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                if (catalog != null) ...[
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              CatalogScreen(repository: catalog),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.inventory_2_outlined),
+                    label: const Text('Browse items'),
+                  ),
+                ],
               ],
             ),
           ),
