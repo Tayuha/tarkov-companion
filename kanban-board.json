@@ -1314,16 +1314,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 19,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Build the quest detail view with objectives, requirements, rewards, unlocks, maps, and wiki link, verified by golden widget tests for quests with item, kill, and visit objectives",
+      "notes": "In progress in worktree t65-quest-detail (session ses_de7072deaffeNoUd9Pgss9hspQ). QuestDetailScreen: header with trader/map labels, objectives with counters, requirements and locked reasons (closes T6.4 presentation), rewards/turn-in items linked to item detail, unlocks, status controls with override confirmation, orphaned/not-found states. No app wiring here; merged then wired and packaged.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795715300381,
+      "archived": false,
+      "sessionID": "ses_de7072deaffeNoUd9Pgss9hspQ"
     },
     {
       "id": "task_impl_6_6",
