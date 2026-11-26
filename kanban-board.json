@@ -1227,16 +1227,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 33,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in worktree t61-quest-queries (branch t61-quest-queries), session ses_de773489affewVfXCuHHwly7rX. QuestQuery/QuestFilters/QuestSummary/QuestPage with search, trader/map/level filters, profile-scoped progress state, sorting, pagination and totals. No availability engine (6.3). Branch merged after review.",
+      "notes": "Completed 2026-11-26 in worktree t61-quest-queries (session ses_de773489affewVfXCuHHwly7rX), merged as 23a82cf. QuestRepository.query/count with text, traderId, mapId, exact/at-or-below level, and profile-scoped progress state (notStarted/inProgress/completed/failed; missing row = notStarted). Sorting on name/level/trader/map both ways, nulls last, stable ties; pagination 1..200 with totals and hasMore. No schema change (normalizedName read from payload JSON). 42 tests; 330 data tests. Branch commit 8c03f6c. Merge resolved a barrel-export conflict with profiles.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
+      "updatedAt": 1795709043624,
       "archived": false,
       "sessionID": "ses_de773489affewVfXCuHHwly7rX"
     },

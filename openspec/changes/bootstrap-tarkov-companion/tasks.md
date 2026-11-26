@@ -59,7 +59,7 @@
 
 ## 6. Quest tracker
 
-- [ ] 6.1 Implement the quest query layer with search, trader/level/map/state filters, and pagination, verified by query tests for each filter and their intersections
+- [x] 6.1 Implement the quest query layer with search, trader/level/map/state filters, and pagination, verified by query tests for each filter and their intersections
 - [ ] 6.2 Build the quest catalog screen with state badges and filter controls, verified by widget tests covering search, filtering, and empty results
 - [ ] 6.3 Implement the availability engine deriving locked/available/in-progress/completed from prerequisites, level, and progress, verified by table-driven unit tests including chains of prerequisites and cycles in malformed data
 - [ ] 6.4 Implement the locked-reason model and its presentation on quests, verified by widget tests naming level, prerequisite quest, and trader loyalty reasons
