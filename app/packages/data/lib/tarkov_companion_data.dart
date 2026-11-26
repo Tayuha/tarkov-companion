@@ -29,6 +29,7 @@ export 'src/logging/rotating_file_log_sink.dart';
 export 'src/net/allowlisted_http_client.dart';
 export 'src/net/host_allowlist.dart';
 export 'src/net/http_errors.dart';
+export 'src/profiles/profile_repository.dart';
 export 'src/settings/app_settings.dart';
 export 'src/settings/settings_repository.dart';
 export 'src/sync/dataset_downloader.dart';
