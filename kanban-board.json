@@ -560,16 +560,37 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
+      "categoryID": "done",
+      "position": 11,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_data"
+      ],
+      "notes": "Completed 2026-11-26 in session ses_de892b956ffeeJhFxMQLceT17q. docs/data-bundles.md completed: layout, manifest field table, localization contract, normalization conventions, zstd/determinism, client resolution algorithm, versioning policy, hand-build tutorial. validate:bundle CLI checks manifest schema, paths, sizes, sha256, zstd, JSONL, kind/id, duplicates, count, placeholders, minAppSchemaVersion. Hand-built 2-record fixture passes; failure modes tested. 213 tests. Commit 1e50fb2.",
+      "sessionID": "ses_de892b956ffeeJhFxMQLceT17q",
+      "createdAt": 1795689376218,
+      "updatedAt": 1795690041383,
+      "archived": false
+    },
+    {
+      "id": "task_impl_2_11",
+      "title": "T2.11 Gate publish on size and coverage",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
       "categoryID": "inprogress",
       "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: complete contract doc matching code (layout, manifest fields, localization, normalization, zstd/determinism, client resolution, versioning), hand-build tutorial, validate:bundle CLI with schema/size/sha/zstd/JSONL/duplicate/traversal checks, example fixture and failure-mode tests, task 2.10 checked.",
-      "sessionID": "ses_de892b956ffeeJhFxMQLceT17q",
-      "createdAt": 1795689376218,
-      "updatedAt": 1795689376218,
+      "notes": "In progress in a linked child session. Acceptance: pure gateBundle with 10 MiB compressed cap, zero surviving placeholders, missingKeys threshold, failedPaths fail (stale pointers warn), sync blocks publication on failure, sync report carries localization metrics, gate CLI with --json, oversized/missing-key/placeholder/sync-block tests, task 2.11 checked.",
+      "sessionID": "ses_de8889ff3ffenHuxJGgtArG1A3",
+      "createdAt": 1795690041383,
+      "updatedAt": 1795690041383,
       "archived": false
     }
   ]
