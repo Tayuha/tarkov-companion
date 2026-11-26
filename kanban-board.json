@@ -982,16 +982,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 29,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: commit the real full items .jsonl.zst fixture (~1.4 MB), benchmark test tagged benchmark with Timeout.none asserting compressed < 10 MiB, ingest wall-clock and RSS delta budgets, row count/checksum correctness; run on windows-latest CI; docs with measured numbers; task 4.8 checked.",
+      "notes": "Completed 2026-11-26 in session ses_de78b339dffetxvxX27ctBtgiK. Real published fixture items-ed751dcd264d.jsonl.zst (1,433,154 B, sha ed751dcd..., 6,015 records / 5,498 items). Benchmark tagged benchmark, Timeout.none: compressed <= 10 MiB, ingest <= 4,000 ms (local median 1.0s, Windows CI 1.93s), maxRss delta <= 256 MiB. Runs in Windows CI; Linux excludes the tag. Fixed a real ingestion blocker: one live item has an empty shortName; allowEmpty now matches the schema/contract. 231 normal data tests + benchmark. CI 45849801370 green. Commit 158f750.",
       "createdAt": 1795706618965,
-      "updatedAt": 1795706663369,
+      "updatedAt": 1795707404936,
       "archived": false,
       "sessionID": "ses_de78b339dffetxvxX27ctBtgiK"
     },
