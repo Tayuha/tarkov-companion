@@ -5,4 +5,5 @@
 /// The rule is enforced by `app/tool/check_architecture.dart`.
 library;
 
+export 'src/catalog/catalog_screen.dart';
 export 'src/section_header.dart';

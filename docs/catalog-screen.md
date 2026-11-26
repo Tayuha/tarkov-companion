@@ -1,0 +1,92 @@
+# Item catalog screen
+
+`CatalogScreen` (`app/packages/features/lib/src/catalog/`) is the browse-first
+entry point into the item catalog. It is presentation-only: every list, count
+and page comes from `CatalogRepository` in the data package, so the screen
+works entirely against the local database with no network request.
+
+## Composition
+
+The screen is built from three small widgets:
+
+| Widget | Responsibility |
+| --- | --- |
+| `CatalogScreen` | Owns the query state, debounce timer, pagination and loading/error state. |
+| `CatalogFilterBar` | Category, type and flea controls plus the active-filter chips. |
+| `CatalogItemRow` | One fixed-height row: placeholder icon, name, short name, weight and prices. |
+
+`CatalogScreen` takes its `CatalogRepository`, a `pageSize` (default 50), a
+`searchDebounce` (default 300 ms), the category/type option lists, and an
+optional `onItemSelected`. It never pushes a route; the app shell decides what a
+row tap means.
+
+## Search and debounce
+
+* Typing waits for 300 ms of idle input before the text reaches the repository.
+  Pressing Enter applies the text immediately.
+* The text is combined with the other filters, so search and structured filters
+  intersect.
+* Every repository request increments a generation counter. A response whose
+  generation is no longer current is dropped without touching state, so a slow
+  request for an older query can never overwrite the results of a newer one.
+* A request that fails while rows are already visible keeps those rows and shows
+  a retry banner; loading a new query keeps the previous rows visible under a
+  progress bar instead of blanking the screen.
+* Clearing the search (the field's clear button, the active `Search:` chip or
+  the reset action) cancels a pending debounce.
+
+## Filters and sort
+
+* Category filters use one category tree per option (`CatalogCategoryKind`).
+  Because the item dataset stores only category ids, the screen accepts a list
+  of `CatalogCategoryOption`s. The default list is a starter set of top-level
+  Tarkov categories; the app shell can replace it when a taxonomy is available.
+* Type filters use the bundle `types[]` vocabulary (`gun`, `ammo`, `mods`, ...).
+* Flea eligibility is a single toggle that filters to eligible items. The data
+  layer also supports the opposite state; the chip can render either when the
+  filter is set programmatically.
+* Every active filter appears as an `InputChip` with its own remove action.
+  Removing a chip changes only that filter. The `Reset` action clears every
+  filter and the search field but keeps the chosen sort.
+* Sort fields are name, base price, flea price and weight; the arrow button
+  reverses the direction. The default order is the repository default:
+  relevance while a search is active and name otherwise. Null prices/weights
+  sort last in both directions, which is the repository's contract (an unknown
+  price is not a zero price).
+
+## Pagination and virtualization
+
+Rows live in a `ListView.builder`, so only the visible window is built. The
+first page is `pageSize` rows; when more rows match, a footer shows
+"`loaded` of `total` loaded" and a **Load more** button. Loading a page appends
+to the existing list and updates the total count shown in the header. A new
+filter or sort resets pagination to offset 0. The screen uses explicit
+load-more rather than scroll-triggered loading so the interaction is
+deterministic and a keyboard user reaches it by tabbing.
+
+## Empty, loading and error states
+
+* **Empty** — the header shows `Showing 0 of 0 items` and the body repeats the
+  active query (for example `No items match "zzzz".`) with a **Reset filters**
+  button. A purely structured empty result names the active filters instead.
+* **Loading** — the first load shows a centered spinner; a later query keeps the
+  old rows and adds a `LinearProgressIndicator`.
+* **Error** — a retry banner appears above the list; rows already loaded stay
+  visible, and an initial failure leaves the banner with a retry action.
+
+## Deliberate placeholder icon
+
+`CatalogItemRow` renders a fixed 48×48 neutral slot with a Material inventory
+icon. It is not an image widget and performs no network or disk access. This is
+intentional: task **5.6** owns the disk-backed image cache with lazy loading,
+placeholder fallback and a size budget. Keeping the slot fixed now means the
+row height, and therefore the virtualized list geometry, will not change when
+the real image widget lands.
+
+## Tests
+
+`app/packages/features/test/catalog/catalog_screen_test.dart` runs against an
+in-memory `AppDatabase` seeded through the FTS triggers and a real
+`CatalogRepository`. It covers the initial load, debounce timing, each filter
+chip applying and clearing, reset, the empty state with the preserved query,
+sorting in both directions, pagination with load-more, and row-tap reporting.
