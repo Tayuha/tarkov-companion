@@ -83,6 +83,15 @@ final class AllowlistedStreamedResponse {
 /// * manual redirect handling, with every hop re-validated, a redirect limit,
 ///   and no downgrade to HTTP.
 ///
+/// ## Test-only loopback exception
+///
+/// [allowInsecureLocalhost] exists only for the local mock manifest server used
+/// by the first-run integration test. It permits plain HTTP **only** for
+/// `127.0.0.1`, `::1` or `localhost`, and only when that host is also on the
+/// explicit allowlist. It defaults to `false`; production construction must
+/// never enable it, so the shipped client remains HTTPS-only and its allowlist
+/// is not weakened.
+///
 /// ## TLS
 ///
 /// The production client is `http.Client()`, which on the VM is
@@ -118,6 +127,7 @@ final class AllowlistedHttpClient {
     Duration timeout = defaultTimeout,
     String userAgent = defaultUserAgent,
     int maxRedirects = defaultMaxRedirects,
+    this.allowInsecureLocalhost = false,
   }) : _allowlist = _normalizeAllowlist(allowlist),
        timeout = _validateTimeout(timeout),
        userAgent = _validateUserAgent(userAgent),
@@ -175,6 +185,12 @@ final class AllowlistedHttpClient {
 
   /// Maximum redirects one [get] may follow. Zero disallows redirects.
   final int maxRedirects;
+
+  /// Whether plain HTTP is permitted for loopback hosts.
+  ///
+  /// Test-only. The default is `false`, and even when enabled the host must
+  /// still appear in [NetworkAllowlist] and be a loopback address.
+  final bool allowInsecureLocalhost;
 
   /// Sends a `GET` request and returns a 2xx response whose body is streamed.
   ///
@@ -300,7 +316,10 @@ final class AllowlistedHttpClient {
   void close() => _inner.close();
 
   void _ensureAllowed(Uri uri) {
-    if (uri.scheme.toLowerCase() != 'https') {
+    final scheme = uri.scheme.toLowerCase();
+    final isPlainHttp = scheme == 'http';
+    if (scheme != 'https' &&
+        !(isPlainHttp && allowInsecureLocalhost && _isLoopback(uri.host))) {
       throw InsecureSchemeException(uri);
     }
     if (uri.host.isEmpty) {
@@ -312,6 +331,14 @@ final class AllowlistedHttpClient {
     if (!_allowlist.contains(uri.host.toLowerCase())) {
       throw DisallowedHostException(uri, host: uri.host);
     }
+  }
+
+  /// Whether [host] is a loopback address this test-only exception accepts.
+  static bool _isLoopback(String host) {
+    final normalized = host.toLowerCase();
+    return normalized == '127.0.0.1' ||
+        normalized == '::1' ||
+        normalized == 'localhost';
   }
 
   Future<http.StreamedResponse> _sendStreamed(

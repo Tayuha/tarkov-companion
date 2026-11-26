@@ -42,7 +42,10 @@ handed to the transport, so a rejected destination produces zero network traffic
 client calls to prove it):
 
 1. **HTTPS only.** A URI whose scheme is not `https` raises `InsecureSchemeException`. Plain HTTP is
-   never attempted.
+   never attempted. The single exception is an explicit, test-only constructor option
+   (`allowInsecureLocalhost: true`) that permits `http://127.0.0.1`, `http://[::1]`, or
+   `http://localhost` **only** when the loopback host also appears in the supplied allowlist. It defaults
+   to `false` and is used only by the first-run integration test; see [`first-run.md`](first-run.md).
 2. **No URL credentials.** A URI with `user:password@` raises `UserInfoNotAllowedException` instead of
    silently sending them.
 3. **A host must be present and listed.** An empty host or a host outside the table raises

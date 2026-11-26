@@ -147,7 +147,8 @@ final class ManifestNotModified extends ManifestFetchResult {
 
 /// Fetches and caches the per-mode bundle manifest with conditional requests.
 ///
-/// The only URL this class requests is the stable release asset:
+/// In production the only URL this class requests is the stable release asset
+/// ([manifestUriFor] exists for the loopback integration test):
 ///
 /// ```
 /// https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json
@@ -168,12 +169,22 @@ final class ManifestNotModified extends ManifestFetchResult {
 /// `304` without a cache) is a typed [ManifestFetchException]; in all of those
 /// cases the cached row is left untouched.
 final class ManifestFetcher {
-  ManifestFetcher(this._client, this._repository, {DateTime Function()? clock})
-    : _clock = clock ?? _repository.now;
+  ManifestFetcher(
+    this._client,
+    this._repository, {
+    DateTime Function()? clock,
+    this.manifestUriFor,
+  }) : _clock = clock ?? _repository.now;
 
   final AllowlistedHttpClient _client;
   final ManifestRepository _repository;
   final DateTime Function() _clock;
+
+  /// Test-only override of the manifest URL.
+  ///
+  /// Production leaves this `null`, so [uriFor] is the only URL used. The
+  /// first-run integration test points it at a loopback `HttpServer`.
+  final Uri Function(GameMode)? manifestUriFor;
 
   /// The stable manifest URL for [mode].
   static Uri uriFor(GameMode mode) => Uri.parse(
@@ -187,7 +198,7 @@ final class ManifestFetcher {
 
   /// Performs one conditional manifest fetch for [mode].
   Future<ManifestFetchResult> fetch(GameMode mode) async {
-    final uri = uriFor(mode);
+    final uri = manifestUriFor?.call(mode) ?? uriFor(mode);
     final cached = await _repository.read(mode);
     final headers = cached?.conditionalHeaders;
 

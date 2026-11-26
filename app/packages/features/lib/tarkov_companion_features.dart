@@ -6,4 +6,5 @@
 library;
 
 export 'src/catalog/catalog_screen.dart';
+export 'src/first_run/first_run_screen.dart';
 export 'src/section_header.dart';

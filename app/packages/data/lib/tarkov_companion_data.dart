@@ -40,3 +40,4 @@ export 'src/sync/jsonl_reader.dart';
 export 'src/sync/manifest_fetcher.dart';
 export 'src/sync/manifest_repository.dart';
 export 'src/sync/scheduler.dart';
+export 'src/sync/sync_coordinator.dart';
