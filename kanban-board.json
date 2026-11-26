@@ -581,16 +581,38 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 12,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
-      "notes": "In progress in a linked child session. Acceptance: pure gateBundle with 10 MiB compressed cap, zero surviving placeholders, missingKeys threshold, failedPaths fail (stale pointers warn), sync blocks publication on failure, sync report carries localization metrics, gate CLI with --json, oversized/missing-key/placeholder/sync-block tests, task 2.11 checked.",
+      "notes": "Completed 2026-11-26 in session ses_de8889ff3ffenHuxJGgtArG1A3. gateBundle: 10 MiB compressed cap computed from files, zero surviving placeholders, missingKeys threshold (default 0), failed pointers fail, stale pointers warn; sync blocks publication and exits 1. Sync report now carries per-mode localization metrics and gate result. gate CLI with --dir/--report/--max-bytes/--json and exit 0/1/2. 231 tests. Commit 5fc4dee. Live check: published regular bundle 2.26 MiB, 0 missing, 0 failed, 2 prune warnings (old items/traders versions), PASS.",
       "sessionID": "ses_de8889ff3ffenHuxJGgtArG1A3",
       "createdAt": 1795690041383,
-      "updatedAt": 1795690041383,
+      "updatedAt": 1795690706668,
+      "archived": false
+    },
+    {
+      "id": "task_plan_flutter_toolchain",
+      "title": "Decide Flutter toolchain and Windows verification path",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/lucas/Projetos/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "ready",
+      "position": 0,
+      "tagIDs": [
+        "tag_planning",
+        "tag_decision",
+        "tag_app",
+        "tag_infra"
+      ],
+      "notes": "Flutter and Dart are not installed on the Linux host, and Flutter cannot build a Windows executable from Linux. Options: (a) install Flutter here with linux+android targets, test logic locally, build/verify Windows on a windows-latest GitHub runner; (b) provide a Windows VM and verify there too; (c) defer the client and finish repo/docs polish. Recommendation: (a). Decision needed before T3.1.",
+      "createdAt": 1795690706668,
+      "updatedAt": 1795690706668,
       "archived": false
     }
   ]
