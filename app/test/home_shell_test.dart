@@ -290,8 +290,11 @@ void main() {
   testWidgets('the shell shares the image cache with the catalog', (
     tester,
   ) async {
-    final directory = await Directory.systemTemp.createTemp('tc-images-');
-    addTearDown(() => directory.delete(recursive: true));
+    // Real disk I/O must run outside the widget test's fake-async zone.
+    final directory = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('tc-images-'),
+    ))!;
+    addTearDown(() => directory.deleteSync(recursive: true));
     final cache = ItemImageCache(directory: directory, fetcher: _NoopFetcher());
 
     await pumpShell(tester, imageCache: cache);
