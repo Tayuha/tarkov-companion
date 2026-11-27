@@ -1,0 +1,110 @@
+name: Bug report
+description: Report a crash, a wrong value, or behaviour that breaks the offline workflow.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing Tarkov Companion. Please search existing issues first.
+        Do **not** paste a player progress export, database, or log containing
+        profile names or file-system paths. For a security issue use the private
+        reporting link on the new-issue page instead.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before reporting
+      options:
+        - label: I searched the open and closed issues for the same problem.
+          required: true
+        - label: This is not a security vulnerability (those go through private reporting).
+          required: true
+        - label: I removed profile names, exports, and personal paths from anything I paste.
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: A short description of the bug and where in the app it happens.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the exact error text or a screenshot when possible.
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Shown on the About screen or in the artifact file name.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: How did you install it?
+      options:
+        - AppImage
+        - Debian package (.deb)
+        - Built from source
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux — Arch / CachyOS
+        - Linux — Debian / Ubuntu
+        - Linux — Fedora
+        - Linux — other
+        - Windows
+        - Android
+    validations:
+      required: true
+  - type: input
+    id: desktop
+    attributes:
+      label: Desktop and display server
+      description: For example "KDE Plasma 6, Wayland" or "GNOME 48, X11".
+      placeholder: KDE Plasma 6, Wayland
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Use the app's Export logs action. Remove profile names and paths first.
+      render: shell
+  - type: textarea
+    id: data-state
+    attributes:
+      label: Data and network state
+      description: |
+        Did the app finish its first-run sync? Was the connection offline,
+        metered, or behind a proxy? Which game mode was active?
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Confirmation
+      options:
+        - label: This happens with the latest release, not only a modified local build.

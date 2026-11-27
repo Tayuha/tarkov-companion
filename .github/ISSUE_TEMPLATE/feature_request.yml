@@ -1,0 +1,70 @@
+name: Feature request
+description: Propose a feature or a change to an existing workflow.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tarkov Companion is local-first by design: no accounts, no telemetry, no
+        cloud sync. Proposals that need a server or upload player data will not
+        be accepted for v0.1. Check the roadmap in `docs/roadmap.md` first.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before proposing
+      options:
+        - label: I searched existing issues and the roadmap for this request.
+          required: true
+        - label: This feature works offline or explains why it cannot.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what makes it hard today?
+      placeholder: As a player who ..., I cannot ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behaviour you want, not only the UI.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing workarounds, other apps, or a smaller version of the idea.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Items and prices
+        - Quests and progress
+        - Profiles and import/export
+        - Sync and offline behaviour
+        - Linux desktop packaging
+        - Accessibility and keyboard use
+        - Documentation and contributor tooling
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data or upstream fields needed
+      description: |
+        Does this need a new field from tarkov.dev, a new bundle dataset, or a
+        schema change? Link the upstream field if you know it.
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints
+      options:
+        - label: This can work without an account, telemetry, or a project-operated server.
+          required: true
+        - label: I am willing to help test or implement this.
