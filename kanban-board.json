@@ -1830,18 +1830,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 99,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Recovery export implementation running in feat-recovery-export.",
+      "notes": "Read-only recovery export: RecoveryProgressExporter reads profiles/questProgress/objectiveProgress through RecoveryDatabase, canonical JSON + checksum, diagnostics copy of backup/logs; screen offers both with inline errors; DELETE proof throws readonly. 8 data + 4 app tests. Gap removed from verification.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795762396592,
-      "archived": false,
-      "sessionID": "ses_de43897d8ffewDlDEn2BtSbS9V"
+      "updatedAt": 1795762967990,
+      "archived": false
     },
     {
       "id": "task_impl_9_4",

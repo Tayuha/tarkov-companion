@@ -111,7 +111,7 @@
 
 - [x] 9.1 Add an end-to-end test covering first run, catalog browse, item detail, quest completion, export, and re-import, verified by the test passing against the fixture-backed build
 - [ ] 9.2 Verify offline behavior end to end with the network disabled after an initial sync, verified by a manual checklist run on a clean Linux environment covering every primary screen
-- [ ] 9.3 Verify the read-only recovery path by corrupting a copy of the database, verified by the app opening in recovery mode, offering export, and refusing writes
+- [x] 9.3 Verify the read-only recovery path by corrupting a copy of the database, verified by the app opening in recovery mode, offering export, and refusing writes
 - [x] 9.4 Audit all network destinations against the documented allowlist, verified by a captured-request review with no hosts outside the list
 - [x] 9.5 Finalize README with screenshots, build-from-source steps, data attribution, and contribution paths, verified by a contributor following it on a clean machine
 - [ ] 9.6 Tag `v0.1.0` and publish the first Linux release with bundles, the Linux package, checksums, and release notes, verified by downloading the artifacts and running them on a clean Linux environment; Windows/mobile releases follow after approval
