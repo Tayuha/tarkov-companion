@@ -20,7 +20,8 @@ This is an independent fan project. No game artwork is bundled; item images are 
 | `preview/02-quests.png` | Desktop Quests — trader strip, list, detail |
 | `preview/03-mobile-items.png` | Mobile Items |
 | `preview/04-mobile-quests.png` | Mobile Quests |
-| `preview/05-items-night-vision.png` | Items in the night-vision variant |
+| `preview/05-items-night-vision.png` | Items in the chosen phosphor variant |
+| `preview/06-items-1920-nv.png` | Phosphor Items at 1920×1080 |
 | `preview/index.html` | Gallery of the five previews |
 
 ## Pages
@@ -34,6 +35,8 @@ This is an independent fan project. No game artwork is bundled; item images are 
 5. **04 · Mobile · Quests** — 390×844. Trader initials, availability tabs, compact task rows.
 6. **05 · Items · Night Vision** — separate file. The same Items screen with the palette shifted to
    phosphor green; the original document is untouched.
+7. **05 · Wide · Items 1920** — 1920×1080 in the phosphor file. Extra width buys two columns
+   (Buy Limit, Updated) and a 506 px inspector; 11 rows fit without scrolling.
 
 ## Items refinement (option 1)
 
@@ -50,10 +53,13 @@ The desktop Items screen is now grounded in the running app:
 - **States:** one selected row (orange bar + tinted fill), alternating row surfaces, stale/— values in
   muted grey, positive/negative deltas in green/red.
 
-## Night-vision variant
+## Chosen direction — phosphor green
 
-`tarkov-companion-night-vision.figcraft` is a **separate copy** generated from the refined document. It is
-not a second theme in the original file.
+**Decision: the phosphor-green variant is the chosen direction.** The orange file remains as the alternative
+and is not the implementation target.
+
+`tarkov-companion-night-vision.figcraft` is a **separate copy** generated from the refined document, now with
+its own 1920×1080 Items page. It is not a second theme inside the original file.
 
 - Backgrounds shift to green-black (`#070D08` base), surfaces to `#0D1510` / `#121C15`.
 - The decision orange `#E08A3C` becomes phosphor mint `#7DF7A8`; the deep selected fill becomes
@@ -62,6 +68,21 @@ not a second theme in the original file.
   pale green `#DCF3E2`.
 - The header records `NIGHT VISION VARIANT · PHOSPHOR GREEN`, so the copy cannot be mistaken for the
   original.
+
+## Resolution behaviour
+
+The layout is adaptive, not scaled:
+
+| Width | Behaviour |
+|---|---|
+| 1024–1279 | Compact: hide Slots and Weight, keep Item/Flea/24h/Trader; inspector narrows. |
+| 1280–1439 | Standard: hide Slots; keep Weight and trader summary. |
+| 1440–1919 | Full: the six-column Items page in this document. |
+| 1920+ | Wide (second monitor): add Buy Limit and Updated, 1330 px table + 506 px inspector. |
+| ≥ 2560 | Cap the content width; do not stretch the table further. |
+
+The 1920 page is the reference for the second-monitor case. It is not a 1.33× scale of the 1440 page: it
+adds data columns and increases the Inspector rather than enlarging every row.
 
 ## Design tokens
 
