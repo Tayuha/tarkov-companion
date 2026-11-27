@@ -22,12 +22,21 @@ import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 /// feature screens: an item tap pushes [ItemDetailScreen] and a quest tap pushes
 /// [QuestDetailScreen]. [onQuestSelected] is a test seam that overrides the
 /// default navigation when supplied.
+///
+/// When [profileServices] is supplied a third **Profiles** destination appears.
+/// It renders [ProfilesScreen] and reports the active profile back here, so the
+/// Quests tab switches to the new profile and refreshes its derived
+/// availability without an app restart. Without the services the shell keeps
+/// its original two tabs, which is what lets the shell tests build a session
+/// with no profile wiring.
 class HomeShell extends StatefulWidget {
   const HomeShell({
     super.key,
     this.catalog,
     this.quests,
     this.activeProfileId,
+    this.profileServices,
+    this.appVersion = '0.1.0',
     this.onQuestSelected,
   });
 
@@ -40,6 +49,13 @@ class HomeShell extends StatefulWidget {
 
   /// Profile whose progress supplies quest state badges.
   final String? activeProfileId;
+
+  /// Profile management services; when present the shell adds the Profiles
+  /// tab. Production passes the session value, shell tests leave it null.
+  final ProfileServices? profileServices;
+
+  /// Version written into exported progress files.
+  final String appVersion;
 
   /// Test seam: when supplied, a quest tap reports the id instead of pushing
   /// [QuestDetailScreen]. Production leaves it null.
@@ -54,13 +70,46 @@ class _HomeShellState extends State<HomeShell> {
   static const double _railBreakpoint = 700;
 
   _HomeTab _tab = _HomeTab.items;
+  late String? _activeProfileId = widget.activeProfileId;
+
+  /// Bumped on every profile change so the mounted Quests tab re-derives
+  /// availability (a level edit keeps the same profile id).
+  int _profileRevision = 0;
+
+  List<_HomeTab> get _tabs => <_HomeTab>[
+    _HomeTab.items,
+    _HomeTab.quests,
+    if (widget.profileServices != null) _HomeTab.profiles,
+  ];
+
+  @override
+  void didUpdateWidget(covariant HomeShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.activeProfileId != oldWidget.activeProfileId) {
+      _activeProfileId = widget.activeProfileId;
+    }
+    if (_tabs.contains(_tab) == false) {
+      _tab = _HomeTab.items;
+    }
+  }
 
   void _selectTab(int index) {
-    final next = _HomeTab.values[index];
+    final tabs = _tabs;
+    if (index < 0 || index >= tabs.length) {
+      return;
+    }
+    final next = tabs[index];
     if (next == _tab) {
       return;
     }
     setState(() => _tab = next);
+  }
+
+  void _onProfileChanged(Profile? active) {
+    setState(() {
+      _activeProfileId = active?.id;
+      _profileRevision++;
+    });
   }
 
   void _openItem(String itemId) {
@@ -78,14 +127,20 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= _railBreakpoint;
+    final tabs = _tabs;
     final body = IndexedStack(
-      index: _tab.index,
+      index: tabs.indexOf(_tab),
       children: <Widget>[
         KeyedSubtree(key: const Key('home-items-tab'), child: _buildItemsTab()),
         KeyedSubtree(
-          key: const Key('home-quests-tab'),
+          key: Key('home-quests-tab-$_profileRevision'),
           child: _buildQuestsTab(),
         ),
+        if (widget.profileServices != null)
+          KeyedSubtree(
+            key: const Key('home-profiles-tab'),
+            child: _buildProfilesTab(),
+          ),
       ],
     );
 
@@ -96,20 +151,29 @@ class _HomeShellState extends State<HomeShell> {
               children: <Widget>[
                 NavigationRail(
                   key: const Key('home-navigation-rail'),
-                  selectedIndex: _tab.index,
+                  selectedIndex: tabs.indexOf(_tab),
                   onDestinationSelected: _selectTab,
                   labelType: NavigationRailLabelType.all,
-                  destinations: const <NavigationRailDestination>[
-                    NavigationRailDestination(
+                  destinations: <NavigationRailDestination>[
+                    const NavigationRailDestination(
                       icon: Icon(Icons.inventory_2_outlined),
                       selectedIcon: Icon(Icons.inventory_2),
                       label: Text('Items', key: Key('home-rail-items-label')),
                     ),
-                    NavigationRailDestination(
+                    const NavigationRailDestination(
                       icon: Icon(Icons.checklist_outlined),
                       selectedIcon: Icon(Icons.checklist),
                       label: Text('Quests', key: Key('home-rail-quests-label')),
                     ),
+                    if (widget.profileServices != null)
+                      const NavigationRailDestination(
+                        icon: Icon(Icons.person_outline),
+                        selectedIcon: Icon(Icons.person),
+                        label: Text(
+                          'Profiles',
+                          key: Key('home-rail-profiles-label'),
+                        ),
+                      ),
                   ],
                 ),
                 const VerticalDivider(width: 1),
@@ -121,21 +185,28 @@ class _HomeShellState extends State<HomeShell> {
           ? null
           : NavigationBar(
               key: const Key('home-bottom-navigation'),
-              selectedIndex: _tab.index,
+              selectedIndex: tabs.indexOf(_tab),
               onDestinationSelected: _selectTab,
-              destinations: const <NavigationDestination>[
-                NavigationDestination(
+              destinations: <NavigationDestination>[
+                const NavigationDestination(
                   key: Key('home-bar-items'),
                   icon: Icon(Icons.inventory_2_outlined),
                   selectedIcon: Icon(Icons.inventory_2),
                   label: 'Items',
                 ),
-                NavigationDestination(
+                const NavigationDestination(
                   key: Key('home-bar-quests'),
                   icon: Icon(Icons.checklist_outlined),
                   selectedIcon: Icon(Icons.checklist),
                   label: 'Quests',
                 ),
+                if (widget.profileServices != null)
+                  const NavigationDestination(
+                    key: Key('home-bar-profiles'),
+                    icon: Icon(Icons.person_outline),
+                    selectedIcon: Icon(Icons.person),
+                    label: 'Profiles',
+                  ),
               ],
             ),
     );
@@ -160,8 +231,16 @@ class _HomeShellState extends State<HomeShell> {
     }
     return QuestListScreen(
       repository: quests,
-      profileId: widget.activeProfileId,
+      profileId: _activeProfileId,
       onQuestSelected: widget.onQuestSelected ?? _openQuest,
+    );
+  }
+
+  Widget _buildProfilesTab() {
+    return ProfilesScreen(
+      services: widget.profileServices!,
+      appVersion: widget.appVersion,
+      onProfileChanged: _onProfileChanged,
     );
   }
 
@@ -176,7 +255,7 @@ class _HomeShellState extends State<HomeShell> {
           repository: quests,
           catalog: catalog,
           questId: questId,
-          profileId: widget.activeProfileId,
+          profileId: _activeProfileId,
         ),
       ),
     );
@@ -185,7 +264,8 @@ class _HomeShellState extends State<HomeShell> {
 
 enum _HomeTab {
   items('Items'),
-  quests('Quests');
+  quests('Quests'),
+  profiles('Profiles');
 
   const _HomeTab(this.label);
 

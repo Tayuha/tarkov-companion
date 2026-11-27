@@ -15,17 +15,26 @@ the database itself.
 The threshold lives in one place, `_HomeShellState._railBreakpoint`. The wide
 layout is the Linux desktop target; the bottom bar is the shell's mobile
 layout, already in place for the Android release. The app bar title follows the
-selected tab ("Items" or "Quests"), and the selected destination is highlighted
-by the Material navigation widgets.
+selected tab ("Items", "Quests" or "Profiles"), and the selected destination is
+highlighted by the Material navigation widgets.
+
+A third **Profiles** destination appears only when `HomeShell.profileServices`
+is supplied. Without it (shell tests, recovery, a session built without SQLite)
+the shell keeps exactly the original two tabs.
 
 ## Tabs and routing
 
 * **Items** renders `CatalogScreen` with the session's `CatalogRepository`.
   Tapping a row pushes `ItemDetailScreen` with a standard `MaterialPageRoute`.
 * **Quests** renders `QuestListScreen` with the session's `QuestRepository` and
-  the active profile id. Tapping a quest calls the shell's `onQuestSelected`
-  callback; the quest detail route is the next task, so the shell deliberately
-  does not push anything yet.
+  the active profile id. Tapping a quest pushes `QuestDetailScreen` (the
+  `onQuestSelected` callback is the test seam).
+* **Profiles** renders `ProfilesScreen` with the session's `ProfileServices`.
+  Editing a level, switching, resetting, deleting or importing calls
+  `onProfileChanged`, which updates the shell's active id and bumps a revision
+  key on the Quests tab so the mounted list re-derives availability.
+  Deleting the last profile reports `null`; the quest tab then reads with no
+  profile until one is created.
 
 Back, the app bar back button and Escape all leave a pushed page through the
 standard `Navigator`. Escape is wired once in `TarkovCompanionApp`; when the root
@@ -49,6 +58,8 @@ conditional `body` without moving the state into a controller first.
 
 ## Adding a tab
 
-Add a value to `_HomeTab`, a matching destination to the rail and the bottom
-bar, and one child to the `IndexedStack`. Keep the child order aligned with
-`_HomeTab.values`; the selected index is stored as the enum, not as a raw int.
+Add a value to `_HomeTab`, add it to `_tabs` (conditionally if it needs
+services), a matching destination to the rail and the bottom bar, and one child
+to the `IndexedStack`. Keep the child order aligned with `_tabs`; the selected
+index is `_tabs.indexOf(_tab)`, not a raw enum index, so optional tabs do not
+shift the others.

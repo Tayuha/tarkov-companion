@@ -1,0 +1,30 @@
+{
+  "format": "tarkov-companion-backup",
+  "formatVersion": 1,
+  "appVersion": "0.1.0",
+  "exportedAt": "2026-11-27T09:30:00.000Z",
+  "profiles": [
+    {
+      "gameMode": "pve",
+      "playerLevel": 22,
+      "quests": [
+        {
+          "questId": "quest-checking",
+          "state": "in-progress"
+        },
+        {
+          "questId": "quest-debut",
+          "state": "completed"
+        }
+      ],
+      "objectives": [
+        {
+          "questId": "quest-checking",
+          "objectiveId": "objective-checking-1",
+          "count": 3
+        }
+      ]
+    }
+  ],
+  "checksum": "sha256:aaebd140bab03eb338d35ca4749a4c76db0cd224c00f14406899fd53ca7df3d1"
+}

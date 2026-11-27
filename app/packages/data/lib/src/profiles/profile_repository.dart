@@ -22,6 +22,54 @@ final class ProfileNotFoundError implements Exception {
   String toString() => 'ProfileNotFoundError: no profile with id "$profileId"';
 }
 
+/// A profile fact is outside its documented range.
+///
+/// Thrown before anything is written, so the stored profile keeps its previous
+/// value when the caller tries to record an impossible one.
+final class ProfileFactValidationError implements Exception {
+  const ProfileFactValidationError(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'ProfileFactValidationError: $message';
+}
+
+/// What [ProfileRepository.resetProgress] removed.
+final class ProfileResetResult {
+  const ProfileResetResult({
+    required this.profileId,
+    required this.questStatesCleared,
+    required this.objectiveCountsCleared,
+  });
+
+  /// The profile whose progress was cleared.
+  final String profileId;
+
+  /// Number of `questProgress` rows deleted.
+  final int questStatesCleared;
+
+  /// Number of `objectiveProgress` rows deleted.
+  final int objectiveCountsCleared;
+
+  /// Whether the profile already had no recorded progress.
+  bool get wasEmpty => questStatesCleared == 0 && objectiveCountsCleared == 0;
+}
+
+/// What [ProfileRepository.delete] removed and which profile is active after.
+final class ProfileDeletionResult {
+  const ProfileDeletionResult({required this.deleted, required this.active});
+
+  /// The removed profile (its progress was removed with it).
+  final Profile deleted;
+
+  /// The profile that is active after the delete, or `null` when the deleted
+  /// profile was the last one. A caller that gets `null` must offer profile
+  /// creation; [ProfileRepository.ensureFirstLaunch] would recreate a regular
+  /// profile on the next start.
+  final Profile? active;
+}
+
 /// The result of [ProfileRepository.createForMode].
 ///
 /// Creation is a typed result rather than a throw because "this mode already
@@ -81,6 +129,21 @@ final class ProfileAlreadyExists extends ProfileCreationResult {
 /// active profile. A missing id throws [ProfileNotFoundError] and leaves the
 /// previous active profile untouched.
 ///
+/// [updatePlayerLevel] writes an editable fact in `[minPlayerLevel,
+/// maxPlayerLevel]`. Availability is derived at read time by
+/// `QuestRepository`, so the next read reflects the new level without a
+/// restart. There is no faction column in the shipped schema; the tracker's
+/// availability inputs are level, recorded states and counts, so faction is
+/// not a profile fact here.
+///
+/// [resetProgress] clears the profile's quest and objective rows in one
+/// transaction, leaving the profile, its level and every other profile intact.
+/// [delete] removes the profile and (by cascade or explicit delete) its
+/// progress. When the deleted profile was active, another existing profile is
+/// activated deterministically (`regular` when present, else the oldest). When
+/// the last profile is deleted, no active id is left and [active] returns
+/// `null`; [ensureFirstLaunch] recreates a regular profile on the next start.
+///
 /// ## Repair
 ///
 /// [active] never throws for stored data that disagrees with the table. When
@@ -111,7 +174,7 @@ final class ProfileRepository {
     String Function()? idGenerator,
     this.onRepair,
   }) : _clock = clock ?? DateTime.now,
-       _idGenerator = idGenerator ?? _generateProfileId;
+       _idGenerator = idGenerator ?? generateProfileId;
 
   final AppDatabase _database;
   final DateTime Function() _clock;
@@ -212,6 +275,152 @@ final class ProfileRepository {
       }
       await _writeActiveId(profile.id);
       return profile;
+    });
+  }
+
+  /// Smallest accepted player level.
+  static const int minPlayerLevel = 1;
+
+  /// Largest accepted player level.
+  static const int maxPlayerLevel = 99;
+
+  /// Whether [level] is a valid recorded player level.
+  static bool isValidPlayerLevel(int level) =>
+      level >= minPlayerLevel && level <= maxPlayerLevel;
+
+  /// Records [level] as the profile's player level and returns the new row.
+  ///
+  /// Throws [ProfileNotFoundError] for an unknown profile and
+  /// [ProfileFactValidationError] for a value outside
+  /// [minPlayerLevel]..[maxPlayerLevel]; nothing is written in either case.
+  /// Only `updatedAt` and the level change. Quest availability is derived on
+  /// the next read, so a caller that refreshes its view sees newly unlocked
+  /// quests immediately.
+  Future<Profile> updatePlayerLevel(String id, int level) {
+    if (!isValidPlayerLevel(level)) {
+      throw ProfileFactValidationError(
+        'Player level must be between $minPlayerLevel and $maxPlayerLevel; '
+        'got $level.',
+      );
+    }
+    return _database.transaction(() async {
+      final profile = await (_database.select(
+        _database.profiles,
+      )..where((row) => row.id.equals(id))).getSingleOrNull();
+      if (profile == null) {
+        throw ProfileNotFoundError(id);
+      }
+      if (profile.playerLevel != level) {
+        await (_database.update(
+          _database.profiles,
+        )..where((row) => row.id.equals(id))).write(
+          ProfilesCompanion(
+            playerLevel: Value(level),
+            updatedAt: Value(_clock()),
+          ),
+        );
+      }
+      return (_database.select(
+        _database.profiles,
+      )..where((row) => row.id.equals(id))).getSingle();
+    });
+  }
+
+  /// Clears the profile's recorded quest and objective progress.
+  ///
+  /// The profile itself, its player level and every other profile stay
+  /// unchanged. Both deletes run in one transaction; `updatedAt` is refreshed
+  /// to record the reset. Throws [ProfileNotFoundError] for an unknown profile
+  /// before deleting anything.
+  Future<ProfileResetResult> resetProgress(String id) {
+    return _database.transaction(() async {
+      final profile = await (_database.select(
+        _database.profiles,
+      )..where((row) => row.id.equals(id))).getSingleOrNull();
+      if (profile == null) {
+        throw ProfileNotFoundError(id);
+      }
+
+      final questStates = await (_database.delete(
+        _database.questProgress,
+      )..where((row) => row.profileId.equals(id))).go();
+      final objectiveCounts = await (_database.delete(
+        _database.objectiveProgress,
+      )..where((row) => row.profileId.equals(id))).go();
+
+      await (_database.update(_database.profiles)
+            ..where((row) => row.id.equals(id)))
+          .write(ProfilesCompanion(updatedAt: Value(_clock())));
+
+      return ProfileResetResult(
+        profileId: id,
+        questStatesCleared: questStates,
+        objectiveCountsCleared: objectiveCounts,
+      );
+    });
+  }
+
+  /// Deletes the profile [id] and its progress.
+  ///
+  /// The profile's quest and objective rows are deleted explicitly in the same
+  /// transaction as the profile, so the result does not depend on the
+  /// connection having foreign keys enabled. When [id] was the active profile
+  /// the deterministic fallback is the `regular` profile when present, else the
+  /// oldest remaining profile. When no profile remains, the active setting is
+  /// removed and [ProfileDeletionResult.active] is `null`.
+  ///
+  /// Throws [ProfileNotFoundError] when [id] does not exist.
+  Future<ProfileDeletionResult> delete(String id) {
+    return _database.transaction(() async {
+      final profile = await (_database.select(
+        _database.profiles,
+      )..where((row) => row.id.equals(id))).getSingleOrNull();
+      if (profile == null) {
+        throw ProfileNotFoundError(id);
+      }
+
+      final activeId = await _readActiveId();
+      await (_database.delete(
+        _database.objectiveProgress,
+      )..where((row) => row.profileId.equals(id))).go();
+      await (_database.delete(
+        _database.questProgress,
+      )..where((row) => row.profileId.equals(id))).go();
+      await (_database.delete(
+        _database.profiles,
+      )..where((row) => row.id.equals(id))).go();
+
+      final remaining = await _profilesInOrder();
+      if (remaining.isEmpty) {
+        await (_database.delete(
+          _database.appSettings,
+        )..where((row) => row.key.equals(AppSettingKeys.activeProfileId))).go();
+        return ProfileDeletionResult(deleted: profile, active: null);
+      }
+
+      if (activeId == id || activeId == null) {
+        final fallback = remaining.firstWhere(
+          (candidate) => candidate.gameMode == GameMode.regular.wireValue,
+          orElse: () => remaining.first,
+        );
+        await _writeActiveId(fallback.id);
+        return ProfileDeletionResult(deleted: profile, active: fallback);
+      }
+
+      // A stored id that still points at a remaining profile is unchanged.
+      for (final candidate in remaining) {
+        if (candidate.id == activeId) {
+          return ProfileDeletionResult(deleted: profile, active: candidate);
+        }
+      }
+
+      // A dangling setting is repaired exactly like [active] would.
+      final fallback = remaining.firstWhere(
+        (candidate) => candidate.gameMode == GameMode.regular.wireValue,
+        orElse: () => remaining.first,
+      );
+      await _writeActiveId(fallback.id);
+      return ProfileDeletionResult(deleted: profile, active: fallback);
     });
   }
 
@@ -333,8 +542,12 @@ final class ProfileRepository {
   }
 }
 
-/// `profile-` plus 16 cryptographically random bytes as lowercase hex.
-String _generateProfileId() {
+/// The default id generator: `profile-` plus 16 cryptographically random
+/// bytes as lowercase hex.
+///
+/// Exposed so import code can create a profile with the same id shape without
+/// duplicating the generator; tests inject their own instead.
+String generateProfileId() {
   final random = Random.secure();
   final buffer = StringBuffer('profile-');
   for (var byte = 0; byte < 16; byte++) {
