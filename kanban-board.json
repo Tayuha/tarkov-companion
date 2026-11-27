@@ -930,17 +930,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 25,
+      "categoryID": "done",
+      "position": 52,
       "tagIDs": [
         "tag_implementation",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
+      "notes": "Merged as 4f0d42b from chore-release-ci. Linux release workflow (manual + tags, draft release), package-linux dry run 12MB AppImage + SHA256SUMS, release notes with unsigned notice, issue/PR templates, roadmap, editorconfig/gitattributes/prettier and opt-in format check. Manual gate remains: clean-machine launch/sync/browse before tagging.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
+      "updatedAt": 1795758025006,
+      "archived": false
     },
     {
       "id": "task_impl_4_9",
@@ -1767,18 +1766,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 22,
+      "categoryID": "done",
+      "position": 49,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
+      "notes": "Merged as 4f0d42b from chore-release-ci. Linux release workflow (manual + tags, draft release), package-linux dry run 12MB AppImage + SHA256SUMS, release notes with unsigned notice, issue/PR templates, roadmap, editorconfig/gitattributes/prettier and opt-in format check. Manual gate remains: clean-machine launch/sync/browse before tagging.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
+      "updatedAt": 1795758025006,
+      "archived": false
     },
     {
       "id": "task_impl_8_10",
@@ -1789,18 +1787,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 23,
+      "categoryID": "done",
+      "position": 50,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
+      "notes": "Merged as 4f0d42b from chore-release-ci. Linux release workflow (manual + tags, draft release), package-linux dry run 12MB AppImage + SHA256SUMS, release notes with unsigned notice, issue/PR templates, roadmap, editorconfig/gitattributes/prettier and opt-in format check. Manual gate remains: clean-machine launch/sync/browse before tagging.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
+      "updatedAt": 1795758025006,
+      "archived": false
     },
     {
       "id": "task_impl_9_1",
@@ -1937,18 +1934,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 24,
+      "categoryID": "done",
+      "position": 51,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
+      "notes": "Merged as 4f0d42b from chore-release-ci. Linux release workflow (manual + tags, draft release), package-linux dry run 12MB AppImage + SHA256SUMS, release notes with unsigned notice, issue/PR templates, roadmap, editorconfig/gitattributes/prettier and opt-in format check. Manual gate remains: clean-machine launch/sync/browse before tagging.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
+      "updatedAt": 1795758025006,
+      "archived": false
     },
     {
       "id": "task_impl_5_10",

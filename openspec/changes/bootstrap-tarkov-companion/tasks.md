@@ -4,7 +4,7 @@
 
 - [x] 1.1 Create the monorepo layout (`app/`, `pipeline/`, `docs/`, `test/fixtures/`) with a root README that explains each directory, verified by `tree -L 2` matching the documented layout
 - [x] 1.2 Add MIT `LICENSE`, `NOTICE` with tarkov.dev attribution and trademark disclaimer, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`, verified by every file referenced from README resolving and `LICENSE` matching the OSI MIT text
-- [ ] 1.3 Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters
+- [x] 1.3 Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters
 - [x] 1.4 Create the Flutter project in `app/` with Windows, Linux, and Android targets, verified by `flutter config` listing the desktop targets, `flutter analyze` and `flutter test` passing, and `flutter build linux --debug` succeeding locally; the Windows debug build is verified by task 1.6 CI on a `windows-latest` runner because the development host is Linux
 - [x] 1.5 Create the TypeScript pipeline in `pipeline/` with strict `tsconfig`, linting, and a `npm test` runner, verified by `npm run lint && npm test` passing with one placeholder test
 - [x] 1.6 Add `.github/workflows/ci.yml` running app analyze/test, pipeline lint/test, and a Windows debug build, verified by the workflow succeeding on the `main` branch (push or dispatch) and on pull requests
@@ -98,8 +98,8 @@
 - [ ] 8.6 Implement single-instance focusing on Linux, verified by a manual test launching twice and observing one window is focused
 - [ ] 8.7 Implement keyboard navigation and visible focus for the catalog and quest lists, verified by widget tests driving focus traversal without pointer input
 - [ ] 8.8 Implement the about screen showing app version, data bundle version, dataset age, license, and attribution, verified by a golden widget test
-- [ ] 8.9 Build the Linux package (AppImage preferred, .deb optional) in CI with version metadata and checksums, verified by running it on a clean Linux environment and launching, syncing, and browsing; this is the gate before Windows/mobile packaging resumes
-- [ ] 8.10 Publish Linux artifact checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text
+- [x] 8.9 Build the Linux package (AppImage preferred, .deb optional) in CI with version metadata and checksums, verified by running it on a clean Linux environment and launching, syncing, and browsing; this is the gate before Windows/mobile packaging resumes
+- [x] 8.10 Publish Linux artifact checksums with release notes that state signing status, verified by a release dry run producing the checksum file and the expected note text
 
 - [x] 8.11 Build the persistent navigation shell (Items/Quests) with state-preserving tabs and a narrow-window bottom bar, verified by widget tests for switching, state retention, and item-detail navigation
 
@@ -115,7 +115,7 @@
 - [ ] 9.4 Audit all network destinations against the documented allowlist, verified by a captured-request review with no hosts outside the list
 - [ ] 9.5 Finalize README with screenshots, build-from-source steps, data attribution, and contribution paths, verified by a contributor following it on a clean machine
 - [ ] 9.6 Tag `v0.1.0` and publish the first Linux release with bundles, the Linux package, checksums, and release notes, verified by downloading the artifacts and running them on a clean Linux environment; Windows/mobile releases follow after approval
-- [ ] 9.7 Add issue and pull-request templates plus a roadmap issue, verified by opening a test issue that renders both templates
+- [x] 9.7 Add issue and pull-request templates plus a roadmap issue, verified by opening a test issue that renders both templates
 
 ## Workflow follow-up
 
