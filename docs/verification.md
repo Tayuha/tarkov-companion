@@ -158,8 +158,11 @@ The app bar reads **Tarkov Companion**. The body shows:
 - message: **The local database could not be opened. It was left untouched and is available read-only.**
   followed by the SQLite failure text (for a non-SQLite file this is a malformed-image or “file is not a
   database” error; the exact SQLite code depends on the build);
-- additional text: **No data was deleted. Export and recovery actions arrive in the release-readiness
-  task.**
+- a **READ-ONLY STATE** panel with **DETECTED SCHEMA VERSION** and a **FAILURE** row (the failure text
+  appears again there);
+- an **EXPORT** panel with the buttons **EXPORT PROGRESS** and **EXPORT DIAGNOSTICS**;
+- the footer sentence
+  **Writes are refused by SQLite, and the recovery handle stays open until the app closes.**
 
 ### Checks
 
@@ -167,8 +170,9 @@ The app bar reads **Tarkov Companion**. The body shows:
 |---|---|---|---|
 | R1 | Launch with the corrupt copy. | The recovery screen appears instead of the shell; the app does not crash or create a fresh empty database. | ☐ pass ☐ fail |
 | R2 | Read the message. | It contains the heading and sentence above, and names the SQLite failure. | ☐ pass ☐ fail |
-| R3 | Look for an export action. | **Expected by task 9.3, currently missing.** The screen has no button; the text says export and recovery actions arrive later. This row fails until the recovery UI gains an export action. | ☐ pass ☐ fail |
-| R4 | Try to write through the app. | No write action is offered in recovery. The handle is SQLite `OpenMode.readOnly`; writes fail at the SQLite layer. | ☐ pass ☐ fail |
+| R3 | Press **EXPORT PROGRESS**. | The button is disabled while the write runs. A **PROGRESS EXPORT** panel then shows the exact path `<RECOVERY_HOME>/tarkov_companion/recovery/progress-recovery-<UTC timestamp>.json`, a **Checksum sha256:** prefix, and a line such as **1 profile · 2 quest states · 1 objective count**. The file opens with `ProgressExportDocument.parse` and its checksum matches. The panel also says **Copy the path above to open the export folder.** | ☐ pass ☐ fail |
+| R3b | Press **EXPORT DIAGNOSTICS**. | The panel reports **Copied N diagnostics files.** and the same `recovery/` path, or **No backup or log files were available to copy.** when there is nothing to copy. The expected copy is `app.log` plus a pre-migration backup when the failed attempt made one; no database read or network request happens. | ☐ pass ☐ fail |
+| R4 | Try to write through the app. | No write action is offered in recovery: only the two export buttons exist. The handle is SQLite `OpenMode.readOnly`; writes fail at the SQLite layer. | ☐ pass ☐ fail |
 | R5 | Confirm the copy was not modified. | `cd "$RECOVERY_HOME/tarkov_companion/db" && sha256sum -c /tmp/tc-recovery-before.sha256` reports **OK**. | ☐ pass ☐ fail |
 | R6 | Confirm the original database is untouched. | Open the real app normally after the test; it still starts with the previous data. | ☐ pass ☐ fail |
 | R7 | Inspect the log. | `grep 'read-only recovery mode' "$RECOVERY_HOME/tarkov_companion/logs/app.log"` finds one JSON line with `path` and `failure` context. | ☐ pass ☐ fail |
@@ -221,7 +225,6 @@ result of each step.
 
 | Gap | Evidence |
 |---|---|
-| Recovery offers no export or restore action. | `app/lib/src/app_root.dart` renders static recovery text: “Export and recovery actions arrive in the release-readiness task.” Task 9.3 requires an export offer. |
 | Price history has no production source. | The published bundle has no history endpoint. `PriceHistoryRepository` is injectable and tested; the detail screen shows the documented unavailable state until a history source is allowlisted. |
 | `host_allowlist.dart` still says GitHub hosts an app-update release page. | The client has no URL launcher and no self-updater; this document corrects the claim, but the code comment is out of scope for this change. |
 
