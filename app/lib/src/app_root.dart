@@ -346,47 +346,292 @@ class _StartupError extends StatelessWidget {
   }
 }
 
-class _RecoveryScreen extends StatelessWidget {
+/// Stable keys for the recovery screen.
+abstract final class RecoveryKeys {
+  static const Key screen = Key('recovery-screen');
+  static const Key exportProgress = Key('recovery-export-progress');
+  static const Key exportDiagnostics = Key('recovery-export-diagnostics');
+  static const Key progressPath = Key('recovery-progress-path');
+  static const Key progressChecksum = Key('recovery-progress-checksum');
+  static const Key progressCounts = Key('recovery-progress-counts');
+  static const Key diagnosticsPath = Key('recovery-diagnostics-path');
+  static const Key error = Key('recovery-error');
+}
+
+class _RecoveryScreen extends StatefulWidget {
   const _RecoveryScreen({required this.recovery});
 
   final AppSessionRecovery recovery;
 
   @override
+  State<_RecoveryScreen> createState() => _RecoveryScreenState();
+}
+
+class _RecoveryScreenState extends State<_RecoveryScreen> {
+  bool _exportingProgress = false;
+  bool _exportingDiagnostics = false;
+  RecoveryProgressFile? _progress;
+  RecoveryDiagnosticsCopy? _diagnostics;
+  String? _diagnosticsMessage;
+  String? _error;
+
+  bool get _busy => _exportingProgress || _exportingDiagnostics;
+
+  Future<void> _exportProgress() async {
+    setState(() {
+      _exportingProgress = true;
+      _error = null;
+    });
+    try {
+      final exporter = RecoveryProgressExporter(
+        widget.recovery.recoveryDatabase,
+      );
+      final result = await exporter.writeTo(
+        appVersion: widget.recovery.appVersion,
+        directory: widget.recovery.exportDirectory,
+      );
+      if (!mounted) return;
+      setState(() => _progress = result);
+    } on NoRecoveryProfilesError catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'No progress was exported. ${error.reasons.join(' ')}';
+      });
+    } on Object catch (error) {
+      if (!mounted) return;
+      setState(() => _error = 'The progress export failed: $error');
+    } finally {
+      if (mounted) setState(() => _exportingProgress = false);
+    }
+  }
+
+  Future<void> _exportDiagnostics() async {
+    setState(() {
+      _exportingDiagnostics = true;
+      _error = null;
+    });
+    try {
+      final result = await exportRecoveryDiagnostics(
+        directory: widget.recovery.exportDirectory,
+        logsDirectory: widget.recovery.logsDirectory,
+        backup: widget.recovery.backup,
+      );
+      if (!mounted) return;
+      setState(() {
+        _diagnostics = result;
+        _diagnosticsMessage = result.isEmpty
+            ? 'No backup or log files were available to copy.'
+            : 'Copied ${result.copiedFileCount} diagnostics '
+                  '${result.copiedFileCount == 1 ? 'file' : 'files'}.';
+      });
+    } on Object catch (error) {
+      if (!mounted) return;
+      setState(() => _error = 'The diagnostics export failed: $error');
+    } finally {
+      if (mounted) setState(() => _exportingDiagnostics = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final recovery = widget.recovery;
+    final progress = _progress;
+    final diagnostics = _diagnostics;
+    final error = _error;
+    final diagnosticsMessage = _diagnosticsMessage;
+
     return Scaffold(
+      key: RecoveryKeys.screen,
       appBar: AppBar(title: const Text('Tarkov Companion')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(tokens.spaceXl),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(
-                  Icons.warning_amber_outlined,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.error,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_outlined,
+                      size: 32,
+                      color: tokens.danger,
+                    ),
+                    SizedBox(width: tokens.spaceMd),
+                    Text('Local database recovery', style: tokens.h1Style),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: tokens.spaceMd),
+                Text(recovery.message, style: tokens.bodyStyle),
+                SizedBox(height: tokens.spaceLg),
+                AppPanel(
+                  label: 'Read-only state',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _RecoveryInfoRow(
+                        label: 'Detected schema version',
+                        value: '${recovery.detectedVersion}',
+                      ),
+                      _RecoveryInfoRow(
+                        label: 'Failure',
+                        value: '${recovery.failure}',
+                      ),
+                      SizedBox(height: tokens.spaceSm),
+                      Text(
+                        'The database file was left untouched. The app keeps '
+                        'one read-only SQLite handle open until it closes, and '
+                        'no write action is offered. Exports read the existing '
+                        'rows through that handle.',
+                        style: tokens.bodyStyle.copyWith(color: tokens.muted),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: tokens.spaceLg),
+                AppPanel(
+                  label: 'Export',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Wrap(
+                        spacing: tokens.spaceMd,
+                        runSpacing: tokens.spaceSm,
+                        children: [
+                          AppButton(
+                            key: RecoveryKeys.exportProgress,
+                            label: 'Export progress',
+                            onPressed: _busy ? null : _exportProgress,
+                          ),
+                          AppButton(
+                            key: RecoveryKeys.exportDiagnostics,
+                            label: 'Export diagnostics',
+                            variant: AppButtonVariant.secondary,
+                            onPressed: _busy ? null : _exportDiagnostics,
+                          ),
+                        ],
+                      ),
+                      if (error != null) ...[
+                        SizedBox(height: tokens.spaceMd),
+                        Text(
+                          error,
+                          key: RecoveryKeys.error,
+                          style: tokens.bodyStyle.copyWith(
+                            color: tokens.danger,
+                          ),
+                        ),
+                      ],
+                      if (diagnosticsMessage != null) ...[
+                        SizedBox(height: tokens.spaceMd),
+                        Text(diagnosticsMessage, style: tokens.bodyStyle),
+                      ],
+                      if (diagnostics != null) ...[
+                        SizedBox(height: tokens.spaceXs),
+                        Text(
+                          diagnostics.directory.path,
+                          key: RecoveryKeys.diagnosticsPath,
+                          style: tokens.dataStyle.copyWith(color: tokens.muted),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (progress != null) ...[
+                  SizedBox(height: tokens.spaceLg),
+                  AppPanel(
+                    label: 'Progress export',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          progress.file.path,
+                          key: RecoveryKeys.progressPath,
+                          style: tokens.dataStyle,
+                        ),
+                        SizedBox(height: tokens.spaceSm),
+                        Text(
+                          '${progress.export.document.profiles.length} '
+                          '${progress.export.document.profiles.length == 1 ? 'profile' : 'profiles'} · '
+                          '${progress.export.document.questCount} quest '
+                          '${progress.export.document.questCount == 1 ? 'state' : 'states'} · '
+                          '${progress.export.document.objectiveCount} objective '
+                          '${progress.export.document.objectiveCount == 1 ? 'count' : 'counts'}',
+                          key: RecoveryKeys.progressCounts,
+                          style: tokens.bodyStyle,
+                        ),
+                        SizedBox(height: tokens.spaceXs),
+                        Text(
+                          'Checksum ${_shortChecksum(progress.export.checksum)}',
+                          key: RecoveryKeys.progressChecksum,
+                          style: tokens.dataStyle.copyWith(color: tokens.value),
+                        ),
+                        SizedBox(height: tokens.spaceSm),
+                        Text(
+                          progress.diagnostics.isExact
+                              ? 'Every readable row was exported exactly.'
+                              : 'Skipped ${progress.diagnostics.skippedRows} '
+                                    'unreadable row(s); clamped '
+                                    '${progress.diagnostics.normalizedRows} '
+                                    'out-of-range value(s).',
+                          style: tokens.bodyStyle.copyWith(
+                            color: progress.diagnostics.isExact
+                                ? tokens.muted
+                                : tokens.danger,
+                          ),
+                        ),
+                        SizedBox(height: tokens.spaceSm),
+                        Text(
+                          'Copy the path above to open the export folder.',
+                          style: tokens.bodyStyle.copyWith(color: tokens.muted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                SizedBox(height: tokens.spaceLg),
                 Text(
-                  'Local database recovery',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(recovery.message, textAlign: TextAlign.center),
-                const SizedBox(height: 12),
-                const Text(
-                  'No data was deleted. Export and recovery actions arrive in '
-                  'the release-readiness task.',
-                  textAlign: TextAlign.center,
+                  'Writes are refused by SQLite, and the recovery handle stays '
+                  'open until the app closes.',
+                  style: tokens.bodyStyle.copyWith(color: tokens.muted),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  String _shortChecksum(String checksum) {
+    const prefix = 'sha256:';
+    final digits = checksum.startsWith(prefix)
+        ? checksum.substring(prefix.length)
+        : checksum;
+    final short = digits.length <= 12 ? digits : digits.substring(0, 12);
+    return 'sha256:$short…';
+  }
+}
+
+class _RecoveryInfoRow extends StatelessWidget {
+  const _RecoveryInfoRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceXs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 180, child: AppSectionLabel(label)),
+          SizedBox(width: tokens.spaceMd),
+          Expanded(child: Text(value, style: tokens.dataStyle)),
+        ],
       ),
     );
   }

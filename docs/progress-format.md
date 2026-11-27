@@ -118,6 +118,49 @@ with the directory picker. The file contents, checksum, save location handling
 and re-read are covered by the data and feature tests; only the dialog itself is
 manual.
 
+## Recovery export
+
+When the database cannot be opened, it is kept and reopened read-only. The
+recovery screen offers **Export progress**, which uses
+`RecoveryProgressExporter` in
+`app/packages/data/lib/src/profiles/recovery_export.dart`.
+
+* **Same file format.** The writer builds the same `ProgressExportDocument`,
+  canonical JSON and `sha256:` checksum as `ProgressExportWriter`, so a recovery
+  file imports through the normal Profiles flow.
+* **One read-only handle.** Every row is read with `RecoveryDatabase.select` on
+  the handle the migration runner already opened. The exporter never opens the
+  database again and never writes to SQLite; `RecoveryDatabase.execute` is only
+  used by tests to prove that a write fails with `attempt to write a readonly
+  database`.
+* **Destination.** `RecoveryProgressExporter.writeTo` writes
+  `progress-recovery-<UTC timestamp>.json` into the app's `<data>/recovery`
+  directory, for example
+  `progress-recovery-20261127T120000.123456Z.json`. A name collision gets a
+  `-1`, `-2`, ... suffix instead of overwriting an earlier export; the screen
+  shows the exact written path.
+* **Deterministic order.** Profiles sort by game mode wire value, then id;
+  quests sort by quest id; objectives sort by quest id, then objective id. A
+  second export of the same rows with the same clock is byte-identical.
+* **Damaged rows.** A row the format cannot represent is skipped and counted in
+  `RecoveryExportDiagnostics.skippedRows`: an unknown quest state, a blank id,
+  an unknown game mode, a duplicate profile/quest/objective or a row that
+  points at a profile that was not readable. A player level outside `1`–`99` or
+  an objective count outside `0`–`1000000` is clamped and counted in
+  `normalizedRows`. The screen reports both counts; it does not throw and it
+  still writes a valid document.
+* **Unreadable tables.** A failed `profiles` read raises
+  `NoRecoveryProfilesError` because the format requires at least one profile;
+  the screen shows that sentence inline. A failed `questProgress` or
+  `objectiveProgress` read is recorded as a warning and the profile is exported
+  with an empty list for that table.
+* **Diagnostics.** **Export diagnostics** copies the current pre-migration
+  backup (when present) and the current `app*.log` files into the same
+  `recovery/` directory with `exportRecoveryDiagnostics`. It copies files only:
+  it does not read the database and does not open a socket. When there is
+  nothing to copy the screen says
+  `No backup or log files were available to copy.`
+
 ## Import validation
 
 The file is validated as a whole before any write:

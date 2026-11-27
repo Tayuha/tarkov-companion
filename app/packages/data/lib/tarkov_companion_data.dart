@@ -37,6 +37,7 @@ export 'src/profiles/profile_services.dart';
 export 'src/profiles/progress_export.dart';
 export 'src/profiles/progress_format.dart';
 export 'src/profiles/progress_import.dart';
+export 'src/profiles/recovery_export.dart';
 export 'src/quests/quest_availability.dart';
 export 'src/quests/quest_detail.dart';
 export 'src/quests/quest_labels.dart';

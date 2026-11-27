@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
@@ -87,15 +88,43 @@ final class AppSessionReady extends AppSession {
 }
 
 /// The database could not be opened and is available read-only.
+///
+/// The session owns the existing [RecoveryDatabase] handle: the recovery screen
+/// reads progress and diagnostics through it, and never opens the file again.
+/// [exportDirectory] is the only writable location the screen uses.
 final class AppSessionRecovery extends AppSession {
   AppSessionRecovery({
     required this.message,
     required this.failure,
+    required this.recoveryDatabase,
+    required this.detectedVersion,
+    required this.logsDirectory,
+    required this.exportDirectory,
+    this.backup,
+    this.appVersion = '0.1.0',
     required super.close,
   });
 
   final String message;
   final Object failure;
+
+  /// The read-only handle opened by the migration runner.
+  final RecoveryDatabase recoveryDatabase;
+
+  /// The file's `PRAGMA user_version` as detected during the failed open.
+  final int detectedVersion;
+
+  /// The pre-migration backup, when the failed attempt created one.
+  final File? backup;
+
+  /// The rotating log directory the app is currently writing to.
+  final Directory logsDirectory;
+
+  /// Writable directory for recovery exports (`<data>/recovery`).
+  final Directory exportDirectory;
+
+  /// User-visible app version recorded in an exported progress file.
+  final String appVersion;
 }
 
 /// Opens the database through the migration lifecycle and builds the sync
@@ -133,6 +162,11 @@ Future<AppSession> openAppSession({
           'The local database could not be opened. It was left untouched and '
           'is available read-only. ${opened.failure}',
       failure: opened.failure,
+      recoveryDatabase: opened.database,
+      detectedVersion: opened.detectedVersion,
+      backup: opened.backup,
+      logsDirectory: paths.logsDirectory,
+      exportDirectory: Directory(_join(paths.root.path, 'recovery')),
       close: () async {
         await opened.close();
         await logger.close();
@@ -232,4 +266,12 @@ Future<AppSession> openAppSession({
     await logger.close();
     rethrow;
   }
+}
+
+String _join(String directory, String name) {
+  final separator = Platform.pathSeparator;
+  final base = directory.endsWith(separator)
+      ? directory.substring(0, directory.length - separator.length)
+      : directory;
+  return '$base$separator$name';
 }
