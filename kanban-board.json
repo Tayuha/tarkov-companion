@@ -1703,17 +1703,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 29,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement keyboard navigation and visible focus for the catalog and quest lists, verified by widget tests driving focus traversal without pointer input",
+      "notes": "Running in final batch workstream ses_de45cb799ffe15mA53P2X180Qp.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb799ffe15mA53P2X180Qp"
     },
     {
       "id": "task_impl_8_8",
@@ -1787,17 +1788,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 32,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Add an end-to-end test covering first run, catalog browse, item detail, quest completion, export, and re-import, verified by the test passing against the fixture-backed build",
+      "notes": "Running in final batch workstream ses_de45cb798ffe4WBjD2m3aikpBT.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb798ffe4WBjD2m3aikpBT"
     },
     {
       "id": "task_impl_9_2",
@@ -1808,17 +1810,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 33,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Manual checklist on a clean Linux environment after an initial sync; Windows VM checklist deferred.",
+      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
     },
     {
       "id": "task_impl_9_3",
@@ -1829,17 +1832,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 34,
+      "categoryID": "inprogress",
+      "position": 3,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Verify the read-only recovery path by corrupting a copy of the database, verified by the app opening in recovery mode, offering export, and refusing writes",
+      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
     },
     {
       "id": "task_impl_9_4",
@@ -1850,17 +1854,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 35,
+      "categoryID": "inprogress",
+      "position": 4,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Audit all network destinations against the documented allowlist, verified by a captured-request review with no hosts outside the list",
+      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
     },
     {
       "id": "task_impl_9_5",
@@ -1871,17 +1876,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 36,
+      "categoryID": "inprogress",
+      "position": 5,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Finalize README with screenshots, build-from-source steps, data attribution, and contribution paths, verified by a contributor following it on a clean machine",
+      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795760024044,
+      "archived": false,
+      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
     },
     {
       "id": "task_impl_9_6",
