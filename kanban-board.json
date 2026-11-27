@@ -1642,18 +1642,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 3,
+      "categoryID": "done",
+      "position": 80,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in shell batch workstream ses_de46be31fffeHCZkisgzaeifKD.",
+      "notes": "Merged as e48ece9. Shared AppStatusStrip/UpstreamStatus, cached rows with retry, explicit offline empty states, quest Available outage variant, detail strips, history retry. Seam optional until the shell passes the check closure.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795759028454,
-      "archived": false,
-      "sessionID": "ses_de46be31fffeHCZkisgzaeifKD"
+      "updatedAt": 1795759743053,
+      "archived": false
     },
     {
       "id": "task_impl_8_5",
