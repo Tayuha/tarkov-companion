@@ -70,4 +70,15 @@ void main() {
     expect(theme.dividerTheme.color, tokens.border);
     expect(theme.dividerTheme.thickness, 1);
   });
+
+  test('the app bar is a compact surface breadcrumb', () {
+    final bar = theme.appBarTheme;
+
+    expect(bar.backgroundColor, tokens.surface);
+    expect(bar.foregroundColor, tokens.muted);
+    expect(bar.elevation, 0);
+    expect(bar.toolbarHeight, 44);
+    expect(bar.titleTextStyle?.fontFamily, 'DejaVu Sans Mono');
+    expect(bar.titleTextStyle?.color, tokens.muted);
+  });
 }

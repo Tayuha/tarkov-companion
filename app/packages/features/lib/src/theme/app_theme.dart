@@ -22,13 +22,23 @@ ThemeData buildAppTheme() {
     textTheme: textTheme,
     primaryTextTheme: textTheme,
     iconTheme: IconThemeData(color: tokens.muted, size: tokens.h2Size),
+    // Detail routes repeat the entity name in the body header, so the bar is a
+    // compact breadcrumb: surface fill, hairline rule, mono label type.
     appBarTheme: AppBarThemeData(
-      backgroundColor: tokens.background,
-      foregroundColor: tokens.text,
+      backgroundColor: tokens.surface,
+      foregroundColor: tokens.muted,
       elevation: 0,
       scrolledUnderElevation: 0,
-      surfaceTintColor: tokens.background,
-      titleTextStyle: tokens.h2Style,
+      surfaceTintColor: tokens.surface,
+      toolbarHeight: 44,
+      shape: Border(bottom: BorderSide(color: tokens.border)),
+      iconTheme: IconThemeData(color: tokens.muted, size: tokens.h2Size),
+      actionsIconTheme: IconThemeData(color: tokens.muted, size: tokens.h2Size),
+      titleTextStyle: tokens.labelStyle.copyWith(
+        fontSize: tokens.dataSize,
+        letterSpacing: 0.06,
+        color: tokens.muted,
+      ),
     ),
     dividerTheme: DividerThemeData(
       color: tokens.border,

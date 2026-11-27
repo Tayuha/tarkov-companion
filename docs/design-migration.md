@@ -173,6 +173,18 @@ omission rule, objective progress rails, not-found/orphaned states and the
 existing action callbacks. Four quest goldens (list at 1440 and 1920, detail at
 1440 and 900) are generated with the phosphor theme and bundled fonts.
 
+Goldens load three font families: Fira Sans Condensed and DejaVu Sans Mono from
+`app/assets/fonts`, plus `MaterialIcons-Regular.otf` from the Flutter SDK cache.
+Without the icon font every `Icon` renders as a tofu box, which made earlier
+goldens look broken even though the runtime was correct. The loader probes
+`FLUTTER_ROOT`, `~/.local/flutter` and `/opt/flutter`, and skips the icon font
+when none is found so non-golden runs stay portable.
+
+Pushed detail routes use the compact 44 px app bar from `buildAppTheme()`: a
+surface fill, a hairline bottom border and the mono label style. The body header
+still carries the entity title, so the bar reads as a breadcrumb rather than a
+second heading.
+
 ```bash
 cd app
 flutter test packages/features/test/catalog

@@ -26,7 +26,41 @@ Future<void> loadDesignFonts() async {
     ..addFont(_read(directory, 'DejaVuSansMono.ttf'))
     ..addFont(_read(directory, 'DejaVuSansMono-Bold.ttf'));
 
-  await Future.wait(<Future<void>>[ui.load(), mono.load()]);
+  final loads = <Future<void>>[ui.load(), mono.load()];
+
+  // Material icons are not bundled with the app assets; flutter_test does not
+  // load them either, so without this every `Icon` renders as a tofu box in a
+  // golden. The font ships with the Flutter SDK.
+  final iconFont = _materialIconsFont();
+  if (iconFont != null) {
+    final icons = FontLoader('MaterialIcons')..addFont(_readFile(iconFont));
+    loads.add(icons.load());
+  }
+
+  await Future.wait(loads);
+}
+
+File? _materialIconsFont() {
+  final roots = <String>[
+    if (Platform.environment['FLUTTER_ROOT'] case final String root) root,
+    if (Platform.environment['HOME'] case final String home)
+      '$home/.local/flutter',
+    '/opt/flutter',
+  ];
+  for (final root in roots) {
+    final file = File(
+      '$root/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+    );
+    if (file.existsSync()) {
+      return file;
+    }
+  }
+  return null;
+}
+
+Future<ByteData> _readFile(File file) async {
+  final bytes = await file.readAsBytes();
+  return ByteData.sublistView(bytes);
 }
 
 Directory? _fontDirectory() {
