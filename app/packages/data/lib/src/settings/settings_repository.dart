@@ -15,12 +15,20 @@ abstract final class AppSettingKeys {
   static const String allowMeteredUpdates = 'settings.allowMeteredUpdates';
   static const String dataFreshnessHours = 'settings.dataFreshnessHours';
 
+  /// Desktop window geometry document written by the app shell.
+  ///
+  /// The value is JSON-encoded like every other setting and holds a JSON
+  /// document (`{"x":0,"y":0,"width":1280,"height":720}`). The data layer
+  /// does not interpret the document.
+  static const String windowGeometry = 'settings.windowGeometry';
+
   /// Every key this client reads and writes.
   static const Set<String> all = {
     activeProfileId,
     autoUpdateEnabled,
     allowMeteredUpdates,
     dataFreshnessHours,
+    windowGeometry,
   };
 }
 
@@ -80,6 +88,7 @@ final class SettingsRepository {
         AppSettings.defaultAllowMeteredUpdates,
       ),
       dataFreshnessHours: _decodeFreshness(stored),
+      windowGeometryJson: _decodeWindowGeometry(stored),
     );
   }
 
@@ -112,6 +121,7 @@ final class SettingsRepository {
       AppSettingKeys.dataFreshnessHours: jsonEncode(
         settings.dataFreshnessHours,
       ),
+      AppSettingKeys.windowGeometry: jsonEncode(settings.windowGeometryJson),
     };
 
     await _database.transaction(() async {
@@ -150,6 +160,17 @@ final class SettingsRepository {
   Future<void> setDataFreshnessHours(int hours) async {
     final current = await read();
     await write(current.copyWith(dataFreshnessHours: hours));
+  }
+
+  /// Saves or clears the desktop window geometry document.
+  Future<void> setWindowGeometryJson(String? geometry) async {
+    final current = await read();
+    await write(current.copyWith(windowGeometryJson: geometry));
+  }
+
+  /// Reads the desktop window geometry document, or `null` when absent.
+  Future<String?> readWindowGeometryJson() async {
+    return (await read()).windowGeometryJson;
   }
 
   /// Deletes every settings row and returns the documented defaults.
@@ -220,6 +241,24 @@ final class SettingsRepository {
       return AppSettings.defaultDataFreshnessHours;
     }
     return value;
+  }
+
+  String? _decodeWindowGeometry(Map<String, String> stored) {
+    const key = AppSettingKeys.windowGeometry;
+    final raw = stored[key];
+    if (raw == null) {
+      return AppSettings.defaultWindowGeometryJson;
+    }
+    final decoded = _decodeJson(raw, key);
+    if (!decoded.isValid) {
+      return AppSettings.defaultWindowGeometryJson;
+    }
+    final value = decoded.value;
+    if (value == null || value is String) {
+      return value as String?;
+    }
+    _warn(key, 'expected a string or null, found ${_typeName(value)}');
+    return AppSettings.defaultWindowGeometryJson;
   }
 
   ({bool isValid, Object? value}) _decodeJson(String raw, String key) {

@@ -52,6 +52,24 @@ final class AppPaths {
   /// Holds verified per-mode dataset files.
   Directory get downloadsDirectory => Directory(_join(root.path, 'downloads'));
 
+  /// Holds the single-instance lock and socket.
+  ///
+  /// Prefers `$XDG_RUNTIME_DIR/tarkov_companion`, the per-user, tmpfs runtime
+  /// location on Linux. When the variable is unset it falls back to `run/` in
+  /// the data root so two processes on one machine still share one lock.
+  Directory get runtimeDirectory => runtimeDirectoryFrom(Platform.environment);
+
+  /// Resolves the runtime directory from [environment].
+  ///
+  /// [environment] exists for tests; production uses the process environment.
+  Directory runtimeDirectoryFrom(Map<String, String> environment) {
+    final xdgRuntime = environment['XDG_RUNTIME_DIR']?.trim();
+    if (xdgRuntime != null && xdgRuntime.isNotEmpty) {
+      return Directory(_join(xdgRuntime, 'tarkov_companion'));
+    }
+    return Directory(_join(root.path, 'run'));
+  }
+
   /// The database file path.
   String get databasePath =>
       _join(databaseDirectory.path, 'tarkov_companion.sqlite');

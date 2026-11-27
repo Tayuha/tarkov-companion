@@ -5,6 +5,7 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import 'app_session.dart';
+import 'deep_links.dart';
 import 'home_shell.dart';
 
 /// Opens a session. Injected so widget tests can start from a fake session.
@@ -17,9 +18,12 @@ typedef AppSessionOpener = Future<AppSession> Function();
 /// after the local database confirms there is no applied dataset. No manifest
 /// request happens until the user presses Start.
 class AppRoot extends StatefulWidget {
-  const AppRoot({super.key, required this.openSession});
+  const AppRoot({super.key, required this.openSession, this.deepLinks});
 
   final AppSessionOpener openSession;
+
+  /// Deep links waiting for the session (launch argument or a second launch).
+  final DeepLinkInbox? deepLinks;
 
   @override
   State<AppRoot> createState() => _AppRootState();
@@ -29,11 +33,22 @@ class _AppRootState extends State<AppRoot> {
   late Future<AppSession> _sessionFuture;
   AppSession? _session;
   bool _firstRunComplete = false;
+  bool _deepLinkFrameScheduled = false;
 
   @override
   void initState() {
     super.initState();
     _sessionFuture = _open();
+    widget.deepLinks?.addListener(_scheduleDeepLink);
+  }
+
+  @override
+  void didUpdateWidget(AppRoot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.deepLinks != widget.deepLinks) {
+      oldWidget.deepLinks?.removeListener(_scheduleDeepLink);
+      widget.deepLinks?.addListener(_scheduleDeepLink);
+    }
   }
 
   Future<AppSession> _open() async {
@@ -56,11 +71,63 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   void dispose() {
+    widget.deepLinks?.removeListener(_scheduleDeepLink);
     final session = _session;
     if (session != null) {
       unawaited(session.close());
     }
     super.dispose();
+  }
+
+  /// Pushes one pending item deep link after the current frame.
+  ///
+  /// Waiting for the frame is required on the launch path: the link can arrive
+  /// before the first session build, and `Navigator.push` cannot run during a
+  /// build. Deep links wait for the first-run gate to finish so the item detail
+  /// can pop back to a populated catalog.
+  void _scheduleDeepLink() {
+    if (_deepLinkFrameScheduled) {
+      return;
+    }
+    _deepLinkFrameScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _deepLinkFrameScheduled = false;
+      _openNextDeepLink();
+    });
+    // A deep link can arrive when nothing else is animating; make sure the
+    // frame that runs the callback is actually scheduled.
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  void _openNextDeepLink() {
+    if (!mounted) {
+      return;
+    }
+    final inbox = widget.deepLinks;
+    final session = _session;
+    if (inbox == null || session is! AppSessionReady) {
+      return;
+    }
+    if (!session.hasAppliedDatasets && !_firstRunComplete) {
+      return;
+    }
+    final catalog = session.catalog;
+    if (catalog == null) {
+      return;
+    }
+    final link = inbox.take();
+    if (link == null) {
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            ItemDetailScreen(repository: catalog, itemId: link.itemId),
+      ),
+    );
+    if (inbox.hasPending) {
+      _scheduleDeepLink();
+    }
   }
 
   @override
@@ -94,8 +161,12 @@ class _AppRootState extends State<AppRoot> {
             return;
           }
           setState(() => _firstRunComplete = true);
+          _scheduleDeepLink();
         },
       );
+    }
+    if (widget.deepLinks?.hasPending ?? false) {
+      _scheduleDeepLink();
     }
     return HomeShell(
       catalog: session.catalog,

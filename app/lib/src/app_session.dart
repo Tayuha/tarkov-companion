@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import 'app_paths.dart';
@@ -22,6 +24,7 @@ final class AppSessionReady extends AppSession {
     this.catalog,
     this.quests,
     this.activeProfileId,
+    this.settings,
     required super.close,
   });
 
@@ -43,6 +46,12 @@ final class AppSessionReady extends AppSession {
 
   /// Active profile id used for quest progress badges, when available.
   final String? activeProfileId;
+
+  /// Typed access to local app preferences, when a real database is open.
+  ///
+  /// The desktop shell uses this for persisted window geometry; tests may
+  /// omit it.
+  final SettingsRepository? settings;
 }
 
 /// The database could not be opened and is available read-only.
@@ -100,6 +109,10 @@ Future<AppSession> openAppSession({
   final database = (opened as DatabaseOpened).database;
   final stateRepository = DatasetStateRepository(database);
   final client = httpClient ?? AllowlistedHttpClient();
+  final settings = SettingsRepository(
+    database,
+    onWarning: (message) => unawaited(logger.warn(message)),
+  );
 
   try {
     final applied = await stateRepository.appliedForMode(GameMode.regular);
@@ -142,6 +155,7 @@ Future<AppSession> openAppSession({
       catalog: CatalogRepository(database),
       quests: QuestRepository(database),
       activeProfileId: activeProfile.id,
+      settings: settings,
       close: () async {
         client.close();
         await opened.close();
