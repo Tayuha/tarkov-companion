@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Tayuha/tarkov-companion/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue.
+  - name: Contributing and development setup
+    url: https://github.com/Tayuha/tarkov-companion/blob/main/CONTRIBUTING.md
+    about: Read the build, test, and OpenSpec workflow before opening a pull request.
+  - name: Release and Linux packaging
+    url: https://github.com/Tayuha/tarkov-companion/blob/main/docs/release.md
+    about: How artifacts are built, checksummed, and approved before publication.

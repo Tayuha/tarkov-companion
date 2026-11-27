@@ -1,0 +1,43 @@
+# Normalize text files to LF; the tree is already LF (see git ls-files --eol).
+# Shell and CI files are pinned so a Windows checkout cannot break them.
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.bash text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.dart text eol=lf
+
+# Windows tooling keeps its native line endings.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+*.vcxproj.filters text eol=crlf
+
+# Binary assets: never diff, merge or convert them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.jar binary
+*.AppImage binary
+*.deb binary
+*.jsonl.zst binary
+*.zst binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Keep generated archives and release output out of GitHub's language stats.
+dist/** linguist-generated=true
+pipeline/package-lock.json linguist-generated=true
+app/pubspec.lock linguist-generated=true
+
+# Dart and Markdown diffs are easier to read with these drivers when set up;
+# they degrade to a normal text diff when they are not.
+*.dart diff=dart
+*.md diff=markdown

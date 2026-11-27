@@ -65,11 +65,11 @@ version: 0.1.0+1
 Bump the version in `app/pubspec.yaml` before packaging a release; do not edit a
 file name by hand. For the current version the script produces:
 
-| Artifact | Path |
-|---|---|
-| AppImage | `dist/TarkovCompanion-0.1.0-x86_64.AppImage` |
-| Debian package (optional) | `dist/TarkovCompanion-0.1.0-x86_64.deb` |
-| Checksums | `dist/SHA256SUMS` |
+| Artifact                  | Path                                         |
+| ------------------------- | -------------------------------------------- |
+| AppImage                  | `dist/TarkovCompanion-0.1.0-x86_64.AppImage` |
+| Debian package (optional) | `dist/TarkovCompanion-0.1.0-x86_64.deb`      |
+| Checksums                 | `dist/SHA256SUMS`                            |
 
 `dist/` is ignored by Git. The AppImage is approximately 11 MB (squashed); the
 `.deb` is about 8 MB because it stores the bundle uncompressed inside an `ar`
@@ -87,9 +87,24 @@ sha256sum -c SHA256SUMS
 `sha256sum -c` on any Linux host. A mismatch means the artifact was rebuilt or
 modified; rebuild and re-check rather than hand-editing the file.
 
-The build is **unsigned**: no signing key is configured yet. The release notes
-for the first release must say so and point to the checksum verification above
-(task 8.10).
+The build is **unsigned**: no signing key is configured yet. The generated
+release notes say so on every release and include the SHA-256 table; see
+[`release.md`](release.md) for the full release process.
+
+## CI
+
+`.github/workflows/release-linux.yml` runs on manual dispatch and on `v*` tags.
+The `package` job runs on `ubuntu-latest` with Flutter 3.50.1, installs the
+GTK/CMake toolchain and `xvfb`, runs `scripts/package-linux.sh`, verifies
+`SHA256SUMS`, smoke-launches the AppImage under Xvfb for up to 25 seconds,
+generates `dist/RELEASE_NOTES.md`, and uploads the AppImage, optional `.deb`,
+checksum file, notes, and smoke log as a workflow artifact. A tag additionally
+creates a **draft** GitHub Release in a separate `contents: write` job. Nothing
+is signed and nothing is published without manual approval.
+
+`.github/workflows/ci.yml` keeps building the package on `main` and pull
+requests for early failure detection. It does not create a release or tag. The
+Windows job stays as a compatibility check.
 
 ## Run the AppImage
 
@@ -133,15 +148,6 @@ cd app/linux/packaging
 rsvg-convert -w 256 -h 256 -o tarkov-companion.png tarkov-companion.svg
 rsvg-convert -w 512 -h 512 -o tarkov-companion-512.png tarkov-companion.svg
 ```
-
-## CI
-
-The `package-linux` job in `.github/workflows/ci.yml` runs on `ubuntu-latest`
-with Flutter 3.50.1. It installs the GTK/CMake toolchain, runs
-`scripts/package-linux.sh`, verifies `SHA256SUMS`, and uploads the AppImage,
-`.deb`, and checksum file as the `tarkov-companion-linux-x86_64` workflow
-artifact. It does not create a release or tag. The Windows job stays as a
-compatibility check.
 
 ## Manual approval checklist (task 8.9 gate)
 

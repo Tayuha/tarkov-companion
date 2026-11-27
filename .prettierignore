@@ -1,0 +1,37 @@
+# Build output and caches
+node_modules/
+dist/
+.cache/
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+pipeline/coverage/
+pipeline/dist/
+
+# Generated or vendored snapshots that are intentionally not Prettier-shaped
+kanban-board.json
+pipeline/package-lock.json
+app/pubspec.lock
+openspec/
+test/fixtures/
+app/packages/**/test/fixtures/
+design/
+app/assets/licenses/
+app/linux/flutter/
+app/windows/flutter/
+
+# Binary assets
+*.png
+*.jpg
+*.jpeg
+*.ico
+*.AppImage
+*.deb
+*.jsonl.zst
+*.zst
+
+# Security and editor files
+.env
+.env.*
+!.env.example

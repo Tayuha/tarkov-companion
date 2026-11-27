@@ -1,0 +1,191 @@
+name: Release (Linux)
+
+# Manual runs always build and upload the artifacts for verification. A version
+# tag additionally creates a *draft* GitHub Release; a maintainer inspects the
+# artifacts and publishes it by hand. Nothing is signed (see docs/release.md).
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-linux-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Package Linux x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact: ${{ steps.version.outputs.artifact }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.50.1"
+          channel: stable
+          cache: true
+
+      - name: Read version from pubspec.yaml
+        id: version
+        run: |
+          version_line="$(sed -n 's/^version:[[:space:]]*//p' app/pubspec.yaml | head -n 1 | tr -d '\r')"
+          version="${version_line%%+*}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "unsupported version '$version_line' in app/pubspec.yaml" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "artifact=tarkov-companion-${version}-linux-x86_64" >> "$GITHUB_OUTPUT"
+          echo "Building Tarkov Companion $version" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check tag matches the app version
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [[ "$TAG" != "v$VERSION" ]]; then
+            echo "tag '$TAG' does not match app/pubspec.yaml version 'v$VERSION'" >&2
+            echo "bump app/pubspec.yaml or retag; refusing to build a mislabelled release" >&2
+            exit 1
+          fi
+
+      # Flutter's Linux desktop build needs GTK/CMake; xvfb provides a display
+      # for the smoke launch, and dpkg-deb builds the optional .deb.
+      - name: Install Linux build and packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev xvfb dbus-x11
+
+      - name: Build AppImage and checksums
+        run: bash scripts/package-linux.sh
+
+      - name: Verify checksums
+        run: (cd dist && sha256sum -c SHA256SUMS)
+
+      - name: Inspect artifacts
+        run: |
+          for artifact in dist/*.AppImage dist/*.deb; do
+            if [[ -f "$artifact" ]]; then
+              file "$artifact"
+            fi
+          done
+
+      # 25 seconds is enough to prove the bundle reaches the Flutter engine.
+      # timeout exits 124 when the app is still running, which is the pass case;
+      # a crash or a missing library exits earlier with a non-zero status.
+      - name: Smoke launch the AppImage
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set +e
+          timeout 25s dbus-run-session -- xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+            "./dist/TarkovCompanion-${VERSION}-x86_64.AppImage" \
+            --appimage-extract-and-run > dist/smoke.log 2>&1
+          status=$?
+          set -e
+          cat dist/smoke.log
+          if [[ "$status" -eq 124 || "$status" -eq 0 ]]; then
+            echo "AppImage started (status $status)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "AppImage failed to start (status $status)" >&2
+            exit 1
+          fi
+
+      - name: Generate release notes
+        env:
+          TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          bash scripts/release-notes.sh \
+            --checksums dist/SHA256SUMS \
+            --out dist/RELEASE_NOTES.md \
+            --commit "$COMMIT" \
+            --tag "$TAG"
+
+      - name: Summarize artifacts
+        run: |
+          {
+            echo "## Linux release artifacts"
+            echo
+            echo "Version: \`${{ steps.version.outputs.version }}\`"
+            echo
+            echo '```'
+            cat dist/SHA256SUMS
+            echo '```'
+            echo
+            echo "Signing status: **unsigned** (no key is configured)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version.outputs.artifact }}
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/SHA256SUMS
+            dist/RELEASE_NOTES.md
+            dist/smoke.log
+          if-no-files-found: error
+          retention-days: 30
+
+  # Only a version tag creates a release, and only as a draft. This keeps the
+  # manual approval gate: download, verify, launch, sync and browse first.
+  draft-release:
+    name: Draft GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.package.outputs.artifact }}
+          path: release
+
+      - name: Create draft release if absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.package.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG already exists; leaving it untouched" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          files=()
+          for candidate in release/*.AppImage release/*.deb release/SHA256SUMS; do
+            if [[ -f "$candidate" ]]; then
+              files+=("$candidate")
+            fi
+          done
+          gh release create "$TAG" "${files[@]}" \
+            --draft \
+            --verify-tag \
+            --title "Tarkov Companion $TAG" \
+            --notes-file release/RELEASE_NOTES.md
+          echo "created draft release $TAG (unsigned); publish after manual approval" \
+            >> "$GITHUB_STEP_SUMMARY"

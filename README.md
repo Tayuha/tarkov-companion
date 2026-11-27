@@ -10,7 +10,7 @@ flea market, and track quest progress — on your machine, offline, without an a
 > sync, the item catalog and item detail, the quest list and interactive quest detail, profiles, and
 > AppImage packaging. The Linux approval gate and the remaining backlog are tracked in
 > [`HANDOFF.md`](HANDOFF.md) and `kanban-board.json`. Windows and mobile are deferred until the Linux
-> build is approved.
+> build is approved. The public roadmap is [`docs/roadmap.md`](docs/roadmap.md).
 >
 > Visual concept: [`design/README.md`](design/README.md) — FigCraft pages, tokens and previews.
 
@@ -51,13 +51,13 @@ dataset by SHA-256 and ingests it transactionally into its own schema. See
 
 ## Repository layout
 
-| Path | Purpose |
-|---|---|
-| `app/` | Flutter client (Linux target at launch) |
-| `pipeline/` | Node/TypeScript data pipeline and bundle publisher |
-| `test/fixtures/` | Trimmed upstream fixtures used by tests |
-| `docs/` | Data bundle contract, sync protocol, local schema, progress format |
-| `openspec/` | Specifications, design, and implementation plan |
+| Path             | Purpose                                                                                      |
+| ---------------- | -------------------------------------------------------------------------------------------- |
+| `app/`           | Flutter client (Linux target at launch)                                                      |
+| `pipeline/`      | Node/TypeScript data pipeline and bundle publisher                                           |
+| `test/fixtures/` | Trimmed upstream fixtures used by tests                                                      |
+| `docs/`          | Data bundle contract, sync protocol, local schema, progress format, release process, roadmap |
+| `openspec/`      | Specifications, design, and implementation plan                                              |
 
 ## Building
 
@@ -84,7 +84,20 @@ bash scripts/package-linux.sh
 ```
 
 Artifacts land in `dist/`. See [`docs/linux-package.md`](docs/linux-package.md) for versioning,
-checksum verification, and the manual approval checklist.
+checksum verification, and the manual approval checklist. The release workflow
+(`.github/workflows/release-linux.yml`) runs on manual dispatch and on `v*` tags; a tag creates a
+draft GitHub Release with the AppImage, optional `.deb`, `SHA256SUMS`, and generated notes that state
+the unsigned status. Do not publish a release before the manual gate passes. See
+[`docs/release.md`](docs/release.md).
+
+Before opening a pull request, check formatting without rewriting unrelated files:
+
+```bash
+bash scripts/check-format.sh
+```
+
+The opt-in check covers `dart format` (80 columns) and Prettier for the release/CI docs. Existing
+docs and pipeline sources have legacy formatting drift; `--all` reports it.
 
 ## Data and attribution
 
