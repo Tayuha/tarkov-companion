@@ -126,9 +126,11 @@ item detail panel labels the same field `48 h` consistently. See
 `ItemImage` when the screen is given an `ItemImageCache`. The cache is lazy,
 disk-backed, bounded by an LRU byte budget and falls back to the same 40×40
 neutral slot on a cache miss or fetch failure, so row height and the
-virtualized list geometry never change. Without a cache (the app shell does not
-pass one yet) the placeholder is used and no network or disk access happens.
-See [`item-detail.md`](item-detail.md#images-task-56).
+virtualized list geometry never change. The production shell builds one cache at
+session start over `cache/images` and passes it to the catalog and every detail
+route; sessions built without a cache (shell tests) use the placeholder and do
+no network or disk access. See
+[`item-detail.md`](item-detail.md#images-task-56).
 
 ## Tests
 

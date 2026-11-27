@@ -44,6 +44,7 @@ class HomeShell extends StatefulWidget {
     this.updates,
     this.dataBundle,
     this.upstreamCheck,
+    this.imageCache,
     this.appVersion = '0.1.0',
     this.onQuestSelected,
   });
@@ -77,6 +78,12 @@ class HomeShell extends StatefulWidget {
   /// network seam leave it null, which keeps the catalog and quests offline
   /// strip dormant.
   final UpstreamCheck? upstreamCheck;
+
+  /// Disk-backed item artwork cache shared by the list and detail routes.
+  ///
+  /// Null keeps placeholders, which is what shell tests without a network
+  /// seam use.
+  final ItemImageCache? imageCache;
 
   /// Version written into exported progress files and shown on About.
   final String appVersion;
@@ -147,6 +154,7 @@ class _HomeShellState extends State<HomeShell> {
           repository: catalog,
           itemId: itemId,
           upstreamCheck: widget.upstreamCheck,
+          imageCache: widget.imageCache,
         ),
       ),
     );
@@ -309,6 +317,7 @@ class _HomeShellState extends State<HomeShell> {
       repository: catalog,
       onItemSelected: _openItem,
       upstreamCheck: widget.upstreamCheck,
+      imageCache: widget.imageCache,
     );
   }
 

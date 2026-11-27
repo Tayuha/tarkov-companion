@@ -150,8 +150,10 @@ Network fetches go through `AllowlistedItemImageFetcher`, which wraps
 `assets.tarkov.dev` allowlist entry. Tests inject a fake fetcher and never open
 a socket.
 
-`ItemDetailScreen` and `CatalogScreen` accept an optional `imageCache`. When it
-is absent (the app shell does not pass one yet) both keep the placeholder and
+`ItemDetailScreen` and `CatalogScreen` accept an optional `imageCache`. The
+production session builds one cache over `<data>/cache/images` with the
+allowlisted fetcher and shares it through the shell with the catalog and every
+detail route. Sessions without a cache (shell tests) keep the placeholder and
 perform no I/O.
 
 ## Price history (task 5.7)
@@ -219,6 +221,7 @@ corrupt payload. `item_relations_test.dart`, `price_history_test.dart` and
 
 ## Out of scope
 
-Deep-link routing by game id (task 5.8) is separate. The image cache and the
-price-history source are injectable but not wired by the app shell yet; the
-screen renders the documented placeholder/unavailable states instead.
+Deep-link routing by game id (task 5.8) is separate. The image cache is wired
+by the production session. The price-history source stays injectable but
+unwired because the published bundle has no history endpoint; the screen
+renders the documented unavailable state instead.

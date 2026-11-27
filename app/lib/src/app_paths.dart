@@ -52,6 +52,9 @@ final class AppPaths {
   /// Holds verified per-mode dataset files.
   Directory get downloadsDirectory => Directory(_join(root.path, 'downloads'));
 
+  /// Holds cached item artwork, bounded by the image cache budget.
+  Directory get imagesDirectory => Directory(_join(root.path, 'cache', 'images'));
+
   /// Holds the single-instance lock and socket.
   ///
   /// Prefers `$XDG_RUNTIME_DIR/tarkov_companion`, the per-user, tmpfs runtime

@@ -214,6 +214,7 @@ class _AppRootState extends State<AppRoot> {
       updates: session.updates,
       dataBundle: session.dataBundle,
       upstreamCheck: _upstreamCheck(session),
+      imageCache: session.imageCache,
     );
   }
 

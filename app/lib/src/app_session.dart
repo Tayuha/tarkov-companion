@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
+import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import 'app_paths.dart';
 import 'sync_monitors.dart';
@@ -29,6 +30,7 @@ final class AppSessionReady extends AppSession {
     this.settings,
     this.updates,
     this.dataBundle,
+    this.imageCache,
     required super.close,
   });
 
@@ -76,6 +78,12 @@ final class AppSessionReady extends AppSession {
 
   /// A read-only summary of the locally applied data bundle for About.
   final DataBundleStatus? dataBundle;
+
+  /// Disk-backed item artwork cache shared by the catalog and detail routes.
+  ///
+  /// Optional so shell tests can build a session without a cache; production
+  /// always provides it.
+  final ItemImageCache? imageCache;
 }
 
 /// The database could not be opened and is available read-only.
@@ -191,6 +199,11 @@ Future<AppSession> openAppSession({
       clock: clock,
     );
 
+    final imageCache = ItemImageCache(
+      directory: paths.imagesDirectory,
+      fetcher: AllowlistedItemImageFetcher(client),
+    );
+
     return AppSessionReady(
       sync: coordinator,
       hasAppliedDatasets: hasAppliedDatasets,
@@ -201,6 +214,7 @@ Future<AppSession> openAppSession({
       settings: settings,
       updates: updates,
       dataBundle: dataBundle,
+      imageCache: imageCache,
       close: () async {
         await updates.dispose();
         client.close();

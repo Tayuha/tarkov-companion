@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -92,6 +94,7 @@ void main() {
     UpdateCheckControl? updates,
     DataBundleStatus? dataBundle,
     UpstreamCheck? upstreamCheck,
+    ItemImageCache? imageCache,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -108,6 +111,7 @@ void main() {
           updates: updates,
           dataBundle: dataBundle,
           upstreamCheck: upstreamCheck,
+          imageCache: imageCache,
         ),
       ),
     );
@@ -283,6 +287,21 @@ void main() {
     expect(find.text('Colt M4A1 5.56x45 assault rifle'), findsWidgets);
   });
 
+  testWidgets('the shell shares the image cache with the catalog', (
+    tester,
+  ) async {
+    final directory = await Directory.systemTemp.createTemp('tc-images-');
+    addTearDown(() => directory.delete(recursive: true));
+    final cache = ItemImageCache(directory: directory, fetcher: _NoopFetcher());
+
+    await pumpShell(tester, imageCache: cache);
+
+    expect(
+      tester.widget<CatalogScreen>(find.byType(CatalogScreen)).imageCache,
+      same(cache),
+    );
+  });
+
   testWidgets('a session without updates still exposes About', (tester) async {
     await pumpShell(tester);
 
@@ -318,4 +337,9 @@ final class _FakeUpdateControl implements UpdateCheckControl {
 
   @override
   Future<void> dispose() => _controller.close();
+}
+
+final class _NoopFetcher implements ItemImageFetcher {
+  @override
+  Future<Uint8List> fetch(Uri uri) async => Uint8List(0);
 }
