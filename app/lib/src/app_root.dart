@@ -23,12 +23,24 @@ typedef AppSessionOpener = Future<AppSession> Function();
 /// the first local frame. It never blocks that frame: a slow manifest, an
 /// offline host or a failed download is reported in the shell footer.
 class AppRoot extends StatefulWidget {
-  const AppRoot({super.key, required this.openSession, this.deepLinks});
+  const AppRoot({
+    super.key,
+    required this.openSession,
+    this.deepLinks,
+    this.progressFilePicker,
+  });
 
   final AppSessionOpener openSession;
 
   /// Deep links waiting for the session (launch argument or a second launch).
   final DeepLinkInbox? deepLinks;
+
+  /// File-dialog seam for profile export/import.
+  ///
+  /// Production omits it and the Profiles screen opens the platform dialog.
+  /// The end-to-end widget test supplies a directory-backed picker because a
+  /// native dialog cannot be driven headlessly.
+  final ProgressFilePicker? progressFilePicker;
 
   @override
   State<AppRoot> createState() => _AppRootState();
@@ -213,6 +225,7 @@ class _AppRootState extends State<AppRoot> {
       profileServices: session.profileServices,
       updates: session.updates,
       dataBundle: session.dataBundle,
+      progressFilePicker: widget.progressFilePicker,
       upstreamCheck: _upstreamCheck(session),
     );
   }

@@ -44,6 +44,7 @@ class HomeShell extends StatefulWidget {
     this.updates,
     this.dataBundle,
     this.upstreamCheck,
+    this.progressFilePicker,
     this.appVersion = '0.1.0',
     this.onQuestSelected,
   });
@@ -77,6 +78,13 @@ class HomeShell extends StatefulWidget {
   /// network seam leave it null, which keeps the catalog and quests offline
   /// strip dormant.
   final UpstreamCheck? upstreamCheck;
+
+  /// File-dialog seam forwarded to [ProfilesScreen].
+  ///
+  /// Null keeps the production platform dialog. The end-to-end widget test
+  /// injects a directory-backed picker, which is the only way to drive export
+  /// and import without a native window.
+  final ProgressFilePicker? progressFilePicker;
 
   /// Version written into exported progress files and shown on About.
   final String appVersion;
@@ -330,6 +338,7 @@ class _HomeShellState extends State<HomeShell> {
   Widget _buildProfilesTab() {
     return ProfilesScreen(
       services: widget.profileServices!,
+      picker: widget.progressFilePicker ?? const PlatformProgressFilePicker(),
       appVersion: widget.appVersion,
       onProfileChanged: _onProfileChanged,
     );
