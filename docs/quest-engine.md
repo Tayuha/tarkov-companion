@@ -18,12 +18,12 @@ locked/available/in-progress/completed answer is computed when it is read.
 ```dart
 final repository = QuestRepository(db);
 
-Future<QuestDetail?> detail(String questId);
+Future<QuestDetail?> detail(String questId, {String? profileId});
 Future<List<QuestObjective>> objectivesFor(String taskId);
 
 Future<List<QuestStatus>> statuses(String profileId);
 Future<QuestStatus?> status(String profileId, String questId);
-Future<List<QuestStatus>> availableQuests(String profileId);
+Future<List<QuestStatus>> availableQuests(String profileId, {QuestSort? sort});
 Future<List<OrphanedQuestProgress>> orphanedProgress(String profileId);
 
 Future<void> setQuestState(
@@ -44,6 +44,10 @@ Every read or write is scoped to one `profileId`. A missing profile throws
 catalog query (`QuestRepository.query`) is independent and still reports the
 raw recorded state used by its `state` filter.
 
+Reads that accept a profile also scope tasks to that profile's game mode (see
+[Game modes](#game-modes)). Without a profile there is no active mode, so the
+catalog and detail lookup stay mode-agnostic.
+
 ## Quest detail
 
 `QuestDetail` is built from the canonical task payload plus the split-out
@@ -61,7 +65,35 @@ raw recorded state used by its `state` filter.
   quest. A quest removed upstream cannot appear as an unlock.
 
 Objectives are ordered by objective id. `objectivesFor` returns an empty list
-for an unknown quest; `detail` returns `null`.
+for an unknown quest; `detail` returns `null`. `detail(id, profileId: …)` also
+returns `null` for a quest scoped to another game mode, so a stale link cannot
+open a quest the active profile cannot see.
+
+## Game modes
+
+Each bundle task may carry `gameMode`, an optional string list. `statuses`,
+`status`, `availableQuests` and the profile-scoped form of `detail` keep only
+tasks whose list is empty or contains the profile's `profiles.gameMode`. A
+missing, empty or malformed list is treated as mode-agnostic so older bundles
+and hand-written fixtures keep working. The catalog query applies the same rule
+whenever `QuestQuery.profileId` names a real profile; see
+[`quest-queries.md`](quest-queries.md).
+
+A PvE-only task is therefore absent from a regular profile's catalog and
+available view even though its row is still in `tasks`. Writing state or an
+objective count for it throws `QuestNotFoundError`, exactly like a quest that
+was removed upstream. Progress rows for a task that exists in another mode are
+not orphans: switching to that mode's profile brings the quest back.
+
+## Available ordering
+
+`availableQuests` returns only `QuestAvailability.available` statuses. Without
+`sort` it uses the recommended order: minimum player level ascending (missing
+last), trader id ascending (missing last), normalized name ascending, quest id
+ascending. `sort` replaces the primary criterion with any `QuestSortField`
+(name, level, trader or map); ties remain normalized name then quest id, and
+missing values stay last in both directions. The available view exposes level,
+trader, map and name.
 
 ## State machine
 
@@ -181,6 +213,11 @@ Orphans are never used for prerequisite satisfaction, level gating or the
 available-quests view. They are preserved so that a quest that returns in a
 later dataset keeps the player's history.
 
+The quest screen lists them in an **Unavailable upstream** panel and keeps the
+catalog usable; the detail screen has a dedicated orphan state. A quest that
+exists in another game mode is not an orphan: existence is checked against
+`tasks`, not against the profile's mode, so switching modes restores it.
+
 ## Transactions, ordering and profile isolation
 
 - `setQuestState` and `setObjectiveCount` each run in one database transaction.
@@ -188,9 +225,9 @@ later dataset keeps the player's history.
   `DateTime.now`); they are diagnostic and never affect availability.
 - `availableQuests` is deterministic: minimum player level ascending (missing
   last), trader id ascending (missing last), normalized name ascending, quest
-  id ascending.
-- Switching `profileId` immediately changes every derived state; no read ever
-  mixes rows from two profiles.
+  id ascending, or the caller's `QuestSort` with the same name/id tie-breakers.
+- Switching `profileId` immediately changes every derived state and the mode
+  filter; no read ever mixes rows from two profiles or two modes.
 
 ## Schema
 

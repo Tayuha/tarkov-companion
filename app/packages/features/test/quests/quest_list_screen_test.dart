@@ -266,6 +266,90 @@ void main() {
     expect(badgeIn('quest-debut', 'NOT STARTED'), findsOneWidget);
   });
 
+  testWidgets('the catalog keeps only the active profile game mode', (
+    tester,
+  ) async {
+    await pumpQuests(tester, profileId: fixtureProfileRegular);
+    expect(find.text('PvE Only Raid'), findsNothing);
+    expect(find.text('Showing 14 of 14 quests'), findsOneWidget);
+
+    await pumpQuests(tester, profileId: fixtureProfilePve);
+    expect(find.text('PvE Only Raid'), findsOneWidget);
+    expect(find.text('Showing 15 of 15 quests'), findsOneWidget);
+  });
+
+  testWidgets('available view lists startable quests and orders them', (
+    tester,
+  ) async {
+    await pumpQuests(tester);
+
+    await tester.tap(find.byKey(const Key('quest-view-available')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Available quests'), findsOneWidget);
+    expect(find.text('6 available quests'), findsOneWidget);
+    expect(badgeIn('quest-cafe', 'AVAILABLE'), findsOneWidget);
+    expect(find.text('Café Crème'), findsOneWidget);
+    expect(find.text('Shortage'), findsOneWidget);
+    expect(find.text('The Punisher - Part 2'), findsOneWidget);
+    expect(find.text('Debut'), findsNothing);
+    expect(find.text('Collector'), findsNothing);
+    expect(find.text('Prapor · Level 1 · Customs'), findsNothing);
+    expect(find.text('Therapist · Level 10 · Interchange'), findsWidgets);
+
+    double topOf(String text) => tester.getTopLeft(find.text(text)).dy;
+    expect(topOf('Shortage'), lessThan(topOf('Car Repair')));
+
+    await tester.tap(find.byKey(const Key('quest-available-order-name')));
+    await tester.pumpAndSettle();
+
+    expect(topOf('Car Repair'), lessThan(topOf('Shortage')));
+    final selected = tester.widget<AppChip>(
+      find.byKey(const Key('quest-available-order-name')),
+    );
+    expect(selected.selected, isTrue);
+  });
+
+  testWidgets('available view explains an empty profile clearly', (
+    tester,
+  ) async {
+    await database.customStatement('UPDATE tasks SET minPlayerLevel = 99');
+    await pumpQuests(tester);
+
+    await tester.tap(find.byKey(const Key('quest-view-available')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 available quests'), findsOneWidget);
+    expect(find.byKey(const Key('quest-available-empty')), findsOneWidget);
+    expect(find.text('Nothing is available to start.'), findsOneWidget);
+    expect(
+      find.textContaining('locked by a level, trader, or prerequisite'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const Key('quest-available-open-catalog')));
+    await tester.pumpAndSettle();
+    expect(find.text('Quest catalog'), findsOneWidget);
+  });
+
+  testWidgets('progress for a removed quest is listed as unavailable', (
+    tester,
+  ) async {
+    await database.customStatement(
+      'INSERT INTO questProgress (profileId, questId, state, updatedAt) '
+      'VALUES (?, ?, ?, ?)',
+      [fixtureProfileRegular, 'quest-removed-upstream', 'in-progress', 0],
+    );
+
+    await pumpQuests(tester);
+
+    expect(find.byKey(const Key('quest-unavailable-panel')), findsOneWidget);
+    expect(find.text('UNAVAILABLE UPSTREAM'), findsOneWidget);
+    expect(find.text('quest-removed-upstream'), findsOneWidget);
+    expect(find.textContaining('In progress'), findsOneWidget);
+    expect(find.text('Showing 14 of 14 quests'), findsOneWidget);
+  });
+
   testWidgets('empty results keep the query and reset restores the list', (
     tester,
   ) async {

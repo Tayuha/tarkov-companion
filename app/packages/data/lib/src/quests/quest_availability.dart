@@ -224,6 +224,8 @@ final class QuestStatus {
     required this.traderId,
     required this.mapId,
     required this.minPlayerLevel,
+    required this.experience,
+    required this.kappaRequired,
     required this.availability,
     required this.recordedState,
     required this.reasons,
@@ -240,6 +242,12 @@ final class QuestStatus {
   final String? traderId;
   final String? mapId;
   final int? minPlayerLevel;
+
+  /// Experience reward, when upstream provides one.
+  final int? experience;
+
+  /// Whether the quest counts towards the Kappa container.
+  final bool kappaRequired;
 
   final QuestAvailability availability;
 
@@ -284,6 +292,23 @@ final class QuestStatus {
 
   /// Whether the UI should offer "mark complete" for the current state.
   bool get canMarkComplete => !isCompleted && objectivesSatisfied;
+
+  /// This status as a catalog row.
+  ///
+  /// The available-quests view renders the same table and compact rows as the
+  /// catalog, so it needs a [QuestSummary]. Converting from the status keeps
+  /// the derived availability separate: the summary only carries the recorded
+  /// state, exactly like a catalog row read for the same profile.
+  QuestSummary toSummary() => QuestSummary(
+    id: id,
+    name: name,
+    traderId: traderId,
+    mapId: mapId,
+    minPlayerLevel: minPlayerLevel,
+    experience: experience,
+    kappaRequired: kappaRequired,
+    progressState: recordedState,
+  );
 
   @override
   String toString() =>

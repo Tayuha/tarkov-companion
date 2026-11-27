@@ -112,7 +112,10 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
     }
 
     try {
-      final detail = await widget.repository.detail(widget.questId);
+      final detail = await widget.repository.detail(
+        widget.questId,
+        profileId: widget.profileId,
+      );
       QuestStatus? status;
       var statusesById = <String, QuestStatus>{};
       var itemNames = <String, String>{};

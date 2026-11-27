@@ -25,24 +25,39 @@ export 'quest_list_row.dart'
         questStateAppStatus,
         questStateLabel;
 
-/// The searchable, filterable quest catalog.
+/// The two views the quest screen switches between.
+enum _QuestViewMode {
+  /// Every quest in the active dataset, with search, filters and pagination.
+  catalog,
+
+  /// Only quests the active profile can start now, with its own ordering.
+  available,
+}
+
+/// The searchable, filterable quest catalog plus the available-quests view.
 ///
 /// The screen owns presentation state only: the data layer executes every
 /// query through [QuestRepository]. It deliberately does not decide quest
-/// availability (task 6.3), open a detail view (tasks 6.4/6.5) or record
-/// progress (task 6.6); a row tap is reported through [onQuestSelected].
+/// availability, open a detail view or record progress; a row tap is reported
+/// through [onQuestSelected].
 ///
 /// Behavior:
 ///
+/// * a Catalog/Available segment switches the list without changing route; the
+///   available view uses the profile's derived statuses and its own ordering,
+///   and explains an empty result instead of showing generic "no results";
 /// * typing waits [searchDebounce] before it reaches the repository, and a
 ///   response that belongs to an older query is discarded, so fast typing
 ///   cannot make an old result overwrite a newer one;
 /// * trader, map, level and state filters combine with AND with the search
 ///   text; each active filter appears as a removable token and the reset action
 ///   clears every filter and the search field;
-/// * progress state is read for [profileId] only, so two profiles render
-///   independent badges over the same catalog; when a profile exists the badge
-///   and progress fraction use the derived availability and objective counts;
+/// * progress and game mode are read for [profileId] only: two profiles render
+///   independent badges and never blend another mode's tasks; the repository
+///   applies the mode filter, so a PvE-only quest is absent under a regular
+///   profile;
+/// * preserved progress for quests missing from the active dataset is listed in
+///   an "Unavailable upstream" panel instead of being dropped;
 /// * rows are built on demand by a `ListView.builder` and pages are appended
 ///   with the explicit load-more control, so a large catalog never
 ///   materializes as one widget tree;
@@ -99,12 +114,16 @@ class _QuestListScreenState extends State<QuestListScreen> {
 
   final List<QuestSummary> _quests = <QuestSummary>[];
   Map<String, QuestStatus> _statusById = const <String, QuestStatus>{};
+  List<OrphanedQuestProgress> _orphans = const <OrphanedQuestProgress>[];
   int _total = 0;
   bool _loading = true;
   bool _loadingMore = false;
   Object? _error;
   late List<QuestFilterOption> _traderOptions;
   late List<QuestFilterOption> _mapOptions;
+
+  _QuestViewMode _view = _QuestViewMode.catalog;
+  QuestSort _availableSort = const QuestSort(QuestSortField.minPlayerLevel);
 
   /// Incremented for each repository request. Only the newest response may
   /// write to the state, which makes the debounce and page appends race-free.
@@ -202,12 +221,60 @@ class _QuestListScreenState extends State<QuestListScreen> {
     profileId: widget.profileId,
   );
 
+  /// Preserved progress whose quest left the active dataset.
+  ///
+  /// A read failure must not hide the catalog: the panel is additive, so it
+  /// degrades to "no known orphans" instead of failing the screen.
+  Future<List<OrphanedQuestProgress>> _loadOrphans() async {
+    final profileId = widget.profileId;
+    if (profileId == null) {
+      return const <OrphanedQuestProgress>[];
+    }
+    try {
+      return await widget.repository.orphanedProgress(profileId);
+    } on Object {
+      return const <OrphanedQuestProgress>[];
+    }
+  }
+
   Future<void> _fetchFirstPage(int generation) async {
     try {
+      if (_view == _QuestViewMode.available) {
+        final profileId = widget.profileId;
+        final availableFuture = profileId == null
+            ? Future<List<QuestStatus>>.value(const <QuestStatus>[])
+            : widget.repository.availableQuests(
+                profileId,
+                sort: _availableSort,
+              );
+        final orphanFuture = _loadOrphans();
+        final available = await availableFuture;
+        final orphans = await orphanFuture;
+        if (!mounted || generation != _requestGeneration) {
+          return;
+        }
+        setState(() {
+          _quests
+            ..clear()
+            ..addAll(available.map((status) => status.toSummary()));
+          _statusById = <String, QuestStatus>{
+            for (final status in available) status.id: status,
+          };
+          _total = available.length;
+          _orphans = orphans;
+          _loading = false;
+          _loadingMore = false;
+          _error = null;
+        });
+        return;
+      }
+
       final pageFuture = widget.repository.query(_queryForOffset(0));
       final statusFuture = _loadStatuses();
+      final orphanFuture = _loadOrphans();
       final page = await pageFuture;
       final statusById = await statusFuture;
+      final orphans = await orphanFuture;
       if (!mounted || generation != _requestGeneration) {
         return;
       }
@@ -217,6 +284,7 @@ class _QuestListScreenState extends State<QuestListScreen> {
           ..addAll(page.quests);
         _total = page.total;
         _statusById = statusById;
+        _orphans = orphans;
         _loading = false;
         _loadingMore = false;
         _error = null;
@@ -244,7 +312,10 @@ class _QuestListScreenState extends State<QuestListScreen> {
   }
 
   Future<void> _loadMore() async {
-    if (_loading || _loadingMore || !_hasMore) {
+    if (_view != _QuestViewMode.catalog ||
+        _loading ||
+        _loadingMore ||
+        !_hasMore) {
       return;
     }
     final generation = ++_requestGeneration;
@@ -346,6 +417,24 @@ class _QuestListScreenState extends State<QuestListScreen> {
     _reload();
   }
 
+  void _setView(_QuestViewMode view) {
+    if (view == _view) {
+      return;
+    }
+    _searchTimer?.cancel();
+    setState(() => _view = view);
+    _reload();
+  }
+
+  void _setAvailableSort(QuestSortField field) {
+    final next = QuestSort(field);
+    if (next == _availableSort) {
+      return;
+    }
+    _availableSort = next;
+    _reload();
+  }
+
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
@@ -366,47 +455,66 @@ class _QuestListScreenState extends State<QuestListScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              key: const Key('quest-search-field'),
-                              controller: _searchController,
-                              textInputAction: TextInputAction.search,
-                              style: tokens.bodyStyle,
-                              decoration: InputDecoration(
-                                hintText: 'Search quests',
-                                prefixIcon: const Icon(Icons.search),
-                                suffixIcon: _searchController.text.isEmpty
-                                    ? null
-                                    : IconButton(
-                                        key: const Key('quest-clear-search'),
-                                        tooltip: 'Clear search',
-                                        onPressed: _clearSearch,
-                                        icon: const Icon(Icons.close),
-                                      ),
+                      if (widget.profileId != null) ...[
+                        _QuestViewSegment(view: _view, onChanged: _setView),
+                        SizedBox(height: tokens.spaceMd),
+                      ],
+                      if (_view == _QuestViewMode.catalog) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                key: const Key('quest-search-field'),
+                                controller: _searchController,
+                                textInputAction: TextInputAction.search,
+                                style: tokens.bodyStyle,
+                                decoration: InputDecoration(
+                                  hintText: 'Search quests',
+                                  prefixIcon: const Icon(Icons.search),
+                                  suffixIcon: _searchController.text.isEmpty
+                                      ? null
+                                      : IconButton(
+                                          key: const Key('quest-clear-search'),
+                                          tooltip: 'Clear search',
+                                          onPressed: _clearSearch,
+                                          icon: const Icon(Icons.close),
+                                        ),
+                                ),
+                                onChanged: _onSearchChanged,
+                                onSubmitted: _onSearchSubmitted,
                               ),
-                              onChanged: _onSearchChanged,
-                              onSubmitted: _onSearchSubmitted,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: tokens.spaceMd),
-                      QuestFilterBar(
-                        filters: _filters,
-                        traderOptions: _traderOptions,
-                        mapOptions: _mapOptions,
-                        onTraderSelected: _setTrader,
-                        onMapSelected: _setMap,
-                        onLevelSelected: _setLevel,
-                        onStateSelected: _setState,
-                        onRemoveText: _clearSearch,
-                        onReset: _resetFilters,
-                      ),
+                          ],
+                        ),
+                        SizedBox(height: tokens.spaceMd),
+                        QuestFilterBar(
+                          filters: _filters,
+                          traderOptions: _traderOptions,
+                          mapOptions: _mapOptions,
+                          onTraderSelected: _setTrader,
+                          onMapSelected: _setMap,
+                          onLevelSelected: _setLevel,
+                          onStateSelected: _setState,
+                          onRemoveText: _clearSearch,
+                          onReset: _resetFilters,
+                        ),
+                      ] else
+                        _AvailableToolbar(
+                          sort: _availableSort,
+                          onSortSelected: _setAvailableSort,
+                        ),
                       SizedBox(height: tokens.spaceLg),
-                      _QuestHeading(resultCount: _resultCountLabel),
+                      _QuestHeading(
+                        title: _view == _QuestViewMode.available
+                            ? 'Available quests'
+                            : 'Quest catalog',
+                        resultCount: _resultCountLabel,
+                      ),
                       SizedBox(height: tokens.spaceSm),
+                      if (_orphans.isNotEmpty) ...[
+                        _UnavailableQuestsPanel(orphans: _orphans),
+                        SizedBox(height: tokens.spaceSm),
+                      ],
                       if (layout != QuestLayout.compact)
                         QuestTableHeader(layout: layout),
                       if (_loading && _quests.isNotEmpty)
@@ -440,6 +548,10 @@ class _QuestListScreenState extends State<QuestListScreen> {
     if (_loading && _quests.isEmpty) {
       return 'Loading quests…';
     }
+    if (_view == _QuestViewMode.available) {
+      final count = _quests.length;
+      return '$count available ${count == 1 ? 'quest' : 'quests'}';
+    }
     return 'Showing ${_quests.length} of $_total quests';
   }
 
@@ -452,6 +564,11 @@ class _QuestListScreenState extends State<QuestListScreen> {
       }
       if (_error != null) {
         return const SizedBox.shrink();
+      }
+      if (_view == _QuestViewMode.available) {
+        return _AvailableEmptyState(
+          onOpenCatalog: () => _setView(_QuestViewMode.catalog),
+        );
       }
       return _QuestEmptyState(filters: _filters, onReset: _resetFilters);
     }
@@ -509,10 +626,209 @@ class _QuestListScreenState extends State<QuestListScreen> {
   }
 }
 
+/// Switches the screen between the full catalog and the available-quests view.
+class _QuestViewSegment extends StatelessWidget {
+  const _QuestViewSegment({required this.view, required this.onChanged});
+
+  final _QuestViewMode view;
+  final ValueChanged<_QuestViewMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      key: const Key('quest-view-segment'),
+      spacing: AppTokens.of(context).spaceSm,
+      runSpacing: AppTokens.of(context).spaceXs,
+      children: [
+        AppChip(
+          key: const Key('quest-view-catalog'),
+          label: 'Catalog',
+          selected: view == _QuestViewMode.catalog,
+          onTap: () => onChanged(_QuestViewMode.catalog),
+        ),
+        AppChip(
+          key: const Key('quest-view-available'),
+          label: 'Available',
+          selected: view == _QuestViewMode.available,
+          onTap: () => onChanged(_QuestViewMode.available),
+        ),
+      ],
+    );
+  }
+}
+
+/// The ordering control for the available-quests view.
+///
+/// The catalog filters do not apply here: the view is exactly "what can I start
+/// now", so only the criterion the user chose is exposed.
+class _AvailableToolbar extends StatelessWidget {
+  const _AvailableToolbar({required this.sort, required this.onSortSelected});
+
+  final QuestSort sort;
+  final ValueChanged<QuestSortField> onSortSelected;
+
+  static const _labels = <QuestSortField, String>{
+    QuestSortField.minPlayerLevel: 'Level',
+    QuestSortField.traderId: 'Trader',
+    QuestSortField.mapId: 'Map',
+    QuestSortField.name: 'Name',
+  };
+
+  static const _keys = <QuestSortField, String>{
+    QuestSortField.minPlayerLevel: 'level',
+    QuestSortField.traderId: 'trader',
+    QuestSortField.mapId: 'map',
+    QuestSortField.name: 'name',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Wrap(
+      key: const Key('quest-available-ordering'),
+      spacing: tokens.spaceSm,
+      runSpacing: tokens.spaceXs,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text('Order by', style: tokens.labelStyle),
+        for (final field in _labels.keys)
+          AppChip(
+            key: Key('quest-available-order-${_keys[field]}'),
+            label: _labels[field]!,
+            selected: sort.field == field,
+            onTap: () => onSortSelected(field),
+          ),
+      ],
+    );
+  }
+}
+
+/// The explanation shown when the profile can start nothing.
+class _AvailableEmptyState extends StatelessWidget {
+  const _AvailableEmptyState({required this.onOpenCatalog});
+
+  final VoidCallback onOpenCatalog;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: Column(
+          key: const Key('quest-available-empty'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.task_alt, size: 48, color: tokens.dim),
+            SizedBox(height: tokens.spaceMd),
+            Text(
+              'Nothing is available to start.',
+              key: const Key('quest-available-empty-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
+            ),
+            SizedBox(height: tokens.spaceXs),
+            Text(
+              'Every quest is locked by a level, trader, or prerequisite '
+              'requirement, already in progress, or completed. Open the '
+              'catalog to see the specific lock reasons.',
+              key: const Key('quest-available-empty-detail'),
+              textAlign: TextAlign.center,
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
+              key: const Key('quest-available-open-catalog'),
+              label: 'Open catalog',
+              variant: AppButtonVariant.secondary,
+              onPressed: onOpenCatalog,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Preserved progress for quests that are not in the active dataset.
+///
+/// The panel lists them separately instead of dropping them: the user's state
+/// and objective counts are still there, but they are excluded from the
+/// catalog, the available view and every prerequisite calculation.
+class _UnavailableQuestsPanel extends StatelessWidget {
+  const _UnavailableQuestsPanel({required this.orphans});
+
+  final List<OrphanedQuestProgress> orphans;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return AppPanel(
+      key: const Key('quest-unavailable-panel'),
+      label: 'Unavailable upstream',
+      trailing: AppStatusBadge(
+        status: AppStatus.locked,
+        label: '${orphans.length}',
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 180),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'These quests are missing from the active dataset. Their '
+                'recorded progress is preserved, but they are excluded from '
+                'requirement calculations.',
+                key: const Key('quest-unavailable-detail'),
+                style: tokens.bodyStyle.copyWith(color: tokens.muted),
+              ),
+              SizedBox(height: tokens.spaceSm),
+              for (final orphan in orphans)
+                Padding(
+                  key: ValueKey('quest-unavailable-${orphan.questId}'),
+                  padding: EdgeInsets.only(top: tokens.spaceXs),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(orphan.questId, style: tokens.bodyStyle),
+                            Text(
+                              '${questStateLabel(orphan.state)} · '
+                              '${orphan.objectiveCounts.length} objective '
+                              '${orphan.objectiveCounts.length == 1 ? 'count' : 'counts'} '
+                              'preserved',
+                              style: tokens.labelStyle.copyWith(
+                                color: tokens.muted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: tokens.spaceSm),
+                      const AppStatusBadge(
+                        status: AppStatus.locked,
+                        label: 'Unavailable',
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The quest title and the result count.
 class _QuestHeading extends StatelessWidget {
-  const _QuestHeading({required this.resultCount});
+  const _QuestHeading({required this.title, required this.resultCount});
 
+  final String title;
   final String resultCount;
 
   @override
@@ -528,7 +844,7 @@ class _QuestHeading extends StatelessWidget {
             children: [
               const AppSectionLabel('Quests'),
               SizedBox(height: tokens.spaceXs),
-              Text('Quest catalog', style: tokens.h1Style),
+              Text(title, style: tokens.h1Style),
             ],
           ),
         ),
