@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -88,6 +89,8 @@ void main() {
     WidgetTester tester, {
     Size size = const Size(1000, 800),
     ValueChanged<String>? onQuestSelected,
+    UpdateCheckControl? updates,
+    DataBundleStatus? dataBundle,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -95,11 +98,14 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildAppTheme(),
         home: HomeShell(
           catalog: catalog,
           quests: quests,
           activeProfileId: 'profile-regular',
           onQuestSelected: onQuestSelected,
+          updates: updates,
+          dataBundle: dataBundle,
         ),
       ),
     );
@@ -215,4 +221,82 @@ void main() {
 
     expect(selected, 'quest-checking');
   });
+
+  testWidgets('the footer keeps the status strip out of the primary rail', (
+    tester,
+  ) async {
+    final updates = _FakeUpdateControl();
+
+    await pumpShell(tester, updates: updates);
+
+    expect(find.byKey(const Key('home-navigation-rail')), findsOneWidget);
+    expect(find.byKey(SyncStatusKeys.bar), findsOneWidget);
+    expect(find.byKey(SyncStatusKeys.about), findsOneWidget);
+    expect(find.byKey(const Key('home-rail-about')), findsNothing);
+    expect(find.text('DAILY'), findsOneWidget);
+  });
+
+  testWidgets('the footer About entry opens the About screen', (tester) async {
+    final updates = _FakeUpdateControl();
+
+    await pumpShell(
+      tester,
+      updates: updates,
+      dataBundle: DataBundleStatus(
+        mode: GameMode.regular,
+        appliedDatasets: 7,
+        expectedDatasets: 7,
+        oldestAppliedAt: DateTime.utc(2026, 11, 25, 12),
+        manifestVersion: 1,
+        bundleSchemaVersion: 1,
+        manifestGeneratedAt: DateTime.utc(2026, 11, 24, 10, 32),
+      ),
+    );
+
+    await tester.tap(find.byKey(SyncStatusKeys.about));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AboutScreen), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(AboutKeys.appVersion)).data, '0.1.0');
+    expect(
+      tester.widget<Text>(find.byKey(AboutKeys.bundleVersion)).data,
+      'manifest 1 · schema 1',
+    );
+  });
+
+  testWidgets('a session without updates still exposes About', (tester) async {
+    await pumpShell(tester);
+
+    expect(find.byKey(const Key('home-footer')), findsOneWidget);
+    expect(find.byKey(const Key('home-about')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('home-about')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AboutScreen), findsOneWidget);
+  });
+}
+
+final class _FakeUpdateControl implements UpdateCheckControl {
+  final _controller = StreamController<UpdateCheckStatus>.broadcast();
+
+  @override
+  UpdateCheckStatus status = const UpdateCheckStatus();
+
+  @override
+  Stream<UpdateCheckStatus> get changes => _controller.stream;
+
+  @override
+  Future<void> start() async {}
+
+  @override
+  Future<UpdateCheckStatus> checkNow() async => status;
+
+  @override
+  Future<void> setSchedule(UpdateSchedule schedule) async {
+    status = status.copyWith(schedule: schedule);
+    _controller.add(status);
+  }
+
+  @override
+  Future<void> dispose() => _controller.close();
 }

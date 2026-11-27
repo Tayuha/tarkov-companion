@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import 'app_paths.dart';
+import 'sync_monitors.dart';
 
 /// An opened application, or a database that needs recovery.
 ///
@@ -26,6 +27,8 @@ final class AppSessionReady extends AppSession {
     this.activeProfileId,
     this.profileServices,
     this.settings,
+    this.updates,
+    this.dataBundle,
     required super.close,
   });
 
@@ -34,6 +37,10 @@ final class AppSessionReady extends AppSession {
   final SyncService sync;
 
   /// Whether the active mode already has at least one applied dataset.
+  ///
+  /// Any applied dataset is enough to render the shell from local data. A
+  /// partial install opens the shell too; the background update check resumes
+  /// the missing datasets without a blocking gate.
   final bool hasAppliedDatasets;
 
   /// Query facade for the catalog, when a real database is open.
@@ -59,6 +66,16 @@ final class AppSessionReady extends AppSession {
   /// The desktop shell uses this for persisted window geometry; tests may
   /// omit it.
   final SettingsRepository? settings;
+
+  /// Background update controls and their persisted status.
+  ///
+  /// Optional so shell widget tests can build a session without a scheduler.
+  /// The production session always provides it; [AppRoot] starts it after the
+  /// first local-data frame.
+  final UpdateCheckControl? updates;
+
+  /// A read-only summary of the locally applied data bundle for About.
+  final DataBundleStatus? dataBundle;
 }
 
 /// The database could not be opened and is available read-only.
@@ -83,6 +100,8 @@ Future<AppSession> openAppSession({
   required AppPaths paths,
   AppDatabaseFactory? databaseFactory,
   AllowlistedHttpClient? httpClient,
+  NetworkMonitor? networkMonitor,
+  VisibilityMonitor? visibilityMonitor,
   DateTime Function()? clock,
 }) async {
   await paths.ensureCreated();
@@ -151,20 +170,39 @@ Future<AppSession> openAppSession({
     final profileServices = ProfileServices(database);
     final activeProfile = await profileServices.profiles.ensureFirstLaunch();
 
-    // The first-run gate must stay visible until the whole mode is present:
-    // a failed sync can leave one or two datasets applied, and until the
-    // update controls exist a partial install has no way to resume.
-    final complete = applied.length >= DatasetKind.values.length;
+    final dataBundle = await DataBundleStatus.read(
+      mode: GameMode.regular,
+      stateRepository: stateRepository,
+      manifestRepository: manifestRepository,
+    );
+
+    // Any applied dataset is enough to open the shell from local data. A
+    // partial install is repaired by the background update check instead of
+    // blocking the user behind the first-run gate. Only a database with no
+    // dataset at all still needs the first-run download.
+    final hasAppliedDatasets = applied.isNotEmpty;
+
+    final updates = UpdateCheckController(
+      settings: settings,
+      sync: coordinator,
+      network: networkMonitor ?? const AlwaysOnlineNetworkMonitor(),
+      visibility:
+          visibilityMonitor ?? const AlwaysForegroundVisibilityMonitor(),
+      clock: clock,
+    );
 
     return AppSessionReady(
       sync: coordinator,
-      hasAppliedDatasets: complete,
+      hasAppliedDatasets: hasAppliedDatasets,
       catalog: CatalogRepository(database),
       quests: QuestRepository(database),
       activeProfileId: activeProfile.id,
       profileServices: profileServices,
       settings: settings,
+      updates: updates,
+      dataBundle: dataBundle,
       close: () async {
+        await updates.dispose();
         client.close();
         await opened.close();
         await logger.close();

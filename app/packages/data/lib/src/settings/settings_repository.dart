@@ -22,6 +22,22 @@ abstract final class AppSettingKeys {
   /// does not interpret the document.
   static const String windowGeometry = 'settings.windowGeometry';
 
+  /// Automatic update-check schedule (`off`, `daily`, `weekly`).
+  static const String updateSchedule = 'settings.updateSchedule';
+
+  /// When the last update check completed successfully, as an ISO-8601 UTC
+  /// string.
+  static const String lastUpdateCheckAt = 'settings.lastUpdateCheckAt';
+
+  /// When the last update check was attempted, successful or not.
+  static const String lastUpdateAttemptAt = 'settings.lastUpdateAttemptAt';
+
+  /// Outcome of the last update check attempt.
+  static const String lastUpdateOutcome = 'settings.lastUpdateOutcome';
+
+  /// Short, user-safe message for the last failed attempt.
+  static const String lastUpdateError = 'settings.lastUpdateError';
+
   /// Every key this client reads and writes.
   static const Set<String> all = {
     activeProfileId,
@@ -29,6 +45,11 @@ abstract final class AppSettingKeys {
     allowMeteredUpdates,
     dataFreshnessHours,
     windowGeometry,
+    updateSchedule,
+    lastUpdateCheckAt,
+    lastUpdateAttemptAt,
+    lastUpdateOutcome,
+    lastUpdateError,
   };
 }
 
@@ -89,6 +110,17 @@ final class SettingsRepository {
       ),
       dataFreshnessHours: _decodeFreshness(stored),
       windowGeometryJson: _decodeWindowGeometry(stored),
+      updateSchedule: _decodeUpdateSchedule(stored),
+      lastUpdateCheckAt: _decodeDateTime(
+        stored,
+        AppSettingKeys.lastUpdateCheckAt,
+      ),
+      lastUpdateAttemptAt: _decodeDateTime(
+        stored,
+        AppSettingKeys.lastUpdateAttemptAt,
+      ),
+      lastUpdateOutcome: _decodeUpdateOutcome(stored),
+      lastUpdateError: _decodeUpdateError(stored),
     );
   }
 
@@ -122,6 +154,19 @@ final class SettingsRepository {
         settings.dataFreshnessHours,
       ),
       AppSettingKeys.windowGeometry: jsonEncode(settings.windowGeometryJson),
+      AppSettingKeys.updateSchedule: jsonEncode(
+        settings.updateSchedule.wireValue,
+      ),
+      AppSettingKeys.lastUpdateCheckAt: jsonEncode(
+        _encodeDateTime(settings.lastUpdateCheckAt),
+      ),
+      AppSettingKeys.lastUpdateAttemptAt: jsonEncode(
+        _encodeDateTime(settings.lastUpdateAttemptAt),
+      ),
+      AppSettingKeys.lastUpdateOutcome: jsonEncode(
+        settings.lastUpdateOutcome?.wireValue,
+      ),
+      AppSettingKeys.lastUpdateError: jsonEncode(settings.lastUpdateError),
     };
 
     await _database.transaction(() async {
@@ -160,6 +205,44 @@ final class SettingsRepository {
   Future<void> setDataFreshnessHours(int hours) async {
     final current = await read();
     await write(current.copyWith(dataFreshnessHours: hours));
+  }
+
+  /// Sets the automatic update-check schedule.
+  ///
+  /// The schedule and the legacy [AppSettings.autoUpdateEnabled] switch are
+  /// written together so the scheduler and the displayed preference never
+  /// disagree: `off` disables automatic checks, `daily` and `weekly` enable
+  /// them.
+  Future<void> setUpdateSchedule(UpdateSchedule schedule) async {
+    final current = await read();
+    await write(
+      current.copyWith(
+        updateSchedule: schedule,
+        autoUpdateEnabled: schedule.isEnabled,
+      ),
+    );
+  }
+
+  /// Records the result of one update check attempt.
+  ///
+  /// [at] moves [AppSettings.lastUpdateAttemptAt] for every outcome, and
+  /// [AppSettings.lastUpdateCheckAt] only for [UpdateOutcome.succeeded]. The
+  /// optional [error] is stored for a failed attempt and cleared afterwards.
+  Future<void> recordUpdateOutcome({
+    required UpdateOutcome outcome,
+    required DateTime at,
+    String? error,
+  }) async {
+    final current = await read();
+    final succeeded = outcome == UpdateOutcome.succeeded;
+    await write(
+      current.copyWith(
+        lastUpdateCheckAt: succeeded ? at.toUtc() : current.lastUpdateCheckAt,
+        lastUpdateAttemptAt: at.toUtc(),
+        lastUpdateOutcome: outcome,
+        lastUpdateError: outcome == UpdateOutcome.failed ? error : null,
+      ),
+    );
   }
 
   /// Saves or clears the desktop window geometry document.
@@ -261,6 +344,102 @@ final class SettingsRepository {
     return AppSettings.defaultWindowGeometryJson;
   }
 
+  UpdateSchedule _decodeUpdateSchedule(Map<String, String> stored) {
+    const key = AppSettingKeys.updateSchedule;
+    final raw = stored[key];
+    if (raw == null) {
+      return AppSettings.defaultUpdateSchedule;
+    }
+    final decoded = _decodeJson(raw, key);
+    if (!decoded.isValid) {
+      return AppSettings.defaultUpdateSchedule;
+    }
+    final value = decoded.value;
+    if (value is! String) {
+      _warn(key, 'expected a string, found ${_typeName(value)}');
+      return AppSettings.defaultUpdateSchedule;
+    }
+    final schedule = UpdateSchedule.fromWire(value);
+    if (schedule == null) {
+      _warn(key, 'unknown schedule "$value"');
+      return AppSettings.defaultUpdateSchedule;
+    }
+    return schedule;
+  }
+
+  DateTime? _decodeDateTime(Map<String, String> stored, String key) {
+    final raw = stored[key];
+    if (raw == null) {
+      return null;
+    }
+    final decoded = _decodeJson(raw, key);
+    if (!decoded.isValid) {
+      return null;
+    }
+    final value = decoded.value;
+    if (value == null) {
+      return null;
+    }
+    if (value is! String) {
+      _warn(
+        key,
+        'expected an ISO-8601 string or null, found '
+        '${_typeName(value)}',
+      );
+      return null;
+    }
+    final parsed = DateTime.tryParse(value);
+    if (parsed == null) {
+      _warn(key, 'not a valid ISO-8601 timestamp');
+      return null;
+    }
+    return parsed.toUtc();
+  }
+
+  UpdateOutcome? _decodeUpdateOutcome(Map<String, String> stored) {
+    const key = AppSettingKeys.lastUpdateOutcome;
+    final raw = stored[key];
+    if (raw == null) {
+      return null;
+    }
+    final decoded = _decodeJson(raw, key);
+    if (!decoded.isValid) {
+      return null;
+    }
+    final value = decoded.value;
+    if (value == null) {
+      return null;
+    }
+    if (value is! String) {
+      _warn(key, 'expected a string or null, found ${_typeName(value)}');
+      return null;
+    }
+    final outcome = UpdateOutcome.fromWire(value);
+    if (outcome == null) {
+      _warn(key, 'unknown outcome "$value"');
+      return null;
+    }
+    return outcome;
+  }
+
+  String? _decodeUpdateError(Map<String, String> stored) {
+    const key = AppSettingKeys.lastUpdateError;
+    final raw = stored[key];
+    if (raw == null) {
+      return null;
+    }
+    final decoded = _decodeJson(raw, key);
+    if (!decoded.isValid) {
+      return null;
+    }
+    final value = decoded.value;
+    if (value == null || value is String) {
+      return value as String?;
+    }
+    _warn(key, 'expected a string or null, found ${_typeName(value)}');
+    return null;
+  }
+
   ({bool isValid, Object? value}) _decodeJson(String raw, String key) {
     try {
       return (isValid: true, value: jsonDecode(raw));
@@ -276,6 +455,8 @@ final class SettingsRepository {
     );
   }
 }
+
+String? _encodeDateTime(DateTime? value) => value?.toUtc().toIso8601String();
 
 String _typeName(Object? value) => switch (value) {
   null => 'null',
