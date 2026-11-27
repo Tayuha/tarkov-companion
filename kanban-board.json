@@ -1996,17 +1996,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 110,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_design"
       ],
-      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "notes": "In progress in worktree t812-design-system. Phosphor tokens ThemeExtension, dark ThemeData, type/spacing, primitives (panel/button/chip/status/stat/progress), bundled Fira Sans Condensed + DejaVu Sans Mono, contrast and golden tests. No screen migration yet.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795755040019,
-      "archived": false
+      "updatedAt": 1795755083511,
+      "archived": false,
+      "sessionID": "ses_de4a81ec8ffevNZXgQj5Datuzm"
     },
     {
       "id": "task_impl_8_13",
@@ -2024,7 +2025,7 @@
         "tag_app",
         "tag_design"
       ],
-      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "notes": "Next after 8.12: migrate Items (1440 + 1920) to the primitives. Backlog.",
       "createdAt": 1795755040019,
       "updatedAt": 1795755040019,
       "archived": false
@@ -2045,7 +2046,7 @@
         "tag_app",
         "tag_design"
       ],
-      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "notes": "After 8.13: migrate Quests list/detail. Backlog.",
       "createdAt": 1795755040019,
       "updatedAt": 1795755040019,
       "archived": false
