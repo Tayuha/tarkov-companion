@@ -5,6 +5,7 @@
 /// The rule is enforced by `app/tool/check_architecture.dart`.
 library;
 
+export 'src/about/about_screen.dart';
 export 'src/catalog/catalog_screen.dart';
 export 'src/common/app_status_strip.dart';
 export 'src/common/upstream_status.dart';
@@ -17,4 +18,5 @@ export 'src/profiles/progress_file_picker.dart';
 export 'src/quests/quest_detail_screen.dart';
 export 'src/quests/quest_list_screen.dart';
 export 'src/section_header.dart';
+export 'src/sync/sync_status_bar.dart';
 export 'src/theme/theme.dart';

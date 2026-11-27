@@ -55,6 +55,59 @@ ManifestFetcher.fetch(mode)
                                 rename over <destination>
 ```
 
+## Non-blocking startup
+
+`AppRoot` opens the database once and then makes a local-only decision:
+
+| Local state | First frame |
+|---|---|
+| No `datasetState` row for the active mode | `FirstRunScreen`; the user starts the first download |
+| At least one applied dataset, even a partial install | `HomeShell` immediately, rendered from the local rows |
+| Database opens read-only | recovery screen |
+
+Only the first row performs a network request before the shell exists. On every
+other start the shell is painted from SQLite and `UpdateCheckController.start`
+runs after that frame. The controller reads settings and arms
+`SyncScheduler`; it never awaits a manifest on the startup path, so a slow,
+offline or failing update check leaves the browsing UI interactive. A partial
+install is repaired by the same background check, which resumes at the first
+dataset `datasetState` does not already match.
+
+The startup test (`app/test/startup_flow_test.dart`) holds the manifest future
+open, pumps the shell, and asserts the cached item row is visible before the
+manifest completes.
+
+## Update controls
+
+`UpdateCheckController` in `app/packages/data/lib/src/sync/update_check.dart`
+owns the background schedule and the persisted status. The shell renders it as
+a footer strip (`SyncStatusBar`) with:
+
+* a schedule selector: **off**, **daily** (24 h) or **weekly** (7 days);
+* **Check now**, which runs a manual check even when automatic checks are off;
+* the last check time and outcome, and a thin progress bar while a check runs;
+* a danger-coloured line for the last failure. Nothing opens a dialog.
+
+`UpdateCheckControl` is the interface the shell and widget tests use. The
+production controller wraps the existing `SyncScheduler`:
+
+* `setSchedule` writes `settings.updateSchedule` and the legacy
+  `autoUpdateEnabled` switch together, then recreates the scheduler with the
+  matching interval;
+* automatic checks still obey foreground, connectivity, metered, backoff and
+  due-time rules from task 4.6;
+* a manual check bypasses preferences and the schedule but still needs a
+  connection;
+* every attempt is persisted through `SettingsRepository.recordUpdateOutcome`.
+  Only a success moves `settings.lastUpdateCheckAt`; all attempts move
+  `settings.lastUpdateAttemptAt`. The footer therefore survives a restart and
+  can say "Last update check failed" without another request.
+
+The desktop shell currently uses a conservative always-online, always-visible
+monitor (`app/lib/src/sync_monitors.dart`). A real offline attempt still fails
+through the sync stack and is shown in the strip; no new network host is
+involved and no telemetry is collected.
+
 ## Manifest URL
 
 ```
@@ -360,6 +413,15 @@ transport calls, both to the manifest URL — a `304` performs no dataset
 download. It also covers changed/identical bodies, `404`, malformed JSON and
 schema, mode mismatch, `304` without a cache, per-mode isolation and clock
 injection.
+
+The update-control suite (`test/sync/update_check_test.dart`) proves `start`
+arms a timer without running sync, manual success and failure persist the right
+timestamps and outcome, an offline manual check is reported as skipped, all
+three schedule choices round-trip through settings, and the legacy
+`autoUpdateEnabled = false` switch still reports an off schedule. The shell
+suite (`packages/features/test/sync/`) renders every outcome and schedule
+combination without a dialog, and `app/test/startup_flow_test.dart` proves the
+cached shell appears before a delayed manifest response.
 
 The download suite covers a valid multi-chunk download (bytes on disk, digest,
 monotonic progress ending at `1.0`, temp file gone), a single flipped byte, a

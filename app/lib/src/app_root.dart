@@ -13,10 +13,15 @@ typedef AppSessionOpener = Future<AppSession> Function();
 
 /// Root widget of the desktop shell.
 ///
-/// The database and network are opened once, asynchronously. The first frame is
-/// therefore always the neutral loading shell; the first-run gate appears only
-/// after the local database confirms there is no applied dataset. No manifest
-/// request happens until the user presses Start.
+/// The database is opened once, asynchronously. The first frame is therefore
+/// the neutral loading shell; as soon as the session is ready, a database with
+/// at least one applied dataset renders [HomeShell] immediately from local
+/// data. Only a database with no dataset at all shows the first-run gate, and
+/// no update request happens before the user presses Start.
+///
+/// For an existing install the background update controller is started after
+/// the first local frame. It never blocks that frame: a slow manifest, an
+/// offline host or a failed download is reported in the shell footer.
 class AppRoot extends StatefulWidget {
   const AppRoot({super.key, required this.openSession, this.deepLinks});
 
@@ -34,6 +39,7 @@ class _AppRootState extends State<AppRoot> {
   AppSession? _session;
   bool _firstRunComplete = false;
   bool _deepLinkFrameScheduled = false;
+  bool _updatesStarted = false;
 
   @override
   void initState() {
@@ -65,8 +71,39 @@ class _AppRootState extends State<AppRoot> {
   void _reload() {
     setState(() {
       _firstRunComplete = false;
+      _updatesStarted = false;
       _sessionFuture = _open();
     });
+  }
+
+  /// Starts the background update check after the local frame is visible.
+  ///
+  /// This is deliberately not awaited and never part of the initial build:
+  /// when local data exists the shell renders first, and a slow or failed
+  /// manifest request is reported in the footer instead of replacing the
+  /// window with a splash.
+  void _ensureUpdatesStarted(AppSessionReady session) {
+    if (_updatesStarted) {
+      return;
+    }
+    final updates = session.updates;
+    if (updates == null) {
+      return;
+    }
+    _updatesStarted = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      unawaited(
+        updates.start().catchError((Object error, StackTrace stackTrace) {
+          // The controller persists failures for the status strip; a failure
+          // here (for example a closed database) must not reach the zone
+          // handler and take the shell down.
+        }),
+      );
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   @override
@@ -165,6 +202,7 @@ class _AppRootState extends State<AppRoot> {
         },
       );
     }
+    _ensureUpdatesStarted(session);
     if (widget.deepLinks?.hasPending ?? false) {
       _scheduleDeepLink();
     }
@@ -173,6 +211,8 @@ class _AppRootState extends State<AppRoot> {
       quests: session.quests,
       activeProfileId: session.activeProfileId,
       profileServices: session.profileServices,
+      updates: session.updates,
+      dataBundle: session.dataBundle,
     );
   }
 }

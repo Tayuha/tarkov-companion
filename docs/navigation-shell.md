@@ -1,9 +1,11 @@
 # Navigation shell
 
-`HomeShell` (`app/lib/src/home_shell.dart`) is the landing interface once the
-local dataset is complete. `AppRoot` shows the first-run gate first and then
-hands the opened session's repositories to the shell, so the shell never opens
-the database itself.
+`HomeShell` (`app/lib/src/home_shell.dart`) is the landing interface as soon as
+at least one dataset is applied locally. `AppRoot` shows the first-run gate only
+when the active mode has no data at all, then hands the opened session's
+repositories to the shell, so the shell never opens the database itself. A
+partial install opens the shell immediately and is repaired by the background
+update check.
 
 ## Layout rules
 
@@ -21,6 +23,20 @@ highlighted by the Material navigation widgets.
 A third **Profiles** destination appears only when `HomeShell.profileServices`
 is supplied. Without it (shell tests, recovery, a session built without SQLite)
 the shell keeps exactly the original two tabs.
+
+## Footer: updates and About
+
+A footer strip sits below the body in both layouts, so it never competes with
+the primary destinations. When `HomeShell.updates` is supplied it renders
+`SyncStatusBar`: the last check time/outcome, a thin progress bar while a check
+runs, an off/daily/weekly schedule selector, **Check now**, and **About**.
+Failures are text in the strip; no dialog is opened. See
+[`client-sync.md`](client-sync.md#update-controls).
+
+Without an update controller the footer still offers **About**, so the licence
+and data attribution remain reachable from every shell session. **About** pushes
+`AboutScreen` with the build version and the session's `DataBundleStatus`; its
+contents are documented in [`about.md`](about.md).
 
 ## Tabs and routing
 
