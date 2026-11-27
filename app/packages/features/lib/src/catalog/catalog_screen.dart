@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../common/app_status_strip.dart';
+import '../common/upstream_status.dart';
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'catalog_filter_bar.dart';
@@ -52,6 +54,7 @@ class CatalogScreen extends StatefulWidget {
     this.categories,
     this.types = defaultCatalogTypes,
     this.imageCache,
+    this.upstreamCheck,
   });
 
   /// The widest the catalog chrome and table may grow.
@@ -83,6 +86,12 @@ class CatalogScreen extends StatefulWidget {
   /// neutral placeholder and perform no I/O.
   final ItemImageCache? imageCache;
 
+  /// Optional upstream check. It runs after the local page is requested and
+  /// never gates the rows: a failure only adds a non-blocking status strip (or
+  /// the explicit offline empty state when nothing is saved). The shell adapts
+  /// `SyncService.prepare` to [UpstreamCheck]; tests pass a failing closure.
+  final UpstreamCheck? upstreamCheck;
+
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
 }
@@ -104,6 +113,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
   bool _loadingMore = false;
   Object? _error;
 
+  /// Owns the optional upstream check. It is created lazily so a screen built
+  /// without the seam performs no network work at all.
+  UpstreamStatusController? _upstream;
+
   /// Incremented for each repository request. Only the newest response may
   /// write to the state, which makes the debounce and page appends race-free.
   int _requestGeneration = 0;
@@ -115,6 +128,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     if (widget.categories == null) {
       _loadCategoryOptions();
     }
+    _attachUpstream(widget.upstreamCheck);
     _fetchFirstPage(++_requestGeneration);
   }
 
@@ -126,6 +140,28 @@ class _CatalogScreenState extends State<CatalogScreen> {
       if (widget.categories == null) {
         _loadCategoryOptions();
       }
+    }
+    if (oldWidget.upstreamCheck != widget.upstreamCheck) {
+      _attachUpstream(widget.upstreamCheck);
+    }
+  }
+
+  void _attachUpstream(UpstreamCheck? check) {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    _upstream = null;
+    if (check == null) {
+      return;
+    }
+    final controller = UpstreamStatusController(check: check);
+    controller.addListener(_onUpstreamChanged);
+    _upstream = controller;
+    unawaited(controller.refresh());
+  }
+
+  void _onUpstreamChanged() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -158,6 +194,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
   void dispose() {
     _searchTimer?.cancel();
     _searchController.dispose();
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
     super.dispose();
   }
 
@@ -344,6 +382,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
+    final upstreamStrip = _buildUpstreamStrip();
     return Scaffold(
       body: SafeArea(
         child: Align(
@@ -384,6 +423,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       SizedBox(height: tokens.spaceLg),
                       _CatalogHeading(resultCount: _resultCountLabel),
                       SizedBox(height: tokens.spaceSm),
+                      if (upstreamStrip != null) ...[
+                        upstreamStrip,
+                        SizedBox(height: tokens.spaceSm),
+                      ],
                       if (layout != CatalogLayout.compact)
                         CatalogTableHeader(layout: layout),
                       if (_loading && _items.isNotEmpty)
@@ -420,6 +463,46 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return 'Showing ${_items.length} of $_total items';
   }
 
+  /// Whether the body owns the offline state instead of the strip.
+  bool get _showsOfflineEmpty {
+    final status = _upstream?.status;
+    return status != null &&
+        status.isProblem &&
+        !_loading &&
+        _error == null &&
+        _items.isEmpty &&
+        _filters.isEmpty;
+  }
+
+  Widget? _buildUpstreamStrip() {
+    final controller = _upstream;
+    if (controller == null) {
+      return null;
+    }
+    final status = controller.status;
+    if (status == null) {
+      return null;
+    }
+    if (_showsOfflineEmpty) {
+      return null;
+    }
+    if (controller.isChecking && status.needsBanner) {
+      return AppStatusStrip(
+        key: const Key('catalog-upstream-status'),
+        kind: AppStatusStripKind.updating,
+        message: 'Showing saved items while the update check runs.',
+      );
+    }
+    if (!status.needsBanner) {
+      return null;
+    }
+    return AppStatusStrip.upstream(
+      key: const Key('catalog-upstream-status'),
+      status: status,
+      onRetry: controller.refresh,
+    );
+  }
+
   Widget _buildBody(CatalogLayout layout) {
     if (_items.isEmpty) {
       if (_loading) {
@@ -429,6 +512,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
       }
       if (_error != null) {
         return const SizedBox.shrink();
+      }
+      if (_showsOfflineEmpty) {
+        final controller = _upstream!;
+        return _CatalogOfflineEmptyState(
+          status: controller.status!,
+          checking: controller.isChecking,
+          onRetry: controller.isChecking ? null : controller.refresh,
+        );
       }
       return _CatalogEmptyState(filters: _filters, onReset: _resetFilters);
     }
@@ -651,6 +742,67 @@ class _LoadMoreFooter extends StatelessWidget {
             onPressed: loading ? null : onLoadMore,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CatalogOfflineEmptyState extends StatelessWidget {
+  const _CatalogOfflineEmptyState({
+    required this.status,
+    required this.checking,
+    required this.onRetry,
+  });
+
+  final UpstreamStatus status;
+  final bool checking;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final updatedAt = status.dataUpdatedAt;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 48, color: tokens.danger),
+            SizedBox(height: tokens.spaceMd),
+            Text(
+              status.state == UpstreamState.failed
+                  ? 'No saved items and the update failed.'
+                  : 'No items are saved yet.',
+              key: const Key('catalog-offline-empty-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
+            ),
+            SizedBox(height: tokens.spaceXs),
+            Text(
+              'Tarkov Companion reads from the local dataset first. There is '
+              'no saved catalog on this device yet, and the last update check '
+              'could not reach the upstream. Connect and retry to download it.',
+              key: const Key('catalog-offline-empty-detail'),
+              textAlign: TextAlign.center,
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+            if (updatedAt != null) ...[
+              SizedBox(height: tokens.spaceXs),
+              Text(
+                'Saved data ${formatStatusAge(updatedAt)}',
+                style: tokens.dataStyle.copyWith(color: tokens.dim),
+              ),
+            ],
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
+              key: const Key('catalog-offline-retry'),
+              label: checking ? 'Checking…' : 'Retry update',
+              variant: AppButtonVariant.secondary,
+              onPressed: onRetry,
+            ),
+          ],
+        ),
       ),
     );
   }

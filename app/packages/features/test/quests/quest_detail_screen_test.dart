@@ -28,6 +28,7 @@ void main() {
     WidgetTester tester, {
     String questId = qdMainQuest,
     String? profileId = qdProfileRegular,
+    UpstreamCheck? upstreamCheck,
     Size size = const Size(1200, 3000),
   }) async {
     await tester.binding.setSurfaceSize(size);
@@ -44,6 +45,7 @@ void main() {
           catalog: catalog,
           questId: questId,
           profileId: profileId,
+          upstreamCheck: upstreamCheck,
         ),
       ),
     );
@@ -487,6 +489,34 @@ void main() {
       // (2000 - 1180) / 2 = 410 px of centred margin.
       expect(header.dx, closeTo(410, 1));
     });
+  });
+
+  testWidgets('a failed upstream keeps the saved quest route usable', (
+    tester,
+  ) async {
+    var checks = 0;
+    await pumpDetail(
+      tester,
+      upstreamCheck: () async {
+        checks++;
+        return const UpstreamStatus.offline();
+      },
+    );
+
+    expect(checks, 1);
+    expect(
+      find.byKey(const Key('quest-detail-upstream-status')),
+      findsOneWidget,
+    );
+    expect(find.text('OFFLINE'), findsOneWidget);
+    expect(find.byKey(const Key('quest-detail-error')), findsNothing);
+
+    await tapVisible(tester, find.byKey(const Key('app-status-retry')));
+    expect(checks, 2);
+    expect(
+      find.byKey(const Key('quest-detail-upstream-status')),
+      findsOneWidget,
+    );
   });
 
   group('golden', () {

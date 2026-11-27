@@ -169,6 +169,11 @@ snapshot. `PriceHistoryRepository` therefore keeps the network behind the
 * a failed refresh falls back to a stale cache and marks the chart stale, and
   with no cache it is unavailable — no point is ever fabricated.
 
+The unavailable and stale chart states use the shared `AppStatusStrip`
+(offline and stale intents), so their wording matches the catalog and quest
+status strips. When the screen supplies a callback, the strip offers the same
+**Retry** action and reloads only the history, leaving the item detail visible.
+
 The cache lives in the existing `priceHistory` table (`itemId`, `observedAt`,
 `price`, `priceMin`). Because that table has no fetch timestamp and a schema
 change was not justified for a cache, the TTL is measured from the newest
@@ -186,6 +191,11 @@ base/price/typed facts and the categories/links/acquisition/disposition/history
 panels split into two columns; narrower windows keep one ordered column, with
 categories and links following the properties.
 
+`ItemDetailScreen` also accepts an optional `UpstreamCheck`. Saved item content
+stays visible under a non-blocking `AppStatusStrip` when the check fails; a
+repository error classified as an upstream/sync failure renders the offline
+strip with retry, while a corrupt payload keeps the generic error state.
+
 ## Tests
 
 `app/packages/features/test/catalog/item_detail_screen_test.dart` renders a
@@ -198,7 +208,9 @@ tests cover the complete, missing-flea and zero-price states; acquisition and
 disposition rows from fixture relationships; the all-missing case; the header
 image cache; the online history chart; and the offline-without-cache state. The
 single-column and wide two-column layouts are covered, as are loading,
-not-found with back navigation, and corrupt-payload error states.
+not-found with back navigation, and corrupt-payload error states. The
+network-state tests add a saved item with a failing upstream and the history
+strip's retry action.
 
 `app/packages/data/test/catalog/item_detail_test.dart` checks the parser against
 the committed normalized item fixture, including prices, a missing id and a

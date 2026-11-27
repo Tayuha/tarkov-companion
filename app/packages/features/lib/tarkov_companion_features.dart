@@ -6,6 +6,8 @@
 library;
 
 export 'src/catalog/catalog_screen.dart';
+export 'src/common/app_status_strip.dart';
+export 'src/common/upstream_status.dart';
 export 'src/catalog/item_detail_screen.dart';
 export 'src/catalog/item_image.dart';
 export 'src/catalog/price_history_chart.dart';

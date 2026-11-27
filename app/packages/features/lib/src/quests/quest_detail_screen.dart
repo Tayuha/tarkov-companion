@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import '../catalog/item_detail_screen.dart';
+import '../common/app_status_strip.dart';
+import '../common/upstream_status.dart';
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'quest_list_row.dart'
@@ -50,6 +54,7 @@ class QuestDetailScreen extends StatefulWidget {
     required this.questId,
     this.profileId,
     this.onBack,
+    this.upstreamCheck,
   });
 
   final QuestRepository repository;
@@ -65,6 +70,11 @@ class QuestDetailScreen extends StatefulWidget {
   /// Called by the not-found and orphaned back actions. When omitted, the
   /// screen pops the current route.
   final VoidCallback? onBack;
+
+  /// Optional upstream check shown as a non-blocking strip above the detail.
+  /// The pushed route keeps its content while the check fails; retry only
+  /// re-runs the check.
+  final UpstreamCheck? upstreamCheck;
 
   @override
   State<QuestDetailScreen> createState() => _QuestDetailScreenState();
@@ -85,21 +95,54 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
   bool _busy = false;
   int _generation = 0;
 
+  /// Owns the optional upstream check; `null` when the caller supplied none.
+  UpstreamStatusController? _upstream;
+
   @override
   void initState() {
     super.initState();
+    _attachUpstream(widget.upstreamCheck);
     _load();
   }
 
   @override
   void didUpdateWidget(QuestDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.upstreamCheck != widget.upstreamCheck) {
+      _attachUpstream(widget.upstreamCheck);
+    }
     if (oldWidget.questId != widget.questId ||
         oldWidget.repository != widget.repository ||
         oldWidget.catalog != widget.catalog ||
         oldWidget.profileId != widget.profileId) {
       _load();
     }
+  }
+
+  void _attachUpstream(UpstreamCheck? check) {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    _upstream = null;
+    if (check == null) {
+      return;
+    }
+    final controller = UpstreamStatusController(check: check);
+    controller.addListener(_onUpstreamChanged);
+    _upstream = controller;
+    unawaited(controller.refresh());
+  }
+
+  void _onUpstreamChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    super.dispose();
   }
 
   Future<void> _load({bool showLoading = true}) async {
@@ -385,10 +428,13 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
     }
     final error = _error;
     if (error != null) {
-      return _ErrorState(error: error, onRetry: _load);
+      return isUpstreamError(error)
+          ? _UpstreamErrorState(error: error, onRetry: _load)
+          : _ErrorState(error: error, onRetry: _load);
     }
+    final Widget content;
     if (detail != null) {
-      return _DetailBody(
+      content = _DetailBody(
         detail: detail,
         status: _status,
         statusesById: _statusesById,
@@ -404,12 +450,57 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
         onRevert: _revert,
         onObjectiveCount: _setObjectiveCount,
       );
+    } else {
+      final orphan = _orphan;
+      if (orphan != null) {
+        content = _OrphanState(orphan: orphan, onBack: _back);
+      } else {
+        content = _NotFoundState(questId: widget.questId, onBack: _back);
+      }
     }
-    final orphan = _orphan;
-    if (orphan != null) {
-      return _OrphanState(orphan: orphan, onBack: _back);
+    final strip = _buildUpstreamStrip();
+    if (strip == null) {
+      return content;
     }
-    return _NotFoundState(questId: widget.questId, onBack: _back);
+    final tokens = AppTokens.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            tokens.spaceXl,
+            tokens.spaceXl,
+            tokens.spaceXl,
+            0,
+          ),
+          child: strip,
+        ),
+        Expanded(child: content),
+      ],
+    );
+  }
+
+  Widget? _buildUpstreamStrip() {
+    final controller = _upstream;
+    final status = controller?.status;
+    if (controller == null || status == null) {
+      return null;
+    }
+    if (controller.isChecking && status.needsBanner) {
+      return AppStatusStrip(
+        key: const Key('quest-detail-upstream-status'),
+        kind: AppStatusStripKind.updating,
+        message: 'Showing the saved quest while the update check runs.',
+      );
+    }
+    if (!status.needsBanner) {
+      return null;
+    }
+    return AppStatusStrip.upstream(
+      key: const Key('quest-detail-upstream-status'),
+      status: status,
+      onRetry: controller.refresh,
+    );
   }
 }
 
@@ -1963,6 +2054,41 @@ class _OrphanState extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UpstreamErrorState extends StatelessWidget {
+  const _UpstreamErrorState({required this.error, required this.onRetry});
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final status = UpstreamStatus.fromError(error);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppStatusStrip.upstream(
+              key: const Key('quest-detail-upstream-error'),
+              status: status,
+              onRetry: onRetry,
+            ),
+            SizedBox(height: tokens.spaceLg),
+            Text(
+              'The saved quest could not be refreshed.',
+              key: const Key('quest-detail-offline-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
+            ),
+          ],
         ),
       ),
     );

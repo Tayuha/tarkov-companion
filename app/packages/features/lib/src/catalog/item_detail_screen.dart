@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../common/app_status_strip.dart';
+import '../common/upstream_status.dart';
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'catalog_item_row.dart' show changeColor, formatChange, formatRoubles;
@@ -35,6 +39,7 @@ class ItemDetailScreen extends StatefulWidget {
     this.imageCache,
     this.priceHistory,
     this.offline = false,
+    this.upstreamCheck,
   });
 
   final CatalogRepository repository;
@@ -57,6 +62,10 @@ class ItemDetailScreen extends StatefulWidget {
   /// Whether the history fetch runs in offline mode (cache only).
   final bool offline;
 
+  /// Optional upstream check shown as a non-blocking strip above the detail.
+  /// The saved item stays visible while the check fails.
+  final UpstreamCheck? upstreamCheck;
+
   @override
   State<ItemDetailScreen> createState() => _ItemDetailScreenState();
 }
@@ -70,21 +79,54 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   bool _historyLoading = false;
   int _generation = 0;
 
+  /// Owns the optional upstream check; `null` when the caller supplied none.
+  UpstreamStatusController? _upstream;
+
   @override
   void initState() {
     super.initState();
+    _attachUpstream(widget.upstreamCheck);
     _load();
   }
 
   @override
   void didUpdateWidget(ItemDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.upstreamCheck != widget.upstreamCheck) {
+      _attachUpstream(widget.upstreamCheck);
+    }
     if (oldWidget.itemId != widget.itemId ||
         oldWidget.repository != widget.repository ||
         oldWidget.priceHistory != widget.priceHistory ||
         oldWidget.offline != widget.offline) {
       _load();
     }
+  }
+
+  void _attachUpstream(UpstreamCheck? check) {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    _upstream = null;
+    if (check == null) {
+      return;
+    }
+    final controller = UpstreamStatusController(check: check);
+    controller.addListener(_onUpstreamChanged);
+    _upstream = controller;
+    unawaited(controller.refresh());
+  }
+
+  void _onUpstreamChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -141,6 +183,34 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
+  Future<void> _reloadHistory() async {
+    final history = widget.priceHistory;
+    final detail = _detail;
+    if (history == null || detail == null) {
+      return;
+    }
+    final generation = _generation;
+    setState(() => _historyLoading = true);
+    try {
+      final snapshot = await history.load(
+        widget.itemId,
+        offline: widget.offline,
+      );
+      if (!mounted || generation != _generation) {
+        return;
+      }
+      setState(() {
+        _history = snapshot;
+        _historyLoading = false;
+      });
+    } on Object {
+      if (!mounted || generation != _generation) {
+        return;
+      }
+      setState(() => _historyLoading = false);
+    }
+  }
+
   void _back() {
     final onBack = widget.onBack;
     if (onBack != null) {
@@ -168,17 +238,63 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
     final error = _error;
     if (error != null) {
-      return _ErrorState(error: error, onRetry: _load);
+      return isUpstreamError(error)
+          ? _UpstreamErrorState(error: error, onRetry: _load)
+          : _ErrorState(error: error, onRetry: _load);
     }
     if (detail == null) {
       return _NotFoundState(itemId: widget.itemId, onBack: _back);
     }
-    return _DetailBody(
+    final content = _DetailBody(
       detail: detail,
       relations: _relations,
       history: _history,
       historyLoading: _historyLoading,
       imageCache: widget.imageCache,
+      onHistoryRetry: widget.priceHistory == null ? null : _reloadHistory,
+    );
+    final strip = _buildUpstreamStrip();
+    if (strip == null) {
+      return content;
+    }
+    final tokens = AppTokens.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            tokens.spaceXl,
+            tokens.spaceXl,
+            tokens.spaceXl,
+            0,
+          ),
+          child: strip,
+        ),
+        Expanded(child: content),
+      ],
+    );
+  }
+
+  Widget? _buildUpstreamStrip() {
+    final controller = _upstream;
+    final status = controller?.status;
+    if (controller == null || status == null) {
+      return null;
+    }
+    if (controller.isChecking && status.needsBanner) {
+      return AppStatusStrip(
+        key: const Key('item-detail-upstream-status'),
+        kind: AppStatusStripKind.updating,
+        message: 'Showing the saved item while the update check runs.',
+      );
+    }
+    if (!status.needsBanner) {
+      return null;
+    }
+    return AppStatusStrip.upstream(
+      key: const Key('item-detail-upstream-status'),
+      status: status,
+      onRetry: controller.refresh,
     );
   }
 }
@@ -190,6 +306,7 @@ class _DetailBody extends StatelessWidget {
     required this.history,
     required this.historyLoading,
     required this.imageCache,
+    required this.onHistoryRetry,
   });
 
   /// The widest the inspector grows, even on a 1920 monitor.
@@ -203,6 +320,7 @@ class _DetailBody extends StatelessWidget {
   final PriceHistorySnapshot? history;
   final bool historyLoading;
   final ItemImageCache? imageCache;
+  final VoidCallback? onHistoryRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +595,7 @@ class _DetailBody extends StatelessWidget {
             minHeight: 2,
           )
         else if (history != null)
-          PriceHistoryChart(snapshot: history!),
+          PriceHistoryChart(snapshot: history!, onRetry: onHistoryRetry),
       ],
     );
   }
@@ -1063,6 +1181,40 @@ class _NotFoundState extends StatelessWidget {
               label: 'Back to catalog',
               variant: AppButtonVariant.secondary,
               onPressed: onBack,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UpstreamErrorState extends StatelessWidget {
+  const _UpstreamErrorState({required this.error, required this.onRetry});
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppStatusStrip.upstream(
+              key: const Key('item-detail-upstream-error'),
+              status: UpstreamStatus.fromError(error),
+              onRetry: onRetry,
+            ),
+            SizedBox(height: tokens.spaceLg),
+            Text(
+              'The saved item could not be refreshed.',
+              key: const Key('item-detail-offline-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
             ),
           ],
         ),

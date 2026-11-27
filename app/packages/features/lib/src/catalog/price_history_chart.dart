@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../common/app_status_strip.dart';
 import '../theme/app_tokens.dart';
 
 /// The flea price history chart.
@@ -17,29 +18,29 @@ class PriceHistoryChart extends StatelessWidget {
     super.key,
     required this.snapshot,
     this.height = 180,
+    this.onRetry,
   });
 
   final PriceHistorySnapshot snapshot;
   final double height;
 
+  /// Reloads the history. When `null` the unavailable and stale strips have no
+  /// action, which is what the presentation-only chart test uses.
+  final VoidCallback? onRetry;
+
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
     if (!snapshot.hasData) {
-      return Row(
+      return AppStatusStrip(
         key: const Key('price-history-unavailable'),
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.cloud_off_outlined, size: 18, color: tokens.muted),
-          SizedBox(width: tokens.spaceSm),
-          Expanded(
-            child: Text(
-              'Price history unavailable offline. No cached history exists '
-              'for this item; it will load on the next online visit.',
-              style: tokens.bodyStyle.copyWith(color: tokens.muted),
-            ),
-          ),
-        ],
+        kind: AppStatusStripKind.offline,
+        title: 'Price history',
+        message:
+            'Price history unavailable offline. No cached history exists for '
+            'this item; it will load on the next online visit.',
+        onRetry: onRetry,
+        retryKey: const Key('price-history-retry'),
       );
     }
 
@@ -108,10 +109,15 @@ class PriceHistoryChart extends StatelessWidget {
         if (snapshot.status == PriceHistoryStatus.stale)
           Padding(
             padding: EdgeInsets.only(top: tokens.spaceXs),
-            child: Text(
-              'Showing cached history; the source could not be refreshed.',
+            child: AppStatusStrip(
               key: const Key('price-history-stale'),
-              style: tokens.labelStyle.copyWith(color: tokens.value),
+              kind: AppStatusStripKind.stale,
+              title: 'Price history',
+              message:
+                  'Showing cached history; the source could not be refreshed.',
+              lastUpdatedAt: snapshot.observedAt,
+              onRetry: onRetry,
+              retryKey: const Key('price-history-retry'),
             ),
           ),
       ],

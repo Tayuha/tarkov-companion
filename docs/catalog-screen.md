@@ -78,6 +78,31 @@ deterministic and a keyboard user reaches it by tabbing.
 * **Error** — a retry banner appears above the list; rows already loaded stay
   visible, and an initial failure leaves the banner with a retry action.
 
+## Offline and upstream states (task 8.4)
+
+The screen accepts an optional `UpstreamCheck`. It runs beside the local query
+and never gates rows: the shell adapts `SyncService.prepare` to that closure,
+and tests pass a failing closure without adding a network stack.
+
+* **Saved rows plus a failed check** — the rows stay in place and an
+  `AppStatusStrip` appears above them. Offline and non-connectivity failures use
+  the same danger treatment, name the saved data, show the dataset age when the
+  check supplies `dataUpdatedAt`, and offer **Retry**.
+* **Retry in flight** — the same strip switches to the `updating` intent
+  (`CHECKING FOR UPDATES`) while the check runs. Rows, filters, pagination and
+  selection never clear.
+* **Nothing saved and a failed check** — the body renders an explicit
+  **No items are saved yet** state with the local-first explanation and a
+  **Retry update** button. It is not the generic empty or error screen.
+* **Stale data** — a check may report `UpstreamStatus.stale`; the strip then
+  shows the saved-data age instead of an error and still offers **Retry**.
+* **Search or filter empty** — a failed check keeps the normal filtered empty
+  state so the query remains the explanation; the status strip stays above it.
+
+The primitive is `AppStatusStrip` and the check types are `UpstreamStatus` /
+`UpstreamCheck`, both exported from `tarkov_companion_features`.
+
+
 ## Responsive layout
 
 The screen measures the width available after the app shell and inside a
@@ -114,3 +139,7 @@ chip applying and clearing, reset, the empty state with the preserved query,
 sorting in both directions, pagination with load-more, row-tap reporting, the
 1440/1920 column sets, compact fallback below 1100, the 1600 px cap and
 alternating row surfaces.
+
+`catalog_offline_test.dart` adds the network-state coverage: populated cache
+with a failing upstream, retry re-running the check, an in-flight retry that
+keeps rows visible, and the empty-plus-failing-upstream offline state.

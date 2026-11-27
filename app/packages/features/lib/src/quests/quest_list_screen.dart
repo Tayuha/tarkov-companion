@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../common/app_status_strip.dart';
+import '../common/upstream_status.dart';
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'quest_filter_bar.dart';
@@ -76,6 +78,7 @@ class QuestListScreen extends StatefulWidget {
     this.searchDebounce = const Duration(milliseconds: 300),
     this.traderOptions = const [],
     this.mapOptions = const [],
+    this.upstreamCheck,
   });
 
   /// The widest the quest chrome and table may grow.
@@ -102,6 +105,12 @@ class QuestListScreen extends StatefulWidget {
   /// Maps offered by the filter bar; see [QuestFilterOption].
   final List<QuestFilterOption> mapOptions;
 
+  /// Optional upstream check. It runs beside the local query and never gates
+  /// rows: a failure only adds a non-blocking status strip, or the explicit
+  /// offline empty state when the current view has no saved results. The shell
+  /// adapts `SyncService.prepare` to [UpstreamCheck].
+  final UpstreamCheck? upstreamCheck;
+
   @override
   State<QuestListScreen> createState() => _QuestListScreenState();
 }
@@ -125,6 +134,9 @@ class _QuestListScreenState extends State<QuestListScreen> {
   _QuestViewMode _view = _QuestViewMode.catalog;
   QuestSort _availableSort = const QuestSort(QuestSortField.minPlayerLevel);
 
+  /// Owns the optional upstream check; `null` when the shell supplied none.
+  UpstreamStatusController? _upstream;
+
   /// Incremented for each repository request. Only the newest response may
   /// write to the state, which makes the debounce and page appends race-free.
   int _requestGeneration = 0;
@@ -134,6 +146,7 @@ class _QuestListScreenState extends State<QuestListScreen> {
     super.initState();
     _traderOptions = widget.traderOptions;
     _mapOptions = widget.mapOptions;
+    _attachUpstream(widget.upstreamCheck);
     _fetchFilterOptions();
     _fetchFirstPage(++_requestGeneration);
   }
@@ -147,6 +160,9 @@ class _QuestListScreenState extends State<QuestListScreen> {
     if (widget.mapOptions != oldWidget.mapOptions) {
       _mapOptions = widget.mapOptions;
     }
+    if (oldWidget.upstreamCheck != widget.upstreamCheck) {
+      _attachUpstream(widget.upstreamCheck);
+    }
     if (widget.profileId != oldWidget.profileId ||
         widget.repository != oldWidget.repository ||
         widget.pageSize != oldWidget.pageSize) {
@@ -155,10 +171,31 @@ class _QuestListScreenState extends State<QuestListScreen> {
     }
   }
 
+  void _attachUpstream(UpstreamCheck? check) {
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
+    _upstream = null;
+    if (check == null) {
+      return;
+    }
+    final controller = UpstreamStatusController(check: check);
+    controller.addListener(_onUpstreamChanged);
+    _upstream = controller;
+    unawaited(controller.refresh());
+  }
+
+  void _onUpstreamChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void dispose() {
     _searchTimer?.cancel();
     _searchController.dispose();
+    _upstream?.removeListener(_onUpstreamChanged);
+    _upstream?.dispose();
     super.dispose();
   }
 
@@ -438,6 +475,7 @@ class _QuestListScreenState extends State<QuestListScreen> {
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
+    final upstreamStrip = _buildUpstreamStrip();
     return Scaffold(
       body: SafeArea(
         child: Align(
@@ -511,6 +549,10 @@ class _QuestListScreenState extends State<QuestListScreen> {
                         resultCount: _resultCountLabel,
                       ),
                       SizedBox(height: tokens.spaceSm),
+                      if (upstreamStrip != null) ...[
+                        upstreamStrip,
+                        SizedBox(height: tokens.spaceSm),
+                      ],
                       if (_orphans.isNotEmpty) ...[
                         _UnavailableQuestsPanel(orphans: _orphans),
                         SizedBox(height: tokens.spaceSm),
@@ -555,6 +597,45 @@ class _QuestListScreenState extends State<QuestListScreen> {
     return 'Showing ${_quests.length} of $_total quests';
   }
 
+  /// Whether the body owns the offline state instead of the strip.
+  bool get _showsOfflineEmpty {
+    final status = _upstream?.status;
+    if (status == null ||
+        !status.isProblem ||
+        _loading ||
+        _error != null ||
+        _quests.isNotEmpty) {
+      return false;
+    }
+    return _view == _QuestViewMode.available || _filters.isEmpty;
+  }
+
+  Widget? _buildUpstreamStrip() {
+    final controller = _upstream;
+    if (controller == null) {
+      return null;
+    }
+    final status = controller.status;
+    if (status == null || _showsOfflineEmpty) {
+      return null;
+    }
+    if (controller.isChecking && status.needsBanner) {
+      return AppStatusStrip(
+        key: const Key('quest-upstream-status'),
+        kind: AppStatusStripKind.updating,
+        message: 'Showing saved quests while the update check runs.',
+      );
+    }
+    if (!status.needsBanner) {
+      return null;
+    }
+    return AppStatusStrip.upstream(
+      key: const Key('quest-upstream-status'),
+      status: status,
+      onRetry: controller.refresh,
+    );
+  }
+
   Widget _buildBody(QuestLayout layout) {
     if (_quests.isEmpty) {
       if (_loading) {
@@ -564,6 +645,22 @@ class _QuestListScreenState extends State<QuestListScreen> {
       }
       if (_error != null) {
         return const SizedBox.shrink();
+      }
+      if (_showsOfflineEmpty) {
+        final controller = _upstream!;
+        if (_view == _QuestViewMode.available) {
+          return _AvailableOfflineEmptyState(
+            status: controller.status!,
+            checking: controller.isChecking,
+            onRetry: controller.isChecking ? null : controller.refresh,
+            onOpenCatalog: () => _setView(_QuestViewMode.catalog),
+          );
+        }
+        return _QuestOfflineEmptyState(
+          status: controller.status!,
+          checking: controller.isChecking,
+          onRetry: controller.isChecking ? null : controller.refresh,
+        );
       }
       if (_view == _QuestViewMode.available) {
         return _AvailableEmptyState(
@@ -699,6 +796,134 @@ class _AvailableToolbar extends StatelessWidget {
             onTap: () => onSortSelected(field),
           ),
       ],
+    );
+  }
+}
+
+/// The explicit empty state when no quest is saved and the upstream failed.
+class _QuestOfflineEmptyState extends StatelessWidget {
+  const _QuestOfflineEmptyState({
+    required this.status,
+    required this.checking,
+    required this.onRetry,
+  });
+
+  final UpstreamStatus status;
+  final bool checking;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          key: const Key('quest-offline-empty'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 48, color: tokens.danger),
+            SizedBox(height: tokens.spaceMd),
+            Text(
+              status.state == UpstreamState.failed
+                  ? 'No saved quests and the update failed.'
+                  : 'No quests are saved yet.',
+              key: const Key('quest-offline-empty-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
+            ),
+            SizedBox(height: tokens.spaceXs),
+            Text(
+              'Tarkov Companion reads from the local dataset first. There is '
+              'no saved quest catalog on this device yet, and the last update '
+              'check could not reach the upstream. Connect and retry to '
+              'download it.',
+              key: const Key('quest-offline-empty-detail'),
+              textAlign: TextAlign.center,
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
+              key: const Key('quest-offline-retry'),
+              label: checking ? 'Checking…' : 'Retry update',
+              variant: AppButtonVariant.secondary,
+              onPressed: onRetry,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The available view's explicit offline empty state.
+///
+/// Availability is derived from saved progress, so a failed upstream check
+/// never invalidates an empty result; the copy says so and offers both a retry
+/// and the catalog view.
+class _AvailableOfflineEmptyState extends StatelessWidget {
+  const _AvailableOfflineEmptyState({
+    required this.status,
+    required this.checking,
+    required this.onRetry,
+    required this.onOpenCatalog,
+  });
+
+  final UpstreamStatus status;
+  final bool checking;
+  final VoidCallback? onRetry;
+  final VoidCallback onOpenCatalog;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Column(
+          key: const Key('quest-available-offline-empty'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 48, color: tokens.danger),
+            SizedBox(height: tokens.spaceMd),
+            Text(
+              'Nothing is available in the saved data.',
+              key: const Key('quest-available-offline-title'),
+              textAlign: TextAlign.center,
+              style: tokens.h2Style,
+            ),
+            SizedBox(height: tokens.spaceXs),
+            Text(
+              'Availability is computed from saved progress, so the result is '
+              'still valid while offline. The update check could not reach the '
+              'upstream; retry to refresh the dataset, or open the catalog to '
+              'review lock reasons.',
+              key: const Key('quest-available-offline-detail'),
+              textAlign: TextAlign.center,
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+            SizedBox(height: tokens.spaceLg),
+            Wrap(
+              spacing: tokens.spaceSm,
+              runSpacing: tokens.spaceSm,
+              children: [
+                AppButton(
+                  key: const Key('quest-available-offline-retry'),
+                  label: checking ? 'Checking…' : 'Retry update',
+                  variant: AppButtonVariant.secondary,
+                  onPressed: onRetry,
+                ),
+                AppButton(
+                  key: const Key('quest-available-offline-open-catalog'),
+                  label: 'Open catalog',
+                  variant: AppButtonVariant.ghost,
+                  onPressed: onOpenCatalog,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

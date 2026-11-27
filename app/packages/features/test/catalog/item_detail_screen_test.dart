@@ -33,6 +33,7 @@ void main() {
     ItemImageCache? imageCache,
     PriceHistoryRepository? priceHistory,
     bool offline = false,
+    UpstreamCheck? upstreamCheck,
     Size size = const Size(960, 1500),
   }) async {
     await tester.binding.setSurfaceSize(size);
@@ -52,6 +53,7 @@ void main() {
           imageCache: imageCache,
           priceHistory: priceHistory,
           offline: offline,
+          upstreamCheck: upstreamCheck,
         ),
       ),
     );
@@ -490,7 +492,34 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const Key('price-history-plot')), findsNothing);
+      expect(find.byKey(const Key('price-history-retry')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('price-history-retry')));
+      await tester.pumpAndSettle();
+      expect(find.text('Colt M4A1 5.56x45 assault rifle'), findsWidgets);
+      expect(
+        find.byKey(const Key('price-history-unavailable')),
+        findsOneWidget,
+      );
     });
+  });
+
+  testWidgets('a failed upstream check leaves the saved item visible', (
+    tester,
+  ) async {
+    await pumpDetail(
+      tester,
+      weaponItemId,
+      upstreamCheck: () async => const UpstreamStatus.offline(),
+    );
+
+    expect(find.text('Colt M4A1 5.56x45 assault rifle'), findsWidgets);
+    expect(
+      find.byKey(const Key('item-detail-upstream-status')),
+      findsOneWidget,
+    );
+    expect(find.text('OFFLINE'), findsOneWidget);
+    expect(find.byKey(const Key('item-detail-error')), findsNothing);
   });
 
   group('images', () {

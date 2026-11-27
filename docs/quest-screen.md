@@ -161,6 +161,27 @@ is deterministic and a keyboard user reaches it by tabbing.
   visible, and an initial failure leaves the banner with a retry action while
   the header keeps the catalog context.
 
+## Offline and upstream states (task 8.4)
+
+`QuestListScreen` accepts an optional `UpstreamCheck`, the same presentation
+seam the catalog uses. It runs beside the local query and never gates rows.
+
+* **Saved quests plus a failed check** — every row stays; an `AppStatusStrip`
+  above the table names the saved data and offers **Retry**.
+* **Retry in flight** — the strip switches to `CHECKING FOR UPDATES` and the
+  segment, filters, pagination and badges stay usable.
+* **Empty catalog plus a failed check** — an explicit **No quests are saved
+  yet** state with the local-first explanation and **Retry update**, not the
+  generic empty or error screen.
+* **Available segment** — the derived list is local, so a failed check keeps
+  it. Its empty result has an offline variant that says availability is still
+  computed from saved progress and offers both **Retry update** and **Open
+  catalog**.
+* **Detail route** — `QuestDetailScreen` accepts the same check and shows a
+  non-blocking strip above the saved detail. A repository error that is an
+  upstream/sync failure renders the offline strip with retry instead of the
+  generic error; a corrupt local record keeps the generic error.
+
 ## Tests
 
 `app/packages/features/test/quests/quest_list_screen_test.dart` runs against an
@@ -174,3 +195,8 @@ objective fraction, the 1440 and 1920 table columns, the compact fallback, the
 load-more, row-tap reporting, game-mode scoping, the populated available view
 with ordering, the explanatory available empty state, the unavailable-upstream
 panel, and list goldens at 1440 and 1920. No test performs network access.
+
+`quest_offline_test.dart` covers the network states with a failing closure:
+populated cache plus offline, retry re-running the check, the available segment
+through an outage, the empty-catalog offline state, and the available segment's
+offline empty explanation.
