@@ -3,6 +3,7 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
+import 'focus_ring.dart';
 
 /// One selectable category in the catalog filter bar.
 ///
@@ -134,6 +135,8 @@ class CatalogFilterBar extends StatelessWidget {
               width: 230,
               child: _DropdownField<String>(
                 fieldKey: const Key('catalog-category-filter'),
+                focusKey: const Key('catalog-category-filter-focus'),
+                ringKey: const Key('catalog-category-filter-ring'),
                 value: _categoryId(filters) ?? '',
                 isExpanded: true,
                 items: [
@@ -156,6 +159,8 @@ class CatalogFilterBar extends StatelessWidget {
               width: 180,
               child: _DropdownField<String>(
                 fieldKey: const Key('catalog-type-filter'),
+                focusKey: const Key('catalog-type-filter-focus'),
+                ringKey: const Key('catalog-type-filter-ring'),
                 value: _type(filters) ?? '',
                 isExpanded: true,
                 items: [
@@ -171,20 +176,30 @@ class CatalogFilterBar extends StatelessWidget {
                 ),
               ),
             ),
-            AppChip(
-              key: const Key('catalog-flea-filter'),
-              label: 'Flea eligible',
-              selected: filters.fleaEligible == true,
-              onTap: () => onFleaEligibleSelected(
-                filters.fleaEligible == true ? null : true,
+            AppFocusRing(
+              borderRadius: BorderRadius.circular(tokens.radiusPill),
+              focusKey: const Key('catalog-flea-filter-focus'),
+              ringKey: const Key('catalog-flea-filter-ring'),
+              child: AppChip(
+                key: const Key('catalog-flea-filter'),
+                label: 'Flea eligible',
+                selected: filters.fleaEligible == true,
+                onTap: () => onFleaEligibleSelected(
+                  filters.fleaEligible == true ? null : true,
+                ),
               ),
             ),
             if (filters.isNotEmpty)
-              AppButton(
-                key: const Key('catalog-reset-filters'),
-                label: 'Reset',
-                variant: AppButtonVariant.ghost,
-                onPressed: onReset,
+              AppFocusRing(
+                borderRadius: BorderRadius.circular(tokens.radiusSm),
+                focusKey: const Key('catalog-reset-filters-focus'),
+                ringKey: const Key('catalog-reset-filters-ring'),
+                child: AppButton(
+                  key: const Key('catalog-reset-filters'),
+                  label: 'Reset',
+                  variant: AppButtonVariant.ghost,
+                  onPressed: onReset,
+                ),
               ),
           ],
         ),
@@ -238,9 +253,13 @@ class _DropdownField<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     required this.isExpanded,
+    this.focusKey,
+    this.ringKey,
   });
 
   final Key fieldKey;
+  final Key? focusKey;
+  final Key? ringKey;
   final T value;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
@@ -249,25 +268,34 @@ class _DropdownField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
-    return Container(
-      height: 30,
-      padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
-      decoration: BoxDecoration(
-        color: tokens.surfaceRaised,
-        border: Border.all(color: tokens.border),
-        borderRadius: BorderRadius.circular(tokens.radiusSm),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          key: fieldKey,
-          value: value,
-          isExpanded: isExpanded,
-          isDense: true,
-          dropdownColor: tokens.surfaceRaised,
-          icon: Icon(Icons.expand_more, size: tokens.h2Size, color: tokens.dim),
-          style: tokens.bodyStyle,
-          items: items,
-          onChanged: onChanged,
+    return AppFocusRing(
+      focusKey: focusKey,
+      ringKey: ringKey,
+      child: Container(
+        height: 30,
+        padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+        decoration: BoxDecoration(
+          color: tokens.surfaceRaised,
+          border: Border.all(color: tokens.border),
+          borderRadius: BorderRadius.circular(tokens.radiusSm),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<T>(
+            key: fieldKey,
+            value: value,
+            isExpanded: isExpanded,
+            isDense: true,
+            focusColor: tokens.focusRing.withValues(alpha: 0.12),
+            dropdownColor: tokens.surfaceRaised,
+            icon: Icon(
+              Icons.expand_more,
+              size: tokens.h2Size,
+              color: tokens.dim,
+            ),
+            style: tokens.bodyStyle,
+            items: items,
+            onChanged: onChanged,
+          ),
         ),
       ),
     );
@@ -291,36 +319,39 @@ class _ActiveFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
-    return Container(
-      height: 24,
-      padding: EdgeInsets.only(left: tokens.spaceMd, right: tokens.spaceXs),
-      decoration: BoxDecoration(
-        color: tokens.accentDeep,
-        border: Border.all(color: tokens.accent),
-        borderRadius: BorderRadius.circular(tokens.radiusPill),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: tokens.labelStyle.copyWith(
-              color: tokens.accent,
-              fontWeight: FontWeight.w600,
+    return AppFocusRing(
+      borderRadius: BorderRadius.circular(tokens.radiusPill),
+      child: Container(
+        height: 24,
+        padding: EdgeInsets.only(left: tokens.spaceMd, right: tokens.spaceXs),
+        decoration: BoxDecoration(
+          color: tokens.accentDeep,
+          border: Border.all(color: tokens.accent),
+          borderRadius: BorderRadius.circular(tokens.radiusPill),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: tokens.labelStyle.copyWith(
+                color: tokens.accent,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          SizedBox(width: tokens.spaceXs),
-          InkWell(
-            onTap: onDeleted,
-            borderRadius: BorderRadius.circular(tokens.radiusPill),
-            child: Padding(
-              padding: EdgeInsets.all(tokens.spaceXs),
-              child: Icon(Icons.close, size: 12, color: tokens.accent),
+            SizedBox(width: tokens.spaceXs),
+            InkWell(
+              onTap: onDeleted,
+              borderRadius: BorderRadius.circular(tokens.radiusPill),
+              child: Padding(
+                padding: EdgeInsets.all(tokens.spaceXs),
+                child: Icon(Icons.close, size: 12, color: tokens.accent),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

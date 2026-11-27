@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
@@ -9,6 +10,7 @@ import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'catalog_filter_bar.dart';
 import 'catalog_item_row.dart';
+import 'focus_ring.dart';
 import 'item_image.dart';
 
 export 'catalog_filter_bar.dart' show CatalogCategoryOption;
@@ -20,6 +22,7 @@ export 'catalog_item_row.dart'
         CatalogTableRow,
         catalogLayoutForWidth,
         formatObservationAge;
+export 'focus_ring.dart' show AppFocusRing, FocusSearchIntent;
 
 /// The searchable, filterable item catalog.
 ///
@@ -98,6 +101,11 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode(debugLabel: 'catalog-search');
+  final FocusNode _screenFocus = FocusNode(
+    debugLabel: 'catalog-screen',
+    skipTraversal: true,
+  );
   Timer? _searchTimer;
 
   CatalogFilters _filters = const CatalogFilters();
@@ -194,6 +202,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
   void dispose() {
     _searchTimer?.cancel();
     _searchController.dispose();
+    _searchFocus.dispose();
+    _screenFocus.dispose();
     _upstream?.removeListener(_onUpstreamChanged);
     _upstream?.dispose();
     super.dispose();
@@ -313,6 +323,27 @@ class _CatalogScreenState extends State<CatalogScreen> {
     _reload();
   }
 
+  /// `/` moves focus into the search field and selects any existing text.
+  void _focusSearch() {
+    _searchFocus.requestFocus();
+    final text = _searchController.text;
+    if (text.isNotEmpty) {
+      _searchController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: text.length,
+      );
+    }
+  }
+
+  /// Escape clears the search when there is text, then returns focus to the
+  /// screen so the next Tab starts from the top of the list again.
+  void _dismissSearch() {
+    if (_searchController.text.isNotEmpty) {
+      _clearSearch();
+    }
+    _screenFocus.requestFocus();
+  }
+
   void _setCategory(String? id) {
     final next = id == null || id.trim().isEmpty ? null : id;
     if (next == _filters.categoryId) {
@@ -383,72 +414,109 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
     final upstreamStrip = _buildUpstreamStrip();
-    return Scaffold(
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            key: const Key('catalog-content'),
-            constraints: const BoxConstraints(
-              maxWidth: CatalogScreen.maxContentWidth,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final layout = catalogLayoutForWidth(constraints.maxWidth);
-                return Padding(
-                  padding: EdgeInsets.all(tokens.spaceLg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _SearchAndSortRow(
-                        controller: _searchController,
-                        sort: _sort,
-                        onSearchChanged: _onSearchChanged,
-                        onSearchSubmitted: _onSearchSubmitted,
-                        onClearSearch: _clearSearch,
-                        onSortChanged: _setSort,
-                        onToggleSortDirection: _toggleSortDirection,
-                      ),
-                      SizedBox(height: tokens.spaceMd),
-                      CatalogFilterBar(
-                        filters: _filters,
-                        categories: _categories,
-                        types: widget.types,
-                        onCategorySelected: _setCategory,
-                        onTypeSelected: _setType,
-                        onFleaEligibleSelected: _setFleaEligible,
-                        onRemoveText: _clearSearch,
-                        onReset: _resetFilters,
-                      ),
-                      SizedBox(height: tokens.spaceLg),
-                      _CatalogHeading(resultCount: _resultCountLabel),
-                      SizedBox(height: tokens.spaceSm),
-                      if (upstreamStrip != null) ...[
-                        upstreamStrip,
-                        SizedBox(height: tokens.spaceSm),
-                      ],
-                      if (layout != CatalogLayout.compact)
-                        CatalogTableHeader(layout: layout),
-                      if (_loading && _items.isNotEmpty)
-                        LinearProgressIndicator(
-                          key: const Key('catalog-loading-bar'),
-                          color: tokens.accent,
-                          backgroundColor: tokens.surfaceRaised,
-                          minHeight: 2,
-                        ),
-                      if (_error != null)
-                        _CatalogErrorBanner(
-                          message: 'Could not load the catalog.',
-                          detail: '$_error',
-                          onRetry: _reload,
-                        ),
-                      if (layout == CatalogLayout.compact)
-                        SizedBox(height: tokens.spaceSm),
-                      Expanded(child: _buildBody(layout)),
-                    ],
+    return Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.slash): FocusSearchIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): DismissListFocusIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          FocusSearchIntent: GuardedCallbackAction<FocusSearchIntent>(
+            enabled: () => !_searchFocus.hasFocus,
+            onInvoke: _focusSearch,
+          ),
+          DismissListFocusIntent: GuardedCallbackAction<DismissListFocusIntent>(
+            enabled: () =>
+                _searchFocus.hasFocus || _searchController.text.isNotEmpty,
+            onInvoke: _dismissSearch,
+          ),
+        },
+        child: Focus(
+          key: const Key('catalog-screen-focus'),
+          focusNode: _screenFocus,
+          autofocus: true,
+          skipTraversal: true,
+          includeSemantics: false,
+          child: Scaffold(
+            body: SafeArea(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  key: const Key('catalog-content'),
+                  constraints: const BoxConstraints(
+                    maxWidth: CatalogScreen.maxContentWidth,
                   ),
-                );
-              },
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final layout = catalogLayoutForWidth(
+                        constraints.maxWidth,
+                      );
+                      return Padding(
+                        padding: EdgeInsets.all(tokens.spaceLg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _SearchAndSortRow(
+                              controller: _searchController,
+                              searchFocus: _searchFocus,
+                              sort: _sort,
+                              onSearchChanged: _onSearchChanged,
+                              onSearchSubmitted: _onSearchSubmitted,
+                              onClearSearch: _clearSearch,
+                              onSortChanged: _setSort,
+                              onToggleSortDirection: _toggleSortDirection,
+                            ),
+                            SizedBox(height: tokens.spaceMd),
+                            CatalogFilterBar(
+                              filters: _filters,
+                              categories: _categories,
+                              types: widget.types,
+                              onCategorySelected: _setCategory,
+                              onTypeSelected: _setType,
+                              onFleaEligibleSelected: _setFleaEligible,
+                              onRemoveText: _clearSearch,
+                              onReset: _resetFilters,
+                            ),
+                            SizedBox(height: tokens.spaceLg),
+                            _CatalogHeading(resultCount: _resultCountLabel),
+                            SizedBox(height: tokens.spaceSm),
+                            if (upstreamStrip != null) ...[
+                              AppFocusRing(
+                                focusKey: const Key(
+                                  'catalog-upstream-retry-focus',
+                                ),
+                                ringKey: const Key(
+                                  'catalog-upstream-retry-ring',
+                                ),
+                                child: upstreamStrip,
+                              ),
+                              SizedBox(height: tokens.spaceSm),
+                            ],
+                            if (layout != CatalogLayout.compact)
+                              CatalogTableHeader(layout: layout),
+                            if (_loading && _items.isNotEmpty)
+                              LinearProgressIndicator(
+                                key: const Key('catalog-loading-bar'),
+                                color: tokens.accent,
+                                backgroundColor: tokens.surfaceRaised,
+                                minHeight: 2,
+                              ),
+                            if (_error != null)
+                              _CatalogErrorBanner(
+                                message: 'Could not load the catalog.',
+                                detail: '$_error',
+                                onRetry: _reload,
+                              ),
+                            if (layout == CatalogLayout.compact)
+                              SizedBox(height: tokens.spaceSm),
+                            Expanded(child: _buildBody(layout)),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -541,19 +609,28 @@ class _CatalogScreenState extends State<CatalogScreen> {
         final onTap = widget.onItemSelected == null
             ? null
             : () => widget.onItemSelected!(item.id);
+        final Widget row;
         if (layout == CatalogLayout.compact) {
-          return CatalogItemRow(
+          row = CatalogItemRow(
             item: item,
             onTap: onTap,
             imageCache: widget.imageCache,
           );
+        } else {
+          row = CatalogTableRow(
+            item: item,
+            layout: layout,
+            index: index,
+            onTap: onTap,
+            imageCache: widget.imageCache,
+          );
         }
-        return CatalogTableRow(
-          item: item,
-          layout: layout,
-          index: index,
-          onTap: onTap,
-          imageCache: widget.imageCache,
+        return AppFocusRing(
+          focusKey: ValueKey('catalog-row-focus-${item.id}'),
+          ringKey: ValueKey('catalog-row-focus-ring-${item.id}'),
+          borderRadius: BorderRadius.zero,
+          scrollIntoView: true,
+          child: row,
         );
       },
     );
@@ -564,6 +641,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 class _SearchAndSortRow extends StatelessWidget {
   const _SearchAndSortRow({
     required this.controller,
+    required this.searchFocus,
     required this.sort,
     required this.onSearchChanged,
     required this.onSearchSubmitted,
@@ -573,6 +651,7 @@ class _SearchAndSortRow extends StatelessWidget {
   });
 
   final TextEditingController controller;
+  final FocusNode searchFocus;
   final CatalogSort? sort;
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onSearchSubmitted;
@@ -591,6 +670,7 @@ class _SearchAndSortRow extends StatelessWidget {
           child: TextField(
             key: const Key('catalog-search-field'),
             controller: controller,
+            focusNode: searchFocus,
             textInputAction: TextInputAction.search,
             style: tokens.bodyStyle,
             decoration: InputDecoration(
@@ -598,11 +678,16 @@ class _SearchAndSortRow extends StatelessWidget {
               prefixIcon: const Icon(Icons.search),
               suffixIcon: controller.text.isEmpty
                   ? null
-                  : IconButton(
-                      key: const Key('catalog-clear-search'),
-                      tooltip: 'Clear search',
-                      onPressed: onClearSearch,
-                      icon: const Icon(Icons.close),
+                  : AppFocusRing(
+                      borderRadius: BorderRadius.circular(tokens.radiusPill),
+                      focusKey: const Key('catalog-clear-search-focus'),
+                      ringKey: const Key('catalog-clear-search-ring'),
+                      child: IconButton(
+                        key: const Key('catalog-clear-search'),
+                        tooltip: 'Clear search',
+                        onPressed: onClearSearch,
+                        icon: const Icon(Icons.close),
+                      ),
                     ),
             ),
             onChanged: onSearchChanged,
@@ -612,64 +697,74 @@ class _SearchAndSortRow extends StatelessWidget {
         SizedBox(width: tokens.spaceLg),
         AppSectionLabel('Sort'),
         SizedBox(width: tokens.spaceSm),
-        Container(
-          height: 30,
-          padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
-          decoration: BoxDecoration(
-            color: tokens.surfaceRaised,
-            border: Border.all(color: tokens.border),
-            borderRadius: BorderRadius.circular(tokens.radiusSm),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<CatalogSortField?>(
-              key: const Key('catalog-sort-field'),
-              value: sort?.field,
-              hint: Text('Default', style: tokens.bodyStyle),
-              dropdownColor: tokens.surfaceRaised,
-              isDense: true,
-              icon: Icon(
-                Icons.expand_more,
-                size: tokens.h2Size,
-                color: tokens.dim,
+        AppFocusRing(
+          focusKey: const Key('catalog-sort-focus'),
+          ringKey: const Key('catalog-sort-ring'),
+          child: Container(
+            height: 30,
+            padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+            decoration: BoxDecoration(
+              color: tokens.surfaceRaised,
+              border: Border.all(color: tokens.border),
+              borderRadius: BorderRadius.circular(tokens.radiusSm),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<CatalogSortField?>(
+                key: const Key('catalog-sort-field'),
+                value: sort?.field,
+                focusColor: tokens.focusRing.withValues(alpha: 0.12),
+                hint: Text('Default', style: tokens.bodyStyle),
+                dropdownColor: tokens.surfaceRaised,
+                isDense: true,
+                icon: Icon(
+                  Icons.expand_more,
+                  size: tokens.h2Size,
+                  color: tokens.dim,
+                ),
+                style: tokens.bodyStyle,
+                items: const [
+                  DropdownMenuItem<CatalogSortField?>(
+                    value: null,
+                    child: Text('Default'),
+                  ),
+                  DropdownMenuItem(
+                    value: CatalogSortField.name,
+                    child: Text('Name'),
+                  ),
+                  DropdownMenuItem(
+                    value: CatalogSortField.basePrice,
+                    child: Text('Base price'),
+                  ),
+                  DropdownMenuItem(
+                    value: CatalogSortField.fleaPrice,
+                    child: Text('Flea price'),
+                  ),
+                  DropdownMenuItem(
+                    value: CatalogSortField.weight,
+                    child: Text('Weight'),
+                  ),
+                ],
+                onChanged: onSortChanged,
               ),
-              style: tokens.bodyStyle,
-              items: const [
-                DropdownMenuItem<CatalogSortField?>(
-                  value: null,
-                  child: Text('Default'),
-                ),
-                DropdownMenuItem(
-                  value: CatalogSortField.name,
-                  child: Text('Name'),
-                ),
-                DropdownMenuItem(
-                  value: CatalogSortField.basePrice,
-                  child: Text('Base price'),
-                ),
-                DropdownMenuItem(
-                  value: CatalogSortField.fleaPrice,
-                  child: Text('Flea price'),
-                ),
-                DropdownMenuItem(
-                  value: CatalogSortField.weight,
-                  child: Text('Weight'),
-                ),
-              ],
-              onChanged: onSortChanged,
             ),
           ),
         ),
         SizedBox(width: tokens.spaceXs),
-        IconButton(
-          key: const Key('catalog-sort-direction'),
-          tooltip: descending ? 'Descending' : 'Ascending',
-          onPressed: sort == null ? null : onToggleSortDirection,
-          visualDensity: VisualDensity.compact,
-          icon: Icon(
-            descending ? Icons.arrow_downward : Icons.arrow_upward,
-            size: tokens.h2Size,
+        AppFocusRing(
+          borderRadius: BorderRadius.circular(tokens.radiusSm),
+          focusKey: const Key('catalog-sort-direction-focus'),
+          ringKey: const Key('catalog-sort-direction-ring'),
+          child: IconButton(
+            key: const Key('catalog-sort-direction'),
+            tooltip: descending ? 'Descending' : 'Ascending',
+            onPressed: sort == null ? null : onToggleSortDirection,
+            visualDensity: VisualDensity.compact,
+            icon: Icon(
+              descending ? Icons.arrow_downward : Icons.arrow_upward,
+              size: tokens.h2Size,
+            ),
+            color: sort == null ? tokens.dim : tokens.muted,
           ),
-          color: sort == null ? tokens.dim : tokens.muted,
         ),
       ],
     );
@@ -735,11 +830,16 @@ class _LoadMoreFooter extends StatelessWidget {
             style: tokens.dataStyle.copyWith(color: tokens.muted),
           ),
           SizedBox(height: tokens.spaceSm),
-          AppButton(
-            key: const Key('catalog-load-more'),
-            label: 'Load more',
-            variant: AppButtonVariant.secondary,
-            onPressed: loading ? null : onLoadMore,
+          AppFocusRing(
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
+            focusKey: const Key('catalog-load-more-focus'),
+            ringKey: const Key('catalog-load-more-ring'),
+            child: AppButton(
+              key: const Key('catalog-load-more'),
+              label: 'Load more',
+              variant: AppButtonVariant.secondary,
+              onPressed: loading ? null : onLoadMore,
+            ),
           ),
         ],
       ),
@@ -795,11 +895,16 @@ class _CatalogOfflineEmptyState extends StatelessWidget {
               ),
             ],
             SizedBox(height: tokens.spaceLg),
-            AppButton(
-              key: const Key('catalog-offline-retry'),
-              label: checking ? 'Checking…' : 'Retry update',
-              variant: AppButtonVariant.secondary,
-              onPressed: onRetry,
+            AppFocusRing(
+              borderRadius: BorderRadius.circular(tokens.radiusSm),
+              focusKey: const Key('catalog-offline-retry-focus'),
+              ringKey: const Key('catalog-offline-retry-ring'),
+              child: AppButton(
+                key: const Key('catalog-offline-retry'),
+                label: checking ? 'Checking…' : 'Retry update',
+                variant: AppButtonVariant.secondary,
+                onPressed: onRetry,
+              ),
             ),
           ],
         ),
@@ -851,11 +956,16 @@ class _CatalogEmptyState extends StatelessWidget {
             ),
             if (filters.isNotEmpty) ...[
               SizedBox(height: tokens.spaceLg),
-              AppButton(
-                key: const Key('catalog-empty-reset'),
-                label: 'Reset filters',
-                variant: AppButtonVariant.secondary,
-                onPressed: onReset,
+              AppFocusRing(
+                borderRadius: BorderRadius.circular(tokens.radiusSm),
+                focusKey: const Key('catalog-empty-reset-focus'),
+                ringKey: const Key('catalog-empty-reset-ring'),
+                child: AppButton(
+                  key: const Key('catalog-empty-reset'),
+                  label: 'Reset filters',
+                  variant: AppButtonVariant.secondary,
+                  onPressed: onReset,
+                ),
               ),
             ],
           ],
@@ -915,11 +1025,16 @@ class _CatalogErrorBanner extends StatelessWidget {
               ],
             ),
           ),
-          AppButton(
-            key: const Key('catalog-retry'),
-            label: 'Retry',
-            variant: AppButtonVariant.ghost,
-            onPressed: onRetry,
+          AppFocusRing(
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
+            focusKey: const Key('catalog-retry-focus'),
+            ringKey: const Key('catalog-retry-ring'),
+            child: AppButton(
+              key: const Key('catalog-retry'),
+              label: 'Retry',
+              variant: AppButtonVariant.ghost,
+              onPressed: onRetry,
+            ),
           ),
         ],
       ),

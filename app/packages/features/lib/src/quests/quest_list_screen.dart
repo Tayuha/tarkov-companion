@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../catalog/focus_ring.dart';
 import '../common/app_status_strip.dart';
 import '../common/upstream_status.dart';
 import '../theme/app_primitives.dart';
@@ -117,6 +119,11 @@ class QuestListScreen extends StatefulWidget {
 
 class _QuestListScreenState extends State<QuestListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode(debugLabel: 'quest-search');
+  final FocusNode _screenFocus = FocusNode(
+    debugLabel: 'quest-screen',
+    skipTraversal: true,
+  );
   Timer? _searchTimer;
 
   QuestFilters _filters = const QuestFilters();
@@ -194,6 +201,8 @@ class _QuestListScreenState extends State<QuestListScreen> {
   void dispose() {
     _searchTimer?.cancel();
     _searchController.dispose();
+    _searchFocus.dispose();
+    _screenFocus.dispose();
     _upstream?.removeListener(_onUpstreamChanged);
     _upstream?.dispose();
     super.dispose();
@@ -459,8 +468,30 @@ class _QuestListScreenState extends State<QuestListScreen> {
       return;
     }
     _searchTimer?.cancel();
+    _searchFocus.unfocus();
     setState(() => _view = view);
     _reload();
+  }
+
+  /// `/` moves focus into the catalog search field and selects existing text.
+  void _focusSearch() {
+    _searchFocus.requestFocus();
+    final text = _searchController.text;
+    if (text.isNotEmpty) {
+      _searchController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: text.length,
+      );
+    }
+  }
+
+  /// Escape clears the search when there is text, then returns focus to the
+  /// screen so the next Tab starts from the top of the list again.
+  void _dismissSearch() {
+    if (_searchController.text.isNotEmpty) {
+      _clearSearch();
+    }
+    _screenFocus.requestFocus();
   }
 
   void _setAvailableSort(QuestSortField field) {
@@ -476,109 +507,161 @@ class _QuestListScreenState extends State<QuestListScreen> {
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
     final upstreamStrip = _buildUpstreamStrip();
-    return Scaffold(
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            key: const Key('quest-content'),
-            constraints: const BoxConstraints(
-              maxWidth: QuestListScreen.maxContentWidth,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final layout = questLayoutForWidth(constraints.maxWidth);
-                return Padding(
-                  padding: EdgeInsets.all(tokens.spaceLg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (widget.profileId != null) ...[
-                        _QuestViewSegment(view: _view, onChanged: _setView),
-                        SizedBox(height: tokens.spaceMd),
-                      ],
-                      if (_view == _QuestViewMode.catalog) ...[
-                        Row(
+    return Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.slash): FocusSearchIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): DismissListFocusIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          FocusSearchIntent: GuardedCallbackAction<FocusSearchIntent>(
+            enabled: () =>
+                _view == _QuestViewMode.catalog && !_searchFocus.hasFocus,
+            onInvoke: _focusSearch,
+          ),
+          DismissListFocusIntent: GuardedCallbackAction<DismissListFocusIntent>(
+            enabled: () =>
+                _searchFocus.hasFocus || _searchController.text.isNotEmpty,
+            onInvoke: _dismissSearch,
+          ),
+        },
+        child: Focus(
+          key: const Key('quest-screen-focus'),
+          focusNode: _screenFocus,
+          autofocus: true,
+          skipTraversal: true,
+          includeSemantics: false,
+          child: Scaffold(
+            body: SafeArea(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  key: const Key('quest-content'),
+                  constraints: const BoxConstraints(
+                    maxWidth: QuestListScreen.maxContentWidth,
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final layout = questLayoutForWidth(constraints.maxWidth);
+                      return Padding(
+                        padding: EdgeInsets.all(tokens.spaceLg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
-                              child: TextField(
-                                key: const Key('quest-search-field'),
-                                controller: _searchController,
-                                textInputAction: TextInputAction.search,
-                                style: tokens.bodyStyle,
-                                decoration: InputDecoration(
-                                  hintText: 'Search quests',
-                                  prefixIcon: const Icon(Icons.search),
-                                  suffixIcon: _searchController.text.isEmpty
-                                      ? null
-                                      : IconButton(
-                                          key: const Key('quest-clear-search'),
-                                          tooltip: 'Clear search',
-                                          onPressed: _clearSearch,
-                                          icon: const Icon(Icons.close),
-                                        ),
-                                ),
-                                onChanged: _onSearchChanged,
-                                onSubmitted: _onSearchSubmitted,
+                            if (widget.profileId != null) ...[
+                              _QuestViewSegment(
+                                view: _view,
+                                onChanged: _setView,
                               ),
+                              SizedBox(height: tokens.spaceMd),
+                            ],
+                            if (_view == _QuestViewMode.catalog) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      key: const Key('quest-search-field'),
+                                      controller: _searchController,
+                                      focusNode: _searchFocus,
+                                      textInputAction: TextInputAction.search,
+                                      style: tokens.bodyStyle,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search quests',
+                                        prefixIcon: const Icon(Icons.search),
+                                        suffixIcon:
+                                            _searchController.text.isEmpty
+                                            ? null
+                                            : AppFocusRing(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      tokens.radiusPill,
+                                                    ),
+                                                focusKey: const Key(
+                                                  'quest-clear-search-focus',
+                                                ),
+                                                ringKey: const Key(
+                                                  'quest-clear-search-ring',
+                                                ),
+                                                child: IconButton(
+                                                  key: const Key(
+                                                    'quest-clear-search',
+                                                  ),
+                                                  tooltip: 'Clear search',
+                                                  onPressed: _clearSearch,
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ),
+                                      ),
+                                      onChanged: _onSearchChanged,
+                                      onSubmitted: _onSearchSubmitted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: tokens.spaceMd),
+                              QuestFilterBar(
+                                filters: _filters,
+                                traderOptions: _traderOptions,
+                                mapOptions: _mapOptions,
+                                onTraderSelected: _setTrader,
+                                onMapSelected: _setMap,
+                                onLevelSelected: _setLevel,
+                                onStateSelected: _setState,
+                                onRemoveText: _clearSearch,
+                                onReset: _resetFilters,
+                              ),
+                            ] else
+                              _AvailableToolbar(
+                                sort: _availableSort,
+                                onSortSelected: _setAvailableSort,
+                              ),
+                            SizedBox(height: tokens.spaceLg),
+                            _QuestHeading(
+                              title: _view == _QuestViewMode.available
+                                  ? 'Available quests'
+                                  : 'Quest catalog',
+                              resultCount: _resultCountLabel,
                             ),
+                            SizedBox(height: tokens.spaceSm),
+                            if (upstreamStrip != null) ...[
+                              AppFocusRing(
+                                focusKey: const Key(
+                                  'quest-upstream-retry-focus',
+                                ),
+                                ringKey: const Key('quest-upstream-retry-ring'),
+                                child: upstreamStrip,
+                              ),
+                              SizedBox(height: tokens.spaceSm),
+                            ],
+                            if (_orphans.isNotEmpty) ...[
+                              _UnavailableQuestsPanel(orphans: _orphans),
+                              SizedBox(height: tokens.spaceSm),
+                            ],
+                            if (layout != QuestLayout.compact)
+                              QuestTableHeader(layout: layout),
+                            if (_loading && _quests.isNotEmpty)
+                              LinearProgressIndicator(
+                                key: const Key('quest-loading-bar'),
+                                color: tokens.accent,
+                                backgroundColor: tokens.surfaceRaised,
+                                minHeight: 2,
+                              ),
+                            if (_error != null)
+                              _QuestErrorBanner(
+                                message: 'Could not load quests.',
+                                detail: '$_error',
+                                onRetry: _reload,
+                              ),
+                            if (layout == QuestLayout.compact)
+                              SizedBox(height: tokens.spaceSm),
+                            Expanded(child: _buildBody(layout)),
                           ],
                         ),
-                        SizedBox(height: tokens.spaceMd),
-                        QuestFilterBar(
-                          filters: _filters,
-                          traderOptions: _traderOptions,
-                          mapOptions: _mapOptions,
-                          onTraderSelected: _setTrader,
-                          onMapSelected: _setMap,
-                          onLevelSelected: _setLevel,
-                          onStateSelected: _setState,
-                          onRemoveText: _clearSearch,
-                          onReset: _resetFilters,
-                        ),
-                      ] else
-                        _AvailableToolbar(
-                          sort: _availableSort,
-                          onSortSelected: _setAvailableSort,
-                        ),
-                      SizedBox(height: tokens.spaceLg),
-                      _QuestHeading(
-                        title: _view == _QuestViewMode.available
-                            ? 'Available quests'
-                            : 'Quest catalog',
-                        resultCount: _resultCountLabel,
-                      ),
-                      SizedBox(height: tokens.spaceSm),
-                      if (upstreamStrip != null) ...[
-                        upstreamStrip,
-                        SizedBox(height: tokens.spaceSm),
-                      ],
-                      if (_orphans.isNotEmpty) ...[
-                        _UnavailableQuestsPanel(orphans: _orphans),
-                        SizedBox(height: tokens.spaceSm),
-                      ],
-                      if (layout != QuestLayout.compact)
-                        QuestTableHeader(layout: layout),
-                      if (_loading && _quests.isNotEmpty)
-                        LinearProgressIndicator(
-                          key: const Key('quest-loading-bar'),
-                          color: tokens.accent,
-                          backgroundColor: tokens.surfaceRaised,
-                          minHeight: 2,
-                        ),
-                      if (_error != null)
-                        _QuestErrorBanner(
-                          message: 'Could not load quests.',
-                          detail: '$_error',
-                          onRetry: _reload,
-                        ),
-                      if (layout == QuestLayout.compact)
-                        SizedBox(height: tokens.spaceSm),
-                      Expanded(child: _buildBody(layout)),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -688,23 +771,32 @@ class _QuestListScreenState extends State<QuestListScreen> {
         final onTap = widget.onQuestSelected == null
             ? null
             : () => widget.onQuestSelected!(quest.id);
+        final Widget row;
         if (layout == QuestLayout.compact) {
-          return QuestListRow(
+          row = QuestListRow(
             quest: quest,
             status: status,
             traderLabel: _optionLabel(_traderOptions, quest.traderId),
             mapLabel: _optionLabel(_mapOptions, quest.mapId),
             onTap: onTap,
           );
+        } else {
+          row = QuestTableRow(
+            quest: quest,
+            layout: layout,
+            status: status,
+            index: index,
+            traderLabel: _optionLabel(_traderOptions, quest.traderId),
+            mapLabel: _optionLabel(_mapOptions, quest.mapId),
+            onTap: onTap,
+          );
         }
-        return QuestTableRow(
-          quest: quest,
-          layout: layout,
-          status: status,
-          index: index,
-          traderLabel: _optionLabel(_traderOptions, quest.traderId),
-          mapLabel: _optionLabel(_mapOptions, quest.mapId),
-          onTap: onTap,
+        return AppFocusRing(
+          focusKey: ValueKey('quest-row-focus-${quest.id}'),
+          ringKey: ValueKey('quest-row-focus-ring-${quest.id}'),
+          borderRadius: BorderRadius.zero,
+          scrollIntoView: true,
+          child: row,
         );
       },
     );
@@ -737,17 +829,27 @@ class _QuestViewSegment extends StatelessWidget {
       spacing: AppTokens.of(context).spaceSm,
       runSpacing: AppTokens.of(context).spaceXs,
       children: [
-        AppChip(
-          key: const Key('quest-view-catalog'),
-          label: 'Catalog',
-          selected: view == _QuestViewMode.catalog,
-          onTap: () => onChanged(_QuestViewMode.catalog),
+        AppFocusRing(
+          borderRadius: BorderRadius.circular(AppTokens.of(context).radiusPill),
+          focusKey: const Key('quest-view-catalog-focus'),
+          ringKey: const Key('quest-view-catalog-ring'),
+          child: AppChip(
+            key: const Key('quest-view-catalog'),
+            label: 'Catalog',
+            selected: view == _QuestViewMode.catalog,
+            onTap: () => onChanged(_QuestViewMode.catalog),
+          ),
         ),
-        AppChip(
-          key: const Key('quest-view-available'),
-          label: 'Available',
-          selected: view == _QuestViewMode.available,
-          onTap: () => onChanged(_QuestViewMode.available),
+        AppFocusRing(
+          borderRadius: BorderRadius.circular(AppTokens.of(context).radiusPill),
+          focusKey: const Key('quest-view-available-focus'),
+          ringKey: const Key('quest-view-available-ring'),
+          child: AppChip(
+            key: const Key('quest-view-available'),
+            label: 'Available',
+            selected: view == _QuestViewMode.available,
+            onTap: () => onChanged(_QuestViewMode.available),
+          ),
         ),
       ],
     );
@@ -789,11 +891,16 @@ class _AvailableToolbar extends StatelessWidget {
       children: [
         Text('Order by', style: tokens.labelStyle),
         for (final field in _labels.keys)
-          AppChip(
-            key: Key('quest-available-order-${_keys[field]}'),
-            label: _labels[field]!,
-            selected: sort.field == field,
-            onTap: () => onSortSelected(field),
+          AppFocusRing(
+            borderRadius: BorderRadius.circular(tokens.radiusPill),
+            focusKey: Key('quest-available-order-${_keys[field]}-focus'),
+            ringKey: Key('quest-available-order-${_keys[field]}-ring'),
+            child: AppChip(
+              key: Key('quest-available-order-${_keys[field]}'),
+              label: _labels[field]!,
+              selected: sort.field == field,
+              onTap: () => onSortSelected(field),
+            ),
           ),
       ],
     );
@@ -843,11 +950,16 @@ class _QuestOfflineEmptyState extends StatelessWidget {
               style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
             SizedBox(height: tokens.spaceLg),
-            AppButton(
-              key: const Key('quest-offline-retry'),
-              label: checking ? 'Checking…' : 'Retry update',
-              variant: AppButtonVariant.secondary,
-              onPressed: onRetry,
+            AppFocusRing(
+              borderRadius: BorderRadius.circular(tokens.radiusSm),
+              focusKey: const Key('quest-offline-retry-focus'),
+              ringKey: const Key('quest-offline-retry-ring'),
+              child: AppButton(
+                key: const Key('quest-offline-retry'),
+                label: checking ? 'Checking…' : 'Retry update',
+                variant: AppButtonVariant.secondary,
+                onPressed: onRetry,
+              ),
             ),
           ],
         ),
@@ -907,17 +1019,31 @@ class _AvailableOfflineEmptyState extends StatelessWidget {
               spacing: tokens.spaceSm,
               runSpacing: tokens.spaceSm,
               children: [
-                AppButton(
-                  key: const Key('quest-available-offline-retry'),
-                  label: checking ? 'Checking…' : 'Retry update',
-                  variant: AppButtonVariant.secondary,
-                  onPressed: onRetry,
+                AppFocusRing(
+                  borderRadius: BorderRadius.circular(tokens.radiusSm),
+                  focusKey: const Key('quest-available-offline-retry-focus'),
+                  ringKey: const Key('quest-available-offline-retry-ring'),
+                  child: AppButton(
+                    key: const Key('quest-available-offline-retry'),
+                    label: checking ? 'Checking…' : 'Retry update',
+                    variant: AppButtonVariant.secondary,
+                    onPressed: onRetry,
+                  ),
                 ),
-                AppButton(
-                  key: const Key('quest-available-offline-open-catalog'),
-                  label: 'Open catalog',
-                  variant: AppButtonVariant.ghost,
-                  onPressed: onOpenCatalog,
+                AppFocusRing(
+                  borderRadius: BorderRadius.circular(tokens.radiusSm),
+                  focusKey: const Key(
+                    'quest-available-offline-open-catalog-focus',
+                  ),
+                  ringKey: const Key(
+                    'quest-available-offline-open-catalog-ring',
+                  ),
+                  child: AppButton(
+                    key: const Key('quest-available-offline-open-catalog'),
+                    label: 'Open catalog',
+                    variant: AppButtonVariant.ghost,
+                    onPressed: onOpenCatalog,
+                  ),
                 ),
               ],
             ),
@@ -962,11 +1088,16 @@ class _AvailableEmptyState extends StatelessWidget {
               style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
             SizedBox(height: tokens.spaceLg),
-            AppButton(
-              key: const Key('quest-available-open-catalog'),
-              label: 'Open catalog',
-              variant: AppButtonVariant.secondary,
-              onPressed: onOpenCatalog,
+            AppFocusRing(
+              borderRadius: BorderRadius.circular(tokens.radiusSm),
+              focusKey: const Key('quest-available-open-catalog-focus'),
+              ringKey: const Key('quest-available-open-catalog-ring'),
+              child: AppButton(
+                key: const Key('quest-available-open-catalog'),
+                label: 'Open catalog',
+                variant: AppButtonVariant.secondary,
+                onPressed: onOpenCatalog,
+              ),
             ),
           ],
         ),
@@ -1109,11 +1240,16 @@ class _LoadMoreFooter extends StatelessWidget {
             style: tokens.dataStyle.copyWith(color: tokens.muted),
           ),
           SizedBox(height: tokens.spaceSm),
-          AppButton(
-            key: const Key('quest-load-more'),
-            label: 'Load more',
-            variant: AppButtonVariant.secondary,
-            onPressed: loading ? null : onLoadMore,
+          AppFocusRing(
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
+            focusKey: const Key('quest-load-more-focus'),
+            ringKey: const Key('quest-load-more-ring'),
+            child: AppButton(
+              key: const Key('quest-load-more'),
+              label: 'Load more',
+              variant: AppButtonVariant.secondary,
+              onPressed: loading ? null : onLoadMore,
+            ),
           ),
         ],
       ),
@@ -1164,11 +1300,16 @@ class _QuestEmptyState extends StatelessWidget {
             ),
             if (filters.isNotEmpty) ...[
               SizedBox(height: tokens.spaceLg),
-              AppButton(
-                key: const Key('quest-empty-reset'),
-                label: 'Reset filters',
-                variant: AppButtonVariant.secondary,
-                onPressed: onReset,
+              AppFocusRing(
+                borderRadius: BorderRadius.circular(tokens.radiusSm),
+                focusKey: const Key('quest-empty-reset-focus'),
+                ringKey: const Key('quest-empty-reset-ring'),
+                child: AppButton(
+                  key: const Key('quest-empty-reset'),
+                  label: 'Reset filters',
+                  variant: AppButtonVariant.secondary,
+                  onPressed: onReset,
+                ),
               ),
             ],
           ],
@@ -1228,11 +1369,16 @@ class _QuestErrorBanner extends StatelessWidget {
               ],
             ),
           ),
-          AppButton(
-            key: const Key('quest-retry'),
-            label: 'Retry',
-            variant: AppButtonVariant.ghost,
-            onPressed: onRetry,
+          AppFocusRing(
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
+            focusKey: const Key('quest-retry-focus'),
+            ringKey: const Key('quest-retry-ring'),
+            child: AppButton(
+              key: const Key('quest-retry'),
+              label: 'Retry',
+              variant: AppButtonVariant.ghost,
+              onPressed: onRetry,
+            ),
           ),
         ],
       ),

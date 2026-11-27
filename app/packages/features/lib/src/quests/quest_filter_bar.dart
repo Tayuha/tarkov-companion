@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../catalog/focus_ring.dart';
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'quest_list_row.dart' show questStateLabel;
@@ -123,6 +124,8 @@ class QuestFilterBar extends StatelessWidget {
               width: 220,
               child: _DropdownField<String>(
                 fieldKey: const Key('quest-trader-filter'),
+                focusKey: const Key('quest-trader-filter-focus'),
+                ringKey: const Key('quest-trader-filter-ring'),
                 value: traderId ?? '',
                 isExpanded: true,
                 items: [
@@ -143,6 +146,8 @@ class QuestFilterBar extends StatelessWidget {
               width: 200,
               child: _DropdownField<String>(
                 fieldKey: const Key('quest-map-filter'),
+                focusKey: const Key('quest-map-filter-focus'),
+                ringKey: const Key('quest-map-filter-ring'),
                 value: mapId ?? '',
                 isExpanded: true,
                 items: [
@@ -160,6 +165,8 @@ class QuestFilterBar extends StatelessWidget {
               width: 170,
               child: _DropdownField<int>(
                 fieldKey: const Key('quest-level-filter'),
+                focusKey: const Key('quest-level-filter-focus'),
+                ringKey: const Key('quest-level-filter-ring'),
                 value: filters.maxPlayerLevel ?? 0,
                 isExpanded: true,
                 items: [
@@ -175,11 +182,16 @@ class QuestFilterBar extends StatelessWidget {
               ),
             ),
             if (filters.isNotEmpty)
-              AppButton(
-                key: const Key('quest-reset-filters'),
-                label: 'Reset',
-                variant: AppButtonVariant.ghost,
-                onPressed: onReset,
+              AppFocusRing(
+                borderRadius: BorderRadius.circular(tokens.radiusSm),
+                focusKey: const Key('quest-reset-filters-focus'),
+                ringKey: const Key('quest-reset-filters-ring'),
+                child: AppButton(
+                  key: const Key('quest-reset-filters'),
+                  label: 'Reset',
+                  variant: AppButtonVariant.ghost,
+                  onPressed: onReset,
+                ),
               ),
           ],
         ),
@@ -190,18 +202,28 @@ class QuestFilterBar extends StatelessWidget {
             spacing: tokens.spaceSm,
             runSpacing: tokens.spaceXs,
             children: [
-              AppChip(
-                key: const Key('quest-state-filter-any'),
-                label: 'All states',
-                selected: filters.state == null,
-                onTap: () => onStateSelected(null),
+              AppFocusRing(
+                borderRadius: BorderRadius.circular(tokens.radiusPill),
+                focusKey: const Key('quest-state-filter-any-focus'),
+                ringKey: const Key('quest-state-filter-any-ring'),
+                child: AppChip(
+                  key: const Key('quest-state-filter-any'),
+                  label: 'All states',
+                  selected: filters.state == null,
+                  onTap: () => onStateSelected(null),
+                ),
               ),
               for (final state in QuestProgressState.values)
-                AppChip(
-                  key: Key('quest-state-filter-${state.name}'),
-                  label: questStateLabel(state),
-                  selected: filters.state == state,
-                  onTap: () => onStateSelected(state),
+                AppFocusRing(
+                  borderRadius: BorderRadius.circular(tokens.radiusPill),
+                  focusKey: Key('quest-state-filter-${state.name}-focus'),
+                  ringKey: Key('quest-state-filter-${state.name}-ring'),
+                  child: AppChip(
+                    key: Key('quest-state-filter-${state.name}'),
+                    label: questStateLabel(state),
+                    selected: filters.state == state,
+                    onTap: () => onStateSelected(state),
+                  ),
                 ),
             ],
           ),
@@ -258,9 +280,13 @@ class _DropdownField<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     required this.isExpanded,
+    this.focusKey,
+    this.ringKey,
   });
 
   final Key fieldKey;
+  final Key? focusKey;
+  final Key? ringKey;
   final T value;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
@@ -269,25 +295,34 @@ class _DropdownField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
-    return Container(
-      height: 30,
-      padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
-      decoration: BoxDecoration(
-        color: tokens.surfaceRaised,
-        border: Border.all(color: tokens.border),
-        borderRadius: BorderRadius.circular(tokens.radiusSm),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          key: fieldKey,
-          value: value,
-          isExpanded: isExpanded,
-          isDense: true,
-          dropdownColor: tokens.surfaceRaised,
-          icon: Icon(Icons.expand_more, size: tokens.h2Size, color: tokens.dim),
-          style: tokens.bodyStyle,
-          items: items,
-          onChanged: onChanged,
+    return AppFocusRing(
+      focusKey: focusKey,
+      ringKey: ringKey,
+      child: Container(
+        height: 30,
+        padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+        decoration: BoxDecoration(
+          color: tokens.surfaceRaised,
+          border: Border.all(color: tokens.border),
+          borderRadius: BorderRadius.circular(tokens.radiusSm),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<T>(
+            key: fieldKey,
+            value: value,
+            isExpanded: isExpanded,
+            isDense: true,
+            focusColor: tokens.focusRing.withValues(alpha: 0.12),
+            dropdownColor: tokens.surfaceRaised,
+            icon: Icon(
+              Icons.expand_more,
+              size: tokens.h2Size,
+              color: tokens.dim,
+            ),
+            style: tokens.bodyStyle,
+            items: items,
+            onChanged: onChanged,
+          ),
         ),
       ),
     );
@@ -310,9 +345,12 @@ class _ActiveFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: 'Remove filter',
-      child: AppChip(label: label, selected: true, onTap: onDeleted),
+    return AppFocusRing(
+      borderRadius: BorderRadius.circular(AppTokens.of(context).radiusPill),
+      child: Tooltip(
+        message: 'Remove filter',
+        child: AppChip(label: label, selected: true, onTap: onDeleted),
+      ),
     );
   }
 }

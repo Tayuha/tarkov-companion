@@ -43,6 +43,14 @@ theme tests remain the proof of the system.
 | `info` | `#7DDCC4` | In-progress states and links |
 | `value` | `#C9D99A` | Prices, standing, numeric values |
 | `onAccent` | `#04140A` | Text drawn on the accent fill |
+| `focusRing` | `#7DF7A8` | The 2 px keyboard focus ring (`focusRingWidth`) |
+
+The focus ring reuses the accent so keyboard focus and selection read as the
+same decision colour. It is painted at `focusRingWidth` (2 logical pixels) as an
+overlay, never as layout padding: a focused control does not move or change
+size. Inputs use the same two-pixel accent `focusedBorder` from the input
+decoration theme, and `ThemeData.focusColor` carries a quiet accent tint for
+InkWell controls that are not wrapped by `AppFocusRing`.
 
 Contrast, measured with the WCAG 2.x relative-luminance formula:
 
@@ -135,6 +143,32 @@ disabled colours from a token with `withValues(alpha: …)` or `Color.alphaBlend
 | `AppStatTile` | A label/value cell for inspector statistics. |
 | `AppProgressBar` | A 3 px progress rail with optional label and readout. |
 | `AppDataRow` | The compact name/meta/value/delta row used as the list density sample. |
+| `AppFocusRing` | A non-traversing wrapper that paints the tokenised ring around any focused descendant; used by list rows, chips, buttons, dropdowns and pagination. |
+
+### Focus
+
+`AppFocusRing` (`lib/src/catalog/focus_ring.dart`) wraps a control without
+adding a tab stop. It observes the focused `InkWell`, `DropdownButton`,
+`IconButton` or `TextField` inside it and paints the accent ring as a
+`Positioned.fill` overlay, so focus never shifts layout. List rows pass
+`scrollIntoView: true`; gaining focus scrolls the row into the nearest
+scrollable, which keeps Tab traversal usable in the virtualised list.
+
+```dart
+AppFocusRing(
+  borderRadius: BorderRadius.circular(tokens.radiusSm),
+  focusKey: const Key('catalog-row-focus'),
+  ringKey: const Key('catalog-row-ring'),
+  scrollIntoView: true,
+  child: CatalogTableRow(item: item, onTap: open),
+);
+```
+
+The ring is not a substitute for semantics. A control still needs its own
+button semantics and an `onTap`; the wrapper only makes the focused state
+visible. The screen-level `FocusSearchIntent` and `DismissListFocusIntent`
+(bound to `/` and Escape) live in the same file so both lists share the
+shortcut contract.
 
 ### Buttons
 
@@ -228,6 +262,8 @@ flutter test packages/features/test/theme --update-goldens
 
 - `tokens_test.dart` checks the required WCAG AA pairs, the spacing/radius/type
   scales, `copyWith` and `lerp`.
+- `focus_test.dart` checks the focus-ring token and that the input theme uses
+  the same two-pixel accent border.
 - `theme_test.dart` checks the dark `ColorScheme`, the token extension, both
   font families, and that Material's default primary is gone.
 - `primitives_test.dart` smoke-tests every primitive and compares a **1x,
