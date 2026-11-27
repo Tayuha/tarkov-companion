@@ -2018,18 +2018,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 47,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_design"
       ],
-      "notes": "In progress in worktree t813-items-migration. Installs buildAppTheme globally, migrates catalog table to token columns with 1440/1920 responsive visibility, restyles item detail with primitives, updates goldens/tests. Split inspector and Quests stay for later.",
+      "notes": "Completed 2026-11-26 in worktree t813-items-migration, merged as 6cf9c59. Theme installed in main.dart; catalog rebuilt on tokens with 34px header/72px rows, responsive <1100 cards, >=1600 Observed column, 1600px content cap; detail restyled with two-column wide layout. 83 feature tests, 4 goldens regenerated. Branch 1270ffb. Deferred: split inspector, 24h delta needs data-layer field.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795755734528,
-      "archived": false,
-      "sessionID": "ses_de49e2ee5ffej6t8LVUGLuyAnL"
+      "updatedAt": 1795756516315,
+      "archived": false
     },
     {
       "id": "task_impl_8_14",
@@ -2047,9 +2046,9 @@
         "tag_app",
         "tag_design"
       ],
-      "notes": "Next after 8.13: migrate Quests list/detail to the same primitives. Backlog.",
+      "notes": "Next: migrate Quests list/detail to the primitives, including the 1920 wide layout. In progress.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795755040019,
+      "updatedAt": 1795756516315,
       "archived": false
     }
   ],
