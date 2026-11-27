@@ -853,7 +853,7 @@
         "tag_app",
         "tag_data"
       ],
-      "notes": "FTS5 external-content table with unicode61 remove_diacritics 2 and insert/update/delete triggers (T3.2). Ingestion relies on the triggers; dataset_ingestor_test asserts search by colt/m4a1/m855 after ingest, and ec9e0a8 adds an ingested \"Café Crème\" matched by \"cafe\". 183 data tests.",
+      "notes": "FTS5 external-content table with unicode61 remove_diacritics 2 and insert/update/delete triggers (T3.2). Ingestion relies on the triggers; dataset_ingestor_test asserts search by colt/m4a1/m855 after ingest, and ec9e0a8 adds an ingested \"Caf\u00e9 Cr\u00e8me\" matched by \"cafe\". 183 data tests.",
       "createdAt": 1795702401024,
       "updatedAt": 1795702401024,
       "archived": false
@@ -1985,6 +1985,69 @@
       "notes": "Completed 2026-11-26 in worktree t811-nav-shell (session ses_de713692fffejg6rtPzucQHER3), merged as 8f4b22d. HomeShell: NavigationRail >=700px, NavigationBar below, IndexedStack preserving search/filter/scroll, Items->Catalog->ItemDetail, Quests->QuestList with active profile and selection callback, Escape pops. HomePlaceholder removed. 23 app tests, 41 features, linux debug build. Branch 387d508.",
       "createdAt": 1795714499951,
       "updatedAt": 1795743597985,
+      "archived": false
+    },
+    {
+      "id": "task_impl_8_12",
+      "title": "T8.12 Flutter phosphor design system",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/tayuha/Projects/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "backlog",
+      "position": 110,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_design"
+      ],
+      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "createdAt": 1795755040019,
+      "updatedAt": 1795755040019,
+      "archived": false
+    },
+    {
+      "id": "task_impl_8_13",
+      "title": "T8.13 Migrate Items to the design system",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/tayuha/Projects/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "backlog",
+      "position": 111,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_design"
+      ],
+      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "createdAt": 1795755040019,
+      "updatedAt": 1795755040019,
+      "archived": false
+    },
+    {
+      "id": "task_impl_8_14",
+      "title": "T8.14 Migrate Quests to the design system",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/tayuha/Projects/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "backlog",
+      "position": 112,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app",
+        "tag_design"
+      ],
+      "notes": "Derived from the approved phosphor design system in design/. See design/README.md and preview/06,07.",
+      "createdAt": 1795755040019,
+      "updatedAt": 1795755040019,
       "archived": false
     }
   ],

@@ -103,6 +103,10 @@
 
 - [x] 8.11 Build the persistent navigation shell (Items/Quests) with state-preserving tabs and a narrow-window bottom bar, verified by widget tests for switching, state retention, and item-detail navigation
 
+- [ ] 8.12 Implement the phosphor design system in Flutter: `AppTokens` ThemeExtension, dark `ThemeData`, typography/spacing, and primitives (panel, button, chip, status badge, stat tile, progress bar), verified by golden and contrast tests
+- [ ] 8.13 Migrate the Items screen to the design-system primitives and phosphor theme, verified by widget/golden tests at the 1440 and 1920 layouts
+- [ ] 8.14 Migrate the Quests list and detail to the design-system primitives, verified by widget/golden tests
+
 ## 9. Integration and release readiness
 
 - [ ] 9.1 Add an end-to-end test covering first run, catalog browse, item detail, quest completion, export, and re-import, verified by the test passing against the fixture-backed build
