@@ -2018,17 +2018,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 111,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_design"
       ],
-      "notes": "Next after 8.12: migrate Items (1440 + 1920) to the primitives. Backlog.",
+      "notes": "In progress in worktree t813-items-migration. Installs buildAppTheme globally, migrates catalog table to token columns with 1440/1920 responsive visibility, restyles item detail with primitives, updates goldens/tests. Split inspector and Quests stay for later.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795755040019,
-      "archived": false
+      "updatedAt": 1795755734528,
+      "archived": false,
+      "sessionID": "ses_de49e2ee5ffej6t8LVUGLuyAnL"
     },
     {
       "id": "task_impl_8_14",
@@ -2046,7 +2047,7 @@
         "tag_app",
         "tag_design"
       ],
-      "notes": "After 8.13: migrate Quests list/detail. Backlog.",
+      "notes": "Next after 8.13: migrate Quests list/detail to the same primitives. Backlog.",
       "createdAt": 1795755040019,
       "updatedAt": 1795755040019,
       "archived": false
