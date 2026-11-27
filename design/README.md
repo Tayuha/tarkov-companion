@@ -13,12 +13,14 @@ This is an independent fan project. No game artwork is bundled; item images are 
 
 | File | What it is |
 |---|---|
-| `tarkov-companion.figcraft` | Editable FigCraft document, five pages |
+| `tarkov-companion.figcraft` | Editable FigCraft document, five pages (original) |
+| `tarkov-companion-night-vision.figcraft` | Separate copy with the Items palette remapped to phosphor green |
 | `preview/00-tokens.png` | Palette, type scale, components |
 | `preview/01-items.png` | Desktop Items — dense catalog + inspector |
 | `preview/02-quests.png` | Desktop Quests — trader strip, list, detail |
 | `preview/03-mobile-items.png` | Mobile Items |
 | `preview/04-mobile-quests.png` | Mobile Quests |
+| `preview/05-items-night-vision.png` | Items in the night-vision variant |
 | `preview/index.html` | Gallery of the five previews |
 
 ## Pages
@@ -30,6 +32,36 @@ This is an independent fan project. No game artwork is bundled; item images are 
    with objectives, requirements, rewards, notes and status actions.
 4. **03 · Mobile · Items** — 390×844. Compact list with per-item price and change; bottom navigation.
 5. **04 · Mobile · Quests** — 390×844. Trader initials, availability tabs, compact task rows.
+6. **05 · Items · Night Vision** — separate file. The same Items screen with the palette shifted to
+   phosphor green; the original document is untouched.
+
+## Items refinement (option 1)
+
+The desktop Items screen is now grounded in the running app:
+
+- **Column priorities at 1440 px:** Item, Flea price + Base subline, 24 h change, Best trader, Weight,
+  Slots. Base price never takes a second primary column; it is a muted subline under the flea low.
+- **Responsive fallback:** at 1280 px drop Slots; at 1024 px drop Weight and move best-trader detail into
+  the inspector. Keep item, flea price, 24 h and the trader summary.
+- **Spacing:** 8 px grid; 72 px table rows; 34 px header; 52 px filter bar; 16 px inspector padding; the
+  inspector action sits inside the 784 px panel instead of clipping at the window edge.
+- **Footer:** dataset age, offline-copy state and the active sort, so the table never floats without
+  context.
+- **States:** one selected row (orange bar + tinted fill), alternating row surfaces, stale/— values in
+  muted grey, positive/negative deltas in green/red.
+
+## Night-vision variant
+
+`tarkov-companion-night-vision.figcraft` is a **separate copy** generated from the refined document. It is
+not a second theme in the original file.
+
+- Backgrounds shift to green-black (`#070D08` base), surfaces to `#0D1510` / `#121C15`.
+- The decision orange `#E08A3C` becomes phosphor mint `#7DF7A8`; the deep selected fill becomes
+  `#17452A`.
+- Success, info and danger stay distinguishable (`#5FBF7A`, `#7DDCC4`, `#D27A6A`); bone text becomes
+  pale green `#DCF3E2`.
+- The header records `NIGHT VISION VARIANT · PHOSPHOR GREEN`, so the copy cannot be mistaken for the
+  original.
 
 ## Design tokens
 
