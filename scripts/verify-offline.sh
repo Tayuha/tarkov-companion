@@ -171,7 +171,7 @@ printf '  6. Profiles: activate, export and re-import a profile with networking 
 printf '  7. About: version, bundle age, attribution and licence render.\n'
 printf '  8. Press a visible retry/Check now; expect a non-blocking offline status.\n'
 printf '  9. Restart offline; data and progress are still present.\n'
-printf ' 10. Image cache: see the known limitation in docs/verification.md.\n'
+printf ' 10. Image cache: reopen an item seen online; its artwork loads from cache.\n'
 printf '\nFirst-run-with-no-network is a separate check with an empty data root:\n'
 printf '  export XDG_DATA_HOME=/tmp/tc-offline-empty\n'
 printf '  bash scripts/verify-offline.sh --launch\n'
