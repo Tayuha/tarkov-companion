@@ -1031,17 +1031,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 68,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Acquisition/disposition sections (trader, barter, craft, quest links) from applied tables.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_5_5",
@@ -1052,17 +1051,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 69,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Price panel: flea low/24h avg, 48h direction, trader base, UTC observation, missing/zero states.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_5_6",
@@ -1073,17 +1071,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 2,
+      "categoryID": "done",
+      "position": 70,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Disk image cache with FNV-1a keys, 32 MiB LRU, offline hit, placeholder fallback; wired to detail and rows.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_5_7",
@@ -1094,17 +1091,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 3,
+      "categoryID": "done",
+      "position": 71,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Price history repository with TTL + chart behind a source interface; no allowlisted history endpoint yet so production hides it.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_5_8",
@@ -1115,17 +1111,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 19,
+      "categoryID": "done",
+      "position": 72,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
+      "notes": "Merged as e400817. Deep links via --item-id and tarkov-companion://item/<id>; removed-item state with back to catalog.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_5_9",
@@ -1136,17 +1131,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 4,
+      "categoryID": "done",
+      "position": 73,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Catalog p95 9.02 ms vs 50 ms and first render 591-887 ms vs 1.5 s, benchmark-tagged.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_6_1",
@@ -1667,18 +1661,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 20,
+      "categoryID": "done",
+      "position": 75,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
+      "notes": "Merged as e400817. Window geometry restore/clamp with 800x560 minimum, GTK method channel, persisted settings key.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_8_6",
@@ -1689,18 +1682,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 21,
+      "categoryID": "done",
+      "position": 76,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
+      "notes": "Merged as e400817. Single-instance PID lock + Unix socket; second launch forwards focus/item and exits before DB open.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_8_7",
@@ -1942,18 +1934,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 5,
+      "categoryID": "done",
+      "position": 74,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
+      "notes": "Merged as e400817. Category options load real id/name pairs from gameRecords; catalog auto-loads them.",
       "createdAt": 1795709662442,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
+      "updatedAt": 1795758978323,
+      "archived": false
     },
     {
       "id": "task_impl_6_12",
