@@ -7,9 +7,10 @@ reference is [`design/README.md`](../design/README.md) and the previews in
 `design/preview/`.
 
 This document covers the shared Flutter layer added in T8.12. It is token,
-theme and primitive code only. **Screens migrate in T8.13 (Items) and T8.14
-(Quests).** Until then `app/lib/main.dart` keeps its original Material theme, so
-the component gallery and the theme tests are the proof of the system.
+theme and primitive code plus the component gallery. T8.13 installed
+`buildAppTheme()` in `app/lib/main.dart` and migrated the Items catalog and
+item detail; Quests still migrate in T8.14. The component gallery and the theme
+tests remain the proof of the system.
 
 ## Where it lives
 
@@ -95,7 +96,8 @@ final tokens = AppTokens.of(context);
 final theme = buildAppTheme();
 ```
 
-`buildAppTheme()` does not install itself. A screen or test opts in explicitly:
+`buildAppTheme()` returns the theme; the app installs it in `app/lib/main.dart`.
+Tests and isolated screen previews opt in explicitly:
 
 ```dart
 MaterialApp(
@@ -242,4 +244,4 @@ gallery is intentionally small and flat so it remains stable across runs.
 - No rounded glass, gloss or decorative gradients. Two-pixel corners at most.
 - Every screen must stay legible offline and at 100% zoom.
 - Item art remains a placeholder until licensing/branding is decided.
-- Do not migrate screens in this layer. T8.13 and T8.14 own that work.
+- Items migrated in T8.13; Quests migrate in T8.14.

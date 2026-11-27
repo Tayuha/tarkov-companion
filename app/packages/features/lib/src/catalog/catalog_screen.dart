@@ -3,12 +3,20 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
-import '../section_header.dart';
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
 import 'catalog_filter_bar.dart';
 import 'catalog_item_row.dart';
 
 export 'catalog_filter_bar.dart' show CatalogCategoryOption;
-export 'catalog_item_row.dart' show CatalogItemRow;
+export 'catalog_item_row.dart'
+    show
+        CatalogItemRow,
+        CatalogLayout,
+        CatalogTableHeader,
+        CatalogTableRow,
+        catalogLayoutForWidth,
+        formatObservationAge;
 
 /// The searchable, filterable item catalog.
 ///
@@ -26,6 +34,10 @@ export 'catalog_item_row.dart' show CatalogItemRow;
 /// * rows are built on demand by a `ListView.builder` and pages are appended
 ///   with the explicit load-more control, so a large catalog never materializes
 ///   as one widget tree;
+/// * the layout is adaptive: a five-column table at 1100 logical pixels, an
+///   extra `Observed` column at 1600, and compact card rows below 1100;
+/// * content width is capped at 1600 logical pixels so an ultra-wide monitor
+///   never stretches the table into unreadable columns;
 /// * images are a fixed neutral placeholder until task 5.6 adds the image cache.
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
@@ -37,6 +49,9 @@ class CatalogScreen extends StatefulWidget {
     this.categories = defaultCatalogCategories,
     this.types = defaultCatalogTypes,
   });
+
+  /// The widest the catalog chrome and table may grow.
+  static const double maxContentWidth = 1600;
 
   final CatalogRepository repository;
 
@@ -274,118 +289,70 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      key: const Key('catalog-search-field'),
-                      controller: _searchController,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: 'Search items',
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchController.text.isEmpty
-                            ? null
-                            : IconButton(
-                                key: const Key('catalog-clear-search'),
-                                tooltip: 'Clear search',
-                                onPressed: _clearSearch,
-                                icon: const Icon(Icons.close),
-                              ),
-                        border: const OutlineInputBorder(),
-                        isDense: true,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            key: const Key('catalog-content'),
+            constraints: const BoxConstraints(
+              maxWidth: CatalogScreen.maxContentWidth,
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final layout = catalogLayoutForWidth(constraints.maxWidth);
+                return Padding(
+                  padding: EdgeInsets.all(tokens.spaceLg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _SearchAndSortRow(
+                        controller: _searchController,
+                        sort: _sort,
+                        onSearchChanged: _onSearchChanged,
+                        onSearchSubmitted: _onSearchSubmitted,
+                        onClearSearch: _clearSearch,
+                        onSortChanged: _setSort,
+                        onToggleSortDirection: _toggleSortDirection,
                       ),
-                      onChanged: _onSearchChanged,
-                      onSubmitted: _onSearchSubmitted,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text('Sort', style: Theme.of(context).textTheme.labelLarge),
-                  const SizedBox(width: 8),
-                  DropdownButton<CatalogSortField?>(
-                    key: const Key('catalog-sort-field'),
-                    value: _sort?.field,
-                    hint: const Text('Default'),
-                    items: const [
-                      DropdownMenuItem<CatalogSortField?>(
-                        value: null,
-                        child: Text('Default'),
+                      SizedBox(height: tokens.spaceMd),
+                      CatalogFilterBar(
+                        filters: _filters,
+                        categories: widget.categories,
+                        types: widget.types,
+                        onCategorySelected: _setCategory,
+                        onTypeSelected: _setType,
+                        onFleaEligibleSelected: _setFleaEligible,
+                        onRemoveText: _clearSearch,
+                        onReset: _resetFilters,
                       ),
-                      DropdownMenuItem(
-                        value: CatalogSortField.name,
-                        child: Text('Name'),
-                      ),
-                      DropdownMenuItem(
-                        value: CatalogSortField.basePrice,
-                        child: Text('Base price'),
-                      ),
-                      DropdownMenuItem(
-                        value: CatalogSortField.fleaPrice,
-                        child: Text('Flea price'),
-                      ),
-                      DropdownMenuItem(
-                        value: CatalogSortField.weight,
-                        child: Text('Weight'),
-                      ),
+                      SizedBox(height: tokens.spaceLg),
+                      _CatalogHeading(resultCount: _resultCountLabel),
+                      SizedBox(height: tokens.spaceSm),
+                      if (layout != CatalogLayout.compact)
+                        CatalogTableHeader(layout: layout),
+                      if (_loading && _items.isNotEmpty)
+                        LinearProgressIndicator(
+                          key: const Key('catalog-loading-bar'),
+                          color: tokens.accent,
+                          backgroundColor: tokens.surfaceRaised,
+                          minHeight: 2,
+                        ),
+                      if (_error != null)
+                        _CatalogErrorBanner(
+                          message: 'Could not load the catalog.',
+                          detail: '$_error',
+                          onRetry: _reload,
+                        ),
+                      if (layout == CatalogLayout.compact)
+                        SizedBox(height: tokens.spaceSm),
+                      Expanded(child: _buildBody(layout)),
                     ],
-                    onChanged: _setSort,
                   ),
-                  IconButton(
-                    key: const Key('catalog-sort-direction'),
-                    tooltip: (_sort?.descending ?? false)
-                        ? 'Descending'
-                        : 'Ascending',
-                    onPressed: _sort == null ? null : _toggleSortDirection,
-                    icon: Icon(
-                      (_sort?.descending ?? false)
-                          ? Icons.arrow_downward
-                          : Icons.arrow_upward,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              CatalogFilterBar(
-                filters: _filters,
-                categories: widget.categories,
-                types: widget.types,
-                onCategorySelected: _setCategory,
-                onTypeSelected: _setType,
-                onFleaEligibleSelected: _setFleaEligible,
-                onRemoveText: _clearSearch,
-                onReset: _resetFilters,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  SectionHeader(title: 'Item catalog'),
-                  const Spacer(),
-                  Text(
-                    _resultCountLabel,
-                    key: const Key('catalog-result-count'),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (_loading && _items.isNotEmpty)
-                const LinearProgressIndicator(key: Key('catalog-loading-bar')),
-              if (_error != null)
-                _CatalogErrorBanner(
-                  message: 'Could not load the catalog.',
-                  detail: '$_error',
-                  onRetry: _reload,
-                ),
-              const SizedBox(height: 4),
-              Expanded(child: _buildBody()),
-            ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -399,11 +366,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return 'Showing ${_items.length} of $_total items';
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(CatalogLayout layout) {
     if (_items.isEmpty) {
       if (_loading) {
-        return const Center(
-          child: CircularProgressIndicator(key: Key('catalog-loading')),
+        return Center(
+          child: CircularProgressIndicator(key: const Key('catalog-loading')),
         );
       }
       if (_error != null) {
@@ -426,13 +393,168 @@ class _CatalogScreenState extends State<CatalogScreen> {
           );
         }
         final item = _items[index];
-        return CatalogItemRow(
+        final onTap = widget.onItemSelected == null
+            ? null
+            : () => widget.onItemSelected!(item.id);
+        if (layout == CatalogLayout.compact) {
+          return CatalogItemRow(item: item, onTap: onTap);
+        }
+        return CatalogTableRow(
           item: item,
-          onTap: widget.onItemSelected == null
-              ? null
-              : () => widget.onItemSelected!(item.id),
+          layout: layout,
+          index: index,
+          onTap: onTap,
         );
       },
+    );
+  }
+}
+
+/// The search field, sort field and sort-direction toggle.
+class _SearchAndSortRow extends StatelessWidget {
+  const _SearchAndSortRow({
+    required this.controller,
+    required this.sort,
+    required this.onSearchChanged,
+    required this.onSearchSubmitted,
+    required this.onClearSearch,
+    required this.onSortChanged,
+    required this.onToggleSortDirection,
+  });
+
+  final TextEditingController controller;
+  final CatalogSort? sort;
+  final ValueChanged<String> onSearchChanged;
+  final ValueChanged<String> onSearchSubmitted;
+  final VoidCallback onClearSearch;
+  final ValueChanged<CatalogSortField?> onSortChanged;
+  final VoidCallback onToggleSortDirection;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final descending = sort?.descending ?? false;
+
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            key: const Key('catalog-search-field'),
+            controller: controller,
+            textInputAction: TextInputAction.search,
+            style: tokens.bodyStyle,
+            decoration: InputDecoration(
+              hintText: 'Search items',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: controller.text.isEmpty
+                  ? null
+                  : IconButton(
+                      key: const Key('catalog-clear-search'),
+                      tooltip: 'Clear search',
+                      onPressed: onClearSearch,
+                      icon: const Icon(Icons.close),
+                    ),
+            ),
+            onChanged: onSearchChanged,
+            onSubmitted: onSearchSubmitted,
+          ),
+        ),
+        SizedBox(width: tokens.spaceLg),
+        AppSectionLabel('Sort'),
+        SizedBox(width: tokens.spaceSm),
+        Container(
+          height: 30,
+          padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+          decoration: BoxDecoration(
+            color: tokens.surfaceRaised,
+            border: Border.all(color: tokens.border),
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<CatalogSortField?>(
+              key: const Key('catalog-sort-field'),
+              value: sort?.field,
+              hint: Text('Default', style: tokens.bodyStyle),
+              dropdownColor: tokens.surfaceRaised,
+              isDense: true,
+              icon: Icon(
+                Icons.expand_more,
+                size: tokens.h2Size,
+                color: tokens.dim,
+              ),
+              style: tokens.bodyStyle,
+              items: const [
+                DropdownMenuItem<CatalogSortField?>(
+                  value: null,
+                  child: Text('Default'),
+                ),
+                DropdownMenuItem(
+                  value: CatalogSortField.name,
+                  child: Text('Name'),
+                ),
+                DropdownMenuItem(
+                  value: CatalogSortField.basePrice,
+                  child: Text('Base price'),
+                ),
+                DropdownMenuItem(
+                  value: CatalogSortField.fleaPrice,
+                  child: Text('Flea price'),
+                ),
+                DropdownMenuItem(
+                  value: CatalogSortField.weight,
+                  child: Text('Weight'),
+                ),
+              ],
+              onChanged: onSortChanged,
+            ),
+          ),
+        ),
+        SizedBox(width: tokens.spaceXs),
+        IconButton(
+          key: const Key('catalog-sort-direction'),
+          tooltip: descending ? 'Descending' : 'Ascending',
+          onPressed: sort == null ? null : onToggleSortDirection,
+          visualDensity: VisualDensity.compact,
+          icon: Icon(
+            descending ? Icons.arrow_downward : Icons.arrow_upward,
+            size: tokens.h2Size,
+          ),
+          color: sort == null ? tokens.dim : tokens.muted,
+        ),
+      ],
+    );
+  }
+}
+
+/// The catalog title and the result count.
+class _CatalogHeading extends StatelessWidget {
+  const _CatalogHeading({required this.resultCount});
+
+  final String resultCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AppSectionLabel('Catalog'),
+              SizedBox(height: tokens.spaceXs),
+              Text('Item catalog', style: tokens.h1Style),
+            ],
+          ),
+        ),
+        Text(
+          resultCount,
+          key: const Key('catalog-result-count'),
+          style: tokens.dataStyle.copyWith(color: tokens.muted),
+        ),
+      ],
     );
   }
 }
@@ -452,26 +574,22 @@ class _LoadMoreFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceLg),
       child: Column(
         children: [
           Text(
             '$loaded of $total loaded',
             key: const Key('catalog-loaded-count'),
-            style: Theme.of(context).textTheme.bodySmall,
+            style: tokens.dataStyle.copyWith(color: tokens.muted),
           ),
-          const SizedBox(height: 8),
-          OutlinedButton(
+          SizedBox(height: tokens.spaceSm),
+          AppButton(
             key: const Key('catalog-load-more'),
+            label: 'Load more',
+            variant: AppButtonVariant.secondary,
             onPressed: loading ? null : onLoadMore,
-            child: loading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Load more'),
           ),
         ],
       ),
@@ -487,7 +605,7 @@ class _CatalogEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final query = filters.text?.trim();
     final headline = query != null && query.isNotEmpty
         ? 'No items match "$query".'
@@ -506,32 +624,27 @@ class _CatalogEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
+            Icon(Icons.search_off, size: 48, color: tokens.dim),
+            SizedBox(height: tokens.spaceMd),
             Text(
               headline,
               key: const Key('catalog-empty-title'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               detail,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
             if (filters.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              FilledButton.tonal(
+              SizedBox(height: tokens.spaceLg),
+              AppButton(
                 key: const Key('catalog-empty-reset'),
+                label: 'Reset filters',
+                variant: AppButtonVariant.secondary,
                 onPressed: onReset,
-                child: const Text('Reset filters'),
               ),
             ],
           ],
@@ -554,41 +667,48 @@ class _CatalogErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final tokens = AppTokens.of(context);
     return Container(
       key: const Key('catalog-error-banner'),
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: EdgeInsets.only(bottom: tokens.spaceSm),
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spaceMd,
+        vertical: tokens.spaceSm,
+      ),
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        color: Color.alphaBlend(
+          tokens.danger.withValues(alpha: 0.12),
+          tokens.surface,
+        ),
+        border: Border.all(color: tokens.danger.withValues(alpha: 0.6)),
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
-          const SizedBox(width: 8),
+          Icon(Icons.error_outline, color: tokens.danger),
+          SizedBox(width: tokens.spaceSm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   message,
-                  style: TextStyle(color: colorScheme.onErrorContainer),
+                  style: tokens.bodyStyle.copyWith(color: tokens.danger),
                 ),
                 Text(
                   detail,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: colorScheme.onErrorContainer),
+                  style: tokens.bodyStyle.copyWith(color: tokens.muted),
                 ),
               ],
             ),
           ),
-          TextButton(
+          AppButton(
             key: const Key('catalog-retry'),
+            label: 'Retry',
+            variant: AppButtonVariant.ghost,
             onPressed: onRetry,
-            child: const Text('Retry'),
           ),
         ],
       ),

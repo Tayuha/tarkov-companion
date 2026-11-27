@@ -75,11 +75,12 @@ image slot is a neutral placeholder and prices are not shown on this screen.
 
 `app/packages/features/test/catalog/item_detail_screen_test.dart` renders a
 weapon, ammunition, armor, and a barter-only item as golden images under
-`goldens/` (960 × 1500, fixed Material 3 theme, device pixel ratio 1). It also
-asserts the omission rule structurally: a weapon has no ammunition rows, an
-ammunition item has no weapon rows, a barter-only item has no typed section, and
-a medkit without `uses` does not show a Uses row. Loading, not-found with back
-navigation, and corrupt-payload error states are covered too.
+`goldens/` (960 × 1500, the phosphor theme and bundled fonts, device pixel
+ratio 1). It also asserts the omission rule structurally: a weapon has no
+ammunition rows, an ammunition item has no weapon rows, a barter-only item has
+no typed section, and a medkit without `uses` does not show a Uses row. The
+single-column and wide two-column layouts are covered, as are loading,
+not-found with back navigation, and corrupt-payload error states.
 
 `app/packages/data/test/catalog/item_detail_test.dart` checks the parser against
 the committed normalized item fixture, including a missing id and a corrupt

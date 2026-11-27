@@ -13,7 +13,8 @@ The screen is built from three small widgets:
 | --- | --- |
 | `CatalogScreen` | Owns the query state, debounce timer, pagination and loading/error state. |
 | `CatalogFilterBar` | Category, type and flea controls plus the active-filter chips. |
-| `CatalogItemRow` | One fixed-height row: placeholder icon, name, short name, weight and prices. |
+| `CatalogTableHeader` / `CatalogTableRow` | The 1100 px+ table header and fixed 72 px data rows. |
+| `CatalogItemRow` | The compact card row used below 1100 px. |
 
 `CatalogScreen` takes its `CatalogRepository`, a `pageSize` (default 50), a
 `searchDebounce` (default 300 ms), the category/type option lists, and an
@@ -45,9 +46,9 @@ row tap means.
 * Flea eligibility is a single toggle that filters to eligible items. The data
   layer also supports the opposite state; the chip can render either when the
   filter is set programmatically.
-* Every active filter appears as an `InputChip` with its own remove action.
-  Removing a chip changes only that filter. The `Reset` action clears every
-  filter and the search field but keeps the chosen sort.
+* Every active filter appears as a removable accent chip with its own remove
+  action. Removing a chip changes only that filter. The `Reset` action clears
+  every filter and the search field but keeps the chosen sort.
 * Sort fields are name, base price, flea price and weight; the arrow button
   reverses the direction. The default order is the repository default:
   relevance while a search is active and name otherwise. Null prices/weights
@@ -74,14 +75,29 @@ deterministic and a keyboard user reaches it by tabbing.
 * **Error** — a retry banner appears above the list; rows already loaded stay
   visible, and an initial failure leaves the banner with a retry action.
 
+## Responsive layout
+
+The screen measures the width available after the app shell and inside a
+1600 px cap:
+
+* **Below 1100 px** — compact card rows, no table header.
+* **1100–1599 px** — five columns: Item, Flea + Base subline, 24H, Weight,
+  Slots.
+* **1600 px and wider** — the same columns plus `Observed`, the age of the
+  newest price observation.
+
+The 24H value is backed by `ItemSummary.change48hPercent`, the only change
+percentage the data layer exposes today. See
+[`design-migration.md`](design-migration.md).
+
 ## Deliberate placeholder icon
 
-`CatalogItemRow` renders a fixed 48×48 neutral slot with a Material inventory
-icon. It is not an image widget and performs no network or disk access. This is
-intentional: task **5.6** owns the disk-backed image cache with lazy loading,
-placeholder fallback and a size budget. Keeping the slot fixed now means the
-row height, and therefore the virtualized list geometry, will not change when
-the real image widget lands.
+`CatalogTableRow` and `CatalogItemRow` render a fixed 40×40 neutral slot with a
+Material inventory icon. It is not an image widget and performs no network or
+disk access. This is intentional: task **5.6** owns the disk-backed image cache
+with lazy loading, placeholder fallback and a size budget. Keeping the slot
+fixed now means the row height, and therefore the virtualized list geometry,
+will not change when the real image widget lands.
 
 ## Tests
 
@@ -89,4 +105,6 @@ the real image widget lands.
 in-memory `AppDatabase` seeded through the FTS triggers and a real
 `CatalogRepository`. It covers the initial load, debounce timing, each filter
 chip applying and clearing, reset, the empty state with the preserved query,
-sorting in both directions, pagination with load-more, and row-tap reporting.
+sorting in both directions, pagination with load-more, row-tap reporting, the
+1440/1920 column sets, compact fallback below 1100, the 1600 px cap and
+alternating row surfaces.

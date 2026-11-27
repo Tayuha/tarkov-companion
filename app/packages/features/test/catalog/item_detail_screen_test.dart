@@ -4,22 +4,16 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import '../support/item_detail_fixture.dart';
-
-/// One fixed theme and surface size for every golden.
-///
-/// Goldens are committed for Linux desktop. A theme built from an explicit
-/// seed keeps typography and elevation deterministic across test runs.
-final _goldenTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xFF3F51B5),
-    brightness: Brightness.light,
-  ),
-);
+import '../theme/support/load_fonts.dart';
 
 void main() {
   late AppDatabase database;
   late CatalogRepository repository;
+
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await loadDesignFonts();
+  });
 
   setUp(() async {
     database = await openItemDetailFixtureDatabase();
@@ -43,7 +37,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: _goldenTheme,
+        theme: buildAppTheme(),
         home: ItemDetailScreen(
           repository: repository,
           itemId: itemId,
@@ -93,6 +87,45 @@ void main() {
         find.byType(ItemDetailScreen),
         matchesGoldenFile('goldens/barter.png'),
       );
+    });
+  });
+
+  group('layout', () {
+    Finder panelAround(String key) => find
+        .ancestor(of: find.byKey(Key(key)), matching: find.byType(AppPanel))
+        .first;
+
+    testWidgets('wide windows keep facts and links in two columns', (
+      tester,
+    ) async {
+      await pumpDetail(tester, weaponItemId, size: const Size(1440, 1200));
+
+      final properties = tester.getTopLeft(
+        find.byKey(const Key('item-detail-section-properties')),
+      );
+      final categories = tester.getTopLeft(
+        panelAround('item-detail-categories'),
+      );
+
+      expect(categories.dx, greaterThan(properties.dx));
+      expect((categories.dy - properties.dy).abs(), lessThan(1));
+      expect(find.byKey(const Key('item-detail-wiki-link')), findsOneWidget);
+    });
+
+    testWidgets('narrow windows keep the single ordered column', (
+      tester,
+    ) async {
+      await pumpDetail(tester, weaponItemId);
+
+      final properties = tester.getTopLeft(
+        find.byKey(const Key('item-detail-section-properties')),
+      );
+      final categories = tester.getTopLeft(
+        panelAround('item-detail-categories'),
+      );
+
+      expect(categories.dx, properties.dx);
+      expect(categories.dy, greaterThan(properties.dy));
     });
   });
 
@@ -242,7 +275,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(
         MaterialApp(
-          theme: _goldenTheme,
+          theme: buildAppTheme(),
           home: ItemDetailScreen(repository: repository, itemId: weaponItemId),
         ),
       );
