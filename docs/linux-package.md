@@ -3,7 +3,9 @@
 The first release target is Linux (design D9). `scripts/package-linux.sh` builds a
 versioned AppImage, an optional `.deb`, and a `SHA256SUMS` file. Nothing is
 signed, tagged, or published: the package must be launched, synced, and browsed
-manually before the Windows/mobile packaging work resumes.
+manually before the Windows/mobile packaging work resumes. Record the run in
+[`verification.md`](verification.md), which also covers offline behaviour, a
+corrupt-database recovery, the captured-request review, and the README walkthrough.
 
 ## Prerequisites
 
@@ -149,10 +151,11 @@ rsvg-convert -w 256 -h 256 -o tarkov-companion.png tarkov-companion.svg
 rsvg-convert -w 512 -h 512 -o tarkov-companion-512.png tarkov-companion.svg
 ```
 
-## Manual approval checklist (task 8.9 gate)
+## Manual approval checklist
 
 Run this on a clean Linux environment with no Flutter SDK and no prior app data.
-Task 8.9 stays unchecked until a human completes it.
+Record the result in [`verification.md`](verification.md) and the release issue;
+do not publish until the manual gates pass.
 
 1. Download the CI artifact and verify it:
    `sha256sum -c SHA256SUMS`.

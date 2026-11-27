@@ -1,7 +1,8 @@
 # Contributing
 
-Thanks for helping build Tarkov Companion. The project is in the planning phase, so the most useful
-contributions right now are reviews of the specifications and spikes that de-risk the architecture.
+Thanks for helping build Tarkov Companion. The project is in the Linux `0.1.0` preview phase: the client
+syncs and browses published data, and the remaining work is the release gate plus the post-v0.1 backlog.
+Reviews, focused fixes, tests, and documentation corrections are all useful.
 
 ## Ground rules
 
@@ -34,6 +35,11 @@ cd pipeline && npm ci && npm run lint && npm test && npm run build
 
 # App
 cd app && flutter analyze && flutter test
+
+# Repository checks (from the repository root)
+bash scripts/check-format.sh
+bash scripts/audit-network.sh          # static allowlist audit; no network calls
+bash scripts/verify-offline.sh         # read-only offline preflight; no root needed
 ```
 
 Windows packaging changes also require a debug build:
@@ -41,6 +47,14 @@ Windows packaging changes also require a debug build:
 ```bash
 cd app && flutter build windows --debug
 ```
+
+Any change to a network destination must update
+[`NetworkAllowlist`](app/packages/data/lib/src/net/host_allowlist.dart),
+[`docs/network.md`](docs/network.md), and the allowlist tests together. `scripts/audit-network.sh` fails when
+the source and documentation disagree.
+
+Manual release gates are in [`docs/verification.md`](docs/verification.md). Do not record a gate as passed
+unless you ran it; keep the environment and version line filled in.
 
 ## Commits and pull requests
 
