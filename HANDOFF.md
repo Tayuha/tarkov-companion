@@ -14,6 +14,15 @@ Snapshot: **2026-11-26**. This is the resume point for working from another mach
   quest list and quest detail are implemented. The manual approval of the quest flow was the last pending
   check.
 
+## Home desktop status (2026-11-26)
+
+- Flutter **3.50.1** installed at `~/.local/flutter` (fish PATH), Dart 3.14, Linux toolchain passes.
+- Full suite passes: 3 core, 387 data (388 with the benchmark), 52 features, 24 app.
+- Debug Linux build and AppImage packaging succeed on this machine.
+- Present: Node 26, ninja, clang, cmake, GTK3, pkgconf, zstd, OpenSpec.
+- Optional/deferred: `gh` (not needed for local testing), `dpkg-deb` (optional `.deb`), Android SDK.
+- A desktop launcher (`Tarkov Companion`) and `tarkov-companion` terminal wrapper are installed.
+
 ## What works
 
 - First-run sync: manifest → compatibility → download → SHA-256 verify → transactional ingest, with
@@ -80,9 +89,9 @@ bash scripts/package-linux.sh
 ```
 
 The release used for the first approval attempt was
-`TarkovCompanion-0.1.0-x86_64.AppImage`, SHA-256
-`dd4e576bd5d9dc6e78ee9886860f1a6135bae76922d41e788720579b3fd2ede4`. Rebuild it after pulling; `dist/` is
-not tracked.
+`TarkovCompanion-0.1.0-x86_64.AppImage`. The desktop rebuild produced SHA-256
+`35b99241fa08eebd85db35d5fef704b07c7a8b163475f5becd5961ca93ce969e`; the checksum changes on every rebuild,
+so trust `dist/SHA256SUMS` rather than this document. `dist/` is not tracked.
 
 Data directory on Linux: `~/.local/share/tarkov_companion/{db,logs,downloads}`.
 
