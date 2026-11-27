@@ -2041,16 +2041,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 61,
+      "categoryID": "done",
+      "position": 44,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Discovered during T6.2: the quest filter bar accepts caller-supplied trader/map options because the query layer exposes ids only. Add a label query (traders and maps tables/gameRecords), feed the filter bar, and test the loaded labels.",
+      "notes": "Completed 2026-11-26 on the home desktop. QuestRepository.traderLabels()/mapLabels() return QuestLabel(id,name) ordered by name. QuestListScreen loads them when no explicit options are passed, so the production dropdowns populate; tests still inject fixed options. Data + widget tests added. 389 data incl benchmark, 24 app.",
       "createdAt": 1795710691454,
-      "updatedAt": 1795710691454,
+      "updatedAt": 1795742644800,
       "archived": false
     },
     {

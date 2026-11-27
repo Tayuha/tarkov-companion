@@ -73,7 +73,7 @@
 - [ ] 6.10 Implement game-mode scoping so the tracker reads only the active mode's quest dataset, verified by a test asserting a PvE-only quest is absent under the regular profile
 - [ ] 6.11 Document quest state semantics and override behavior in `docs/quest-tracking.md`, verified by the documented state table matching the implementation tests
 
-- [ ] 6.12 Expose trader and map labels for the quest filters from the traders/maps tables (or gameRecords) instead of caller-supplied options, verified by a label query test and a widget test using the loaded labels
+- [x] 6.12 Expose trader and map labels for the quest filters from the traders/maps tables (or gameRecords) instead of caller-supplied options, verified by a label query test and a widget test using the loaded labels
 
 ## 7. Profiles and portability
 
