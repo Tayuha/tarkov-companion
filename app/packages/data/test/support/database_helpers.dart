@@ -135,6 +135,7 @@ Future<void> insertItem(
   String shortName = 'Test',
   String normalizedName = 'test-item',
   String payload = '{}',
+  List<String> types = const [],
 }) async {
   await db
       .into(db.items)
@@ -147,6 +148,11 @@ Future<void> insertItem(
           payload: payload,
         ),
       );
+  for (final type in types) {
+    await db
+        .into(db.itemTypes)
+        .insert(ItemTypesCompanion.insert(itemId: id, type: type));
+  }
 }
 
 /// Inserts a minimal profile.

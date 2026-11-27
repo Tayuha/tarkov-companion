@@ -7,6 +7,7 @@ import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
 import 'catalog_filter_bar.dart';
 import 'catalog_item_row.dart';
+import 'item_image.dart';
 
 export 'catalog_filter_bar.dart' show CatalogCategoryOption;
 export 'catalog_item_row.dart'
@@ -38,7 +39,9 @@ export 'catalog_item_row.dart'
 ///   extra `Observed` column at 1600, and compact card rows below 1100;
 /// * content width is capped at 1600 logical pixels so an ultra-wide monitor
 ///   never stretches the table into unreadable columns;
-/// * images are a fixed neutral placeholder until task 5.6 adds the image cache.
+/// * rows render their `iconLink` through an optional disk-backed image cache,
+///   falling back to the neutral placeholder without performing I/O when no
+///   cache is supplied.
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
     super.key,
@@ -46,8 +49,9 @@ class CatalogScreen extends StatefulWidget {
     this.onItemSelected,
     this.pageSize = 50,
     this.searchDebounce = const Duration(milliseconds: 300),
-    this.categories = defaultCatalogCategories,
+    this.categories,
     this.types = defaultCatalogTypes,
+    this.imageCache,
   });
 
   /// The widest the catalog chrome and table may grow.
@@ -64,11 +68,20 @@ class CatalogScreen extends StatefulWidget {
   /// How long typing is idle before the query is sent.
   final Duration searchDebounce;
 
-  /// Categories offered by the filter bar; see [CatalogCategoryOption].
-  final List<CatalogCategoryOption> categories;
+  /// Categories offered by the filter bar.
+  ///
+  /// When omitted, the screen loads the real category labels from the applied
+  /// bundle through `CatalogRepository.categoryOptions`, so the filter never
+  /// depends on a hardcoded starter list. A caller may still pass explicit
+  /// options (tests do) to keep a screen deterministic.
+  final List<CatalogCategoryOption>? categories;
 
   /// Bundle `types[]` values offered by the filter bar.
   final List<String> types;
+
+  /// Optional disk-backed item image cache. When absent, rows render the
+  /// neutral placeholder and perform no I/O.
+  final ItemImageCache? imageCache;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -85,6 +98,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   CatalogSort? _sort;
 
   final List<ItemSummary> _items = <ItemSummary>[];
+  List<CatalogCategoryOption> _categories = const [];
   int _total = 0;
   bool _loading = true;
   bool _loadingMore = false;
@@ -97,7 +111,47 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   void initState() {
     super.initState();
+    _categories = widget.categories ?? const [];
+    if (widget.categories == null) {
+      _loadCategoryOptions();
+    }
     _fetchFirstPage(++_requestGeneration);
+  }
+
+  @override
+  void didUpdateWidget(CatalogScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categories != widget.categories) {
+      _categories = widget.categories ?? _categories;
+      if (widget.categories == null) {
+        _loadCategoryOptions();
+      }
+    }
+  }
+
+  /// Loads the real category labels from the applied bundle.
+  ///
+  /// Failure is quiet: the catalog still queries without a category filter. A
+  /// later dataset refresh is picked up on the next screen open.
+  Future<void> _loadCategoryOptions() async {
+    try {
+      final categories = await widget.repository.categoryOptions();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _categories = [
+          for (final category in categories)
+            CatalogCategoryOption(
+              id: category.id,
+              label: category.name,
+              kind: category.kind,
+            ),
+        ];
+      });
+    } on Object {
+      // Keep the empty list; the rest of the catalog is unaffected.
+    }
   }
 
   @override
@@ -235,7 +289,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     if (id == null) {
       return null;
     }
-    for (final option in widget.categories) {
+    for (final option in _categories) {
       if (option.id == id) {
         return option;
       }
@@ -319,7 +373,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       SizedBox(height: tokens.spaceMd),
                       CatalogFilterBar(
                         filters: _filters,
-                        categories: widget.categories,
+                        categories: _categories,
                         types: widget.types,
                         onCategorySelected: _setCategory,
                         onTypeSelected: _setType,
@@ -397,13 +451,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
             ? null
             : () => widget.onItemSelected!(item.id);
         if (layout == CatalogLayout.compact) {
-          return CatalogItemRow(item: item, onTap: onTap);
+          return CatalogItemRow(
+            item: item,
+            onTap: onTap,
+            imageCache: widget.imageCache,
+          );
         }
         return CatalogTableRow(
           item: item,
           layout: layout,
           index: index,
           onTap: onTap,
+          imageCache: widget.imageCache,
         );
       },
     );

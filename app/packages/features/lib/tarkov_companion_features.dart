@@ -7,6 +7,8 @@ library;
 
 export 'src/catalog/catalog_screen.dart';
 export 'src/catalog/item_detail_screen.dart';
+export 'src/catalog/item_image.dart';
+export 'src/catalog/price_history_chart.dart';
 export 'src/first_run/first_run_screen.dart';
 export 'src/quests/quest_detail_screen.dart';
 export 'src/quests/quest_list_screen.dart';

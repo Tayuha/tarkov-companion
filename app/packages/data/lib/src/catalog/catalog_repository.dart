@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import '../database/app_database.dart';
 import 'catalog_query.dart';
 import 'item_detail.dart';
+import 'item_relations.dart';
 
 /// Read-side execution of [CatalogQuery] over the local item catalog.
 ///
@@ -151,6 +152,72 @@ final class CatalogRepository {
       handbookCategoryIds: tags.handbookCategories[id] ?? const [],
       categoryNames: await _loadCategoryNames(categoryIds),
     );
+  }
+
+  /// Acquisition and disposition relationships for [itemId].
+  ///
+  /// Returns `null` for an unknown item, like [itemDetail]. A relationship
+  /// collection that the applied bundle does not contain yields an empty list,
+  /// so a caller omits that section rather than rendering a placeholder.
+  Future<ItemRelations?> itemRelations(String itemId) =>
+      ItemRelationsRepository(_database).relations(itemId);
+
+  /// Category filter options built from the categories actually present in the
+  /// applied `items` dataset, with display names from the bundle's
+  /// `itemCategory`/`handbookCategory` records.
+  ///
+  /// Only categories attached to at least one item are returned, so a filter
+  /// never offers an empty result. Names are sorted case-insensitively; a
+  /// category without a record falls back to its id, matching [itemDetail].
+  Future<List<CatalogCategory>> categoryOptions({
+    CatalogCategoryKind kind = CatalogCategoryKind.item,
+  }) async {
+    final rows = await _database
+        .customSelect(
+          'SELECT c.categoryId AS id, MAX(r.payload) AS payload '
+          'FROM itemCategories c '
+          'LEFT JOIN gameRecords r ON r.id = c.categoryId '
+          "AND r.kind IN ('itemCategory', 'handbookCategory') "
+          'WHERE c.categoryKind = ? '
+          'GROUP BY c.categoryId',
+          variables: [Variable<String>(kind.name)],
+        )
+        .get();
+
+    final categories = <CatalogCategory>[];
+    for (final row in rows) {
+      final id = row.read<String>('id');
+      categories.add(
+        CatalogCategory(
+          id: id,
+          name: _recordName(row.readNullable<String>('payload')) ?? id,
+          kind: kind,
+        ),
+      );
+    }
+    categories.sort((a, b) {
+      final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      return byName != 0 ? byName : a.id.compareTo(b.id);
+    });
+    return List.unmodifiable(categories);
+  }
+
+  String? _recordName(String? payload) {
+    if (payload == null) {
+      return null;
+    }
+    try {
+      final decoded = jsonDecode(payload);
+      if (decoded is Map<String, Object?>) {
+        final name = decoded['name'];
+        if (name is String && name.trim().isNotEmpty) {
+          return name;
+        }
+      }
+    } on FormatException {
+      // A category record without decodable JSON falls back to the id.
+    }
+    return null;
   }
 
   /// Display names for [categoryIds] from the auxiliary bundle records.

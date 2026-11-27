@@ -20,6 +20,7 @@ final class CatalogFixtureItem {
     this.fleaPrice,
     this.change48hPercent,
     this.fleaEligible = true,
+    this.iconLink,
   });
 
   final String id;
@@ -34,6 +35,7 @@ final class CatalogFixtureItem {
   final int? fleaPrice;
   final double? change48hPercent;
   final bool? fleaEligible;
+  final String? iconLink;
 }
 
 const fixtureWeapons = 'cat-weapons';
@@ -77,6 +79,7 @@ const fixtureItems = <CatalogFixtureItem>[
     fleaPrice: 40000,
     types: ['gun', 'wearable'],
     categoryIds: [fixtureWeapons],
+    iconLink: 'https://assets.tarkov.dev/colt-icon.webp',
   ),
   CatalogFixtureItem(
     id: 'item-m4a1-upper',
@@ -240,8 +243,9 @@ Future<void> seedCatalogFixture(AppDatabase database) async {
     await database.customStatement(
       'INSERT INTO items ('
       'id, name, shortName, normalizedName, weight, width, height, basePrice, '
-      'avg24hPrice, lastLowPrice, changeLast48hPercent, fleaEligible, payload'
-      ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'avg24hPrice, lastLowPrice, changeLast48hPercent, fleaEligible, '
+      'iconLink, payload'
+      ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         item.id,
         item.name,
@@ -255,6 +259,7 @@ Future<void> seedCatalogFixture(AppDatabase database) async {
         item.fleaPrice,
         item.change48hPercent,
         item.fleaEligible == null ? null : (item.fleaEligible! ? 1 : 0),
+        item.iconLink,
         '{}',
       ],
     );
@@ -271,6 +276,19 @@ Future<void> seedCatalogFixture(AppDatabase database) async {
         [item.id, categoryId, 'item'],
       );
     }
+  }
+
+  // The bundle's category records, so the screen can resolve real labels the
+  // same way it does against a published items dataset.
+  for (final option in fixtureCategories) {
+    await database.customStatement(
+      'INSERT INTO gameRecords (kind, id, payload) VALUES (?, ?, ?)',
+      [
+        'itemCategory',
+        option.id,
+        '{"id":"${option.id}","kind":"itemCategory","name":"${option.label}"}',
+      ],
+    );
   }
 }
 

@@ -39,9 +39,12 @@ row tap means.
 ## Filters and sort
 
 * Category filters use one category tree per option (`CatalogCategoryKind`).
-  Because the item dataset stores only category ids, the screen accepts a list
-  of `CatalogCategoryOption`s. The default list is a starter set of top-level
-  Tarkov categories; the app shell can replace it when a taxonomy is available.
+  When the caller passes no options, the screen loads
+  `CatalogRepository.categoryOptions()`, which returns the categories actually
+  attached to items in the applied dataset with the display names from the
+  bundle's `itemCategory`/`handbookCategory` records. A category without a
+  record keeps its id. Callers may still pass explicit
+  `CatalogCategoryOption`s to make a screen deterministic (the tests do).
 * Type filters use the bundle `types[]` vocabulary (`gun`, `ammo`, `mods`, ...).
 * Flea eligibility is a single toggle that filters to eligible items. The data
   layer also supports the opposite state; the chip can render either when the
@@ -87,17 +90,20 @@ The screen measures the width available after the app shell and inside a
   newest price observation.
 
 The 24H value is backed by `ItemSummary.change48hPercent`, the only change
-percentage the data layer exposes today. See
+percentage the data layer exposes today. The column heading is historical; the
+item detail panel labels the same field `48 h` consistently. See
+[`item-detail.md`](item-detail.md) and
 [`design-migration.md`](design-migration.md).
 
-## Deliberate placeholder icon
+## Images
 
-`CatalogTableRow` and `CatalogItemRow` render a fixed 40×40 neutral slot with a
-Material inventory icon. It is not an image widget and performs no network or
-disk access. This is intentional: task **5.6** owns the disk-backed image cache
-with lazy loading, placeholder fallback and a size budget. Keeping the slot
-fixed now means the row height, and therefore the virtualized list geometry,
-will not change when the real image widget lands.
+`CatalogTableRow` and `CatalogItemRow` render the item's `iconLink` through
+`ItemImage` when the screen is given an `ItemImageCache`. The cache is lazy,
+disk-backed, bounded by an LRU byte budget and falls back to the same 40×40
+neutral slot on a cache miss or fetch failure, so row height and the
+virtualized list geometry never change. Without a cache (the app shell does not
+pass one yet) the placeholder is used and no network or disk access happens.
+See [`item-detail.md`](item-detail.md#images-task-56).
 
 ## Tests
 

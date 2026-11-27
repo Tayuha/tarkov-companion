@@ -8,6 +8,15 @@ const ammunitionItemId = 'detail-ammo';
 const armorItemId = 'detail-armor';
 const barterItemId = 'detail-barter';
 const medicalItemId = 'detail-medkit';
+const relationsItemId = 'detail-relations';
+const completePriceItemId = 'detail-price-complete';
+const missingPriceItemId = 'detail-price-missing';
+const zeroPriceItemId = 'detail-price-zero';
+
+const _praporId = 'trader-prapor';
+const _therapistId = 'trader-therapist';
+const _workbenchId = 'station-workbench';
+const _questId = 'quest-relations';
 
 /// One hand-written bundle item.
 ///
@@ -180,6 +189,82 @@ const fixtureDetailItems = <DetailFixtureItem>[
       },
     },
   ),
+  DetailFixtureItem(
+    id: relationsItemId,
+    name: 'Expeditionary fuel tank',
+    shortName: 'Fuel tank',
+    types: ['barter'],
+    categoryIds: ['cat-barter'],
+    weight: 2.5,
+    width: 3,
+    height: 2,
+    record: {
+      'description': 'A metal fuel tank used in barter trades.',
+      'iconLink': 'https://assets.tarkov.dev/fuel-tank-icon.webp',
+      'stackMaxSize': 1,
+      'properties': null,
+      'buyFromTrader': [
+        {
+          'traderId': _praporId,
+          'price': 22000,
+          'currency': 'RUB',
+          'loyaltyLevel': 2,
+          'buyLimit': 3,
+          'taskUnlockId': _questId,
+        },
+      ],
+      'sellToTrader': [
+        {'traderId': _therapistId, 'price': 9000, 'currency': 'RUB'},
+      ],
+    },
+  ),
+  DetailFixtureItem(
+    id: completePriceItemId,
+    name: 'Price complete item',
+    shortName: 'PRICE',
+    types: ['barter'],
+    categoryIds: ['cat-barter'],
+    record: {
+      'basePrice': 18397,
+      'price': {
+        'lastLow': 40000,
+        'avg24h': 111351,
+        'change48h': 16102,
+        'change48hPercent': 16.91,
+        'observedAt': '2026-11-25T17:08:02.000Z',
+      },
+    },
+  ),
+  DetailFixtureItem(
+    id: missingPriceItemId,
+    name: 'Price missing item',
+    shortName: 'NOPRICE',
+    types: ['barter'],
+    categoryIds: ['cat-barter'],
+    record: {
+      'price': {
+        'observedAt': '2026-11-25T17:08:02.000Z',
+        'lastLow': null,
+        'avg24h': null,
+      },
+    },
+  ),
+  DetailFixtureItem(
+    id: zeroPriceItemId,
+    name: 'Price zero item',
+    shortName: 'ZERO',
+    types: ['barter'],
+    categoryIds: ['cat-barter'],
+    record: {
+      'price': {
+        'lastLow': 0,
+        'avg24h': 0,
+        'change48h': 0,
+        'change48hPercent': 0,
+        'observedAt': '2026-11-25T17:08:02.000Z',
+      },
+    },
+  ),
 ];
 
 /// Opens an in-memory database seeded with [fixtureDetailItems].
@@ -257,6 +342,143 @@ Future<void> seedItemDetailFixture(AppDatabase database) async {
       ],
     );
   }
+
+  await _seedRelations(database);
+}
+
+/// Inserts the traders, barters, crafts and quests the relation sections read.
+Future<void> _seedRelations(AppDatabase database) async {
+  for (final trader in [
+    {'id': _praporId, 'name': 'Prapor'},
+    {'id': _therapistId, 'name': 'Therapist'},
+  ]) {
+    await database.customStatement(
+      'INSERT INTO traders (id, name, normalizedName, payload) '
+      'VALUES (?, ?, ?, ?)',
+      [
+        trader['id'],
+        trader['name'],
+        trader['name']!.toLowerCase(),
+        jsonEncode({
+          'id': trader['id'],
+          'kind': 'trader',
+          'name': trader['name'],
+        }),
+      ],
+    );
+  }
+
+  await database.customStatement(
+    'INSERT INTO hideoutStations (id, name, payload) VALUES (?, ?, ?)',
+    [
+      _workbenchId,
+      'Workbench',
+      jsonEncode({
+        'id': _workbenchId,
+        'kind': 'hideoutStation',
+        'name': 'Workbench',
+      }),
+    ],
+  );
+
+  final barters = [
+    {
+      'id': 'barter-offer',
+      'traderId': _praporId,
+      'minTraderLevel': 2,
+      'buyLimit': 3,
+      'offeredItem': {'itemId': relationsItemId, 'count': 1, 'attributes': {}},
+      'requiredItems': [
+        {'itemId': ammunitionItemId, 'count': 2, 'attributes': {}},
+      ],
+    },
+    {
+      'id': 'barter-consume',
+      'traderId': _therapistId,
+      'offeredItem': {'itemId': weaponItemId, 'count': 1, 'attributes': {}},
+      'requiredItems': [
+        {'itemId': relationsItemId, 'count': 1, 'attributes': {}},
+      ],
+    },
+  ];
+  for (final barter in barters) {
+    await database.customStatement(
+      'INSERT INTO barters (id, payload) VALUES (?, ?)',
+      [
+        barter['id'],
+        jsonEncode({...barter, 'kind': 'barter'}),
+      ],
+    );
+  }
+
+  final crafts = [
+    {
+      'id': 'craft-make',
+      'stationId': _workbenchId,
+      'duration': 1200,
+      'level': 2,
+      'productItem': {'itemId': relationsItemId, 'count': 1, 'attributes': {}},
+      'requiredItems': [
+        {'itemId': medicalItemId, 'count': 1, 'attributes': {}},
+      ],
+    },
+    {
+      'id': 'craft-use',
+      'stationId': _workbenchId,
+      'duration': 600,
+      'level': 1,
+      'productItem': {'itemId': weaponItemId, 'count': 1, 'attributes': {}},
+      'requiredItems': [
+        {'itemId': relationsItemId, 'count': 1, 'attributes': {}},
+      ],
+    },
+  ];
+  for (final craft in crafts) {
+    await database.customStatement(
+      'INSERT INTO crafts (id, stationId, productItemId, payload) '
+      'VALUES (?, ?, ?, ?)',
+      [
+        craft['id'],
+        craft['stationId'],
+        (craft['productItem']! as Map<String, Object?>)['itemId'],
+        jsonEncode({...craft, 'kind': 'craft'}),
+      ],
+    );
+  }
+
+  final objective = {
+    'id': 'obj-relations',
+    'kind': 'taskObjective',
+    'type': 'giveItem',
+    'description': 'Hand over the fuel tank',
+    'itemIds': [relationsItemId],
+  };
+  await database.customStatement(
+    'INSERT INTO tasks (id, name, traderId, payload) VALUES (?, ?, ?, ?)',
+    [
+      _questId,
+      'Supply Run',
+      _praporId,
+      jsonEncode({
+        'id': _questId,
+        'kind': 'task',
+        'name': 'Supply Run',
+        'traderId': _praporId,
+        'objectives': [objective],
+      }),
+    ],
+  );
+  await database.customStatement(
+    'INSERT INTO taskObjectives (id, taskId, type, description, payload) '
+    'VALUES (?, ?, ?, ?, ?)',
+    [
+      objective['id'],
+      _questId,
+      objective['type'],
+      objective['description'],
+      jsonEncode(objective),
+    ],
+  );
 }
 
 String _normalize(String name) =>

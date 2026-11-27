@@ -107,6 +107,68 @@ void main() {
     expect(detail.wikiLink, isNotNull);
   });
 
+  test('the price snapshot is parsed from the payload', () async {
+    await ingestFixture();
+
+    final detail = await repository.itemDetail(_m4a1);
+
+    expect(detail, isNotNull);
+    expect(detail!.basePrice, 18397);
+    expect(detail.price.fleaLastLow, 40000);
+    expect(detail.price.fleaAvg24h, 111351);
+    expect(detail.price.change48hPercent, closeTo(16.91, 0.001));
+    expect(detail.price.change48hAbsolute, 16102);
+    expect(detail.price.observedAt, DateTime.utc(2026, 11, 25, 17, 8, 2));
+    expect(detail.price.hasFleaObservation, isTrue);
+    expect(detail.price.isZero, isFalse);
+  });
+
+  test('a missing flea price stays null instead of becoming zero', () async {
+    await insertItem(
+      db,
+      id: 'no-flea-price',
+      payload:
+          '{"id":"no-flea-price","kind":"item","price":'
+          '{"lastLow":null,"avg24h":null,"observedAt":"2026-11-25T17:08:02Z"}}',
+    );
+
+    final detail = await repository.itemDetail('no-flea-price');
+
+    expect(detail, isNotNull);
+    expect(detail!.price.fleaLastLow, isNull);
+    expect(detail.price.fleaAvg24h, isNull);
+    expect(detail.price.hasFleaObservation, isFalse);
+    expect(detail.price.isZero, isFalse);
+    expect(detail.price.observedAt, DateTime.utc(2026, 11, 25, 17, 8, 2));
+  });
+
+  test('a zero flea price is a real observation', () async {
+    await insertItem(
+      db,
+      id: 'zero-price',
+      payload:
+          '{"id":"zero-price","kind":"item","price":'
+          '{"lastLow":0,"avg24h":0,"change48h":0,"change48hPercent":0}}',
+    );
+
+    final detail = await repository.itemDetail('zero-price');
+
+    expect(detail, isNotNull);
+    expect(detail!.price.fleaLastLow, 0);
+    expect(detail.price.fleaAvg24h, 0);
+    expect(detail.price.isZero, isTrue);
+    expect(detail.price.hasFleaObservation, isTrue);
+  });
+
+  test('no flea eligibility is derived from the noFlea type', () async {
+    await insertItem(db, id: 'no-flea-item', types: const ['barter', 'noFlea']);
+
+    final detail = await repository.itemDetail('no-flea-item');
+
+    expect(detail, isNotNull);
+    expect(detail!.fleaEligible, isFalse);
+  });
+
   test('an unknown or blank id returns null', () async {
     await ingestFixture();
 

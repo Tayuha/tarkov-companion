@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import '../theme/app_tokens.dart';
+import 'item_image.dart';
 
 /// The responsive layouts of the catalog.
 enum CatalogLayout {
@@ -152,10 +153,15 @@ class CatalogTableRow extends StatelessWidget {
     required this.layout,
     this.index = 0,
     this.onTap,
+    this.imageCache,
   });
 
   final ItemSummary item;
   final CatalogLayout layout;
+
+  /// Optional disk-backed image source; when absent the row keeps its
+  /// neutral placeholder and never touches the network or disk.
+  final ItemImageCache? imageCache;
 
   /// Row position, used only to alternate the resting surface.
   final int index;
@@ -188,6 +194,7 @@ class CatalogTableRow extends StatelessWidget {
               _ItemCell(
                 key: ValueKey('catalog-row-item-${item.id}'),
                 item: item,
+                imageCache: imageCache,
               ),
               CatalogTableCell(
                 child: Column(
@@ -277,10 +284,18 @@ class CatalogTableRow extends StatelessWidget {
 /// The row stays image-free: a neutral placeholder preserves the row height
 /// whether or not an image cache ever supplies artwork.
 class CatalogItemRow extends StatelessWidget {
-  const CatalogItemRow({super.key, required this.item, this.onTap});
+  const CatalogItemRow({
+    super.key,
+    required this.item,
+    this.onTap,
+    this.imageCache,
+  });
 
   final ItemSummary item;
   final VoidCallback? onTap;
+
+  /// Optional disk-backed image source; see [ItemImageCache].
+  final ItemImageCache? imageCache;
 
   @override
   Widget build(BuildContext context) {
@@ -305,7 +320,14 @@ class CatalogItemRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _PlaceholderIcon(size: 40, tokenSize: 20),
+              ItemImage(
+                cache: imageCache,
+                url: item.iconLink,
+                size: 40,
+                iconSize: 20,
+                placeholderKey: ValueKey('catalog-row-icon-${item.id}'),
+                imageKey: ValueKey('catalog-row-image-${item.id}'),
+              ),
               SizedBox(width: tokens.spaceMd),
               Expanded(
                 child: Column(
@@ -376,9 +398,10 @@ class CatalogItemRow extends StatelessWidget {
 
 /// The item identity cell: placeholder tile, name and mono meta.
 class _ItemCell extends StatelessWidget {
-  const _ItemCell({super.key, required this.item});
+  const _ItemCell({super.key, required this.item, this.imageCache});
 
   final ItemSummary item;
+  final ItemImageCache? imageCache;
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +415,14 @@ class _ItemCell extends StatelessWidget {
 
     return Row(
       children: [
-        _PlaceholderIcon(size: 40, tokenSize: 20),
+        ItemImage(
+          cache: imageCache,
+          url: item.iconLink,
+          size: 40,
+          iconSize: 20,
+          placeholderKey: ValueKey('catalog-row-icon-${item.id}'),
+          imageKey: ValueKey('catalog-row-image-${item.id}'),
+        ),
         SizedBox(width: tokens.spaceMd),
         Expanded(
           child: Column(
@@ -420,36 +450,6 @@ class _ItemCell extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// A neutral item icon slot.
-///
-/// This is intentionally not an image widget: no network or disk access happens
-/// here, and a missing image never changes the row's height.
-class _PlaceholderIcon extends StatelessWidget {
-  const _PlaceholderIcon({required this.size, required this.tokenSize});
-
-  final double size;
-  final double tokenSize;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = AppTokens.of(context);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: tokens.surfaceRaised,
-        border: Border.all(color: tokens.border),
-        borderRadius: BorderRadius.circular(tokens.radiusSm),
-      ),
-      child: Icon(
-        Icons.inventory_2_outlined,
-        size: tokenSize,
-        color: tokens.dim,
-      ),
     );
   }
 }
