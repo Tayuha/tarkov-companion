@@ -261,6 +261,34 @@ Future<void> seedQuestFixture(AppDatabase database) async {
     );
   }
 
+  // Three required objectives on one quest so the list can render a real
+  // progress fraction. One is already recorded for the regular profile.
+  for (final (index, objectiveId) in const [
+    'fixture-cafe-objective-1',
+    'fixture-cafe-objective-2',
+    'fixture-cafe-objective-3',
+  ].indexed) {
+    await database.customStatement(
+      'INSERT INTO taskObjectives (id, taskId, type, description, count, '
+      'payload) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        objectiveId,
+        'quest-cafe',
+        'visit',
+        'Objective ${index + 1}',
+        1,
+        '{"id":"$objectiveId","type":"visit","description":"Objective '
+            '${index + 1}","count":1}',
+      ],
+    );
+  }
+  await database.customStatement(
+    'INSERT INTO objectiveProgress ('
+    'profileId, questId, objectiveId, count, updatedAt'
+    ') VALUES (?, ?, ?, ?, ?)',
+    [fixtureProfileRegular, 'quest-cafe', 'fixture-cafe-objective-1', 1, now],
+  );
+
   for (final entry in fixtureProgress.entries) {
     for (final progress in entry.value.entries) {
       await database.customStatement(

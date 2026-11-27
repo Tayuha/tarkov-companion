@@ -5,19 +5,19 @@ view of the quest tracker. It is presentation-only: every row, count and page
 comes from `QuestRepository` in the data package, so the screen works entirely
 against the local database with no network request.
 
-This is the **catalog list** only. It shows the recorded progress state as a
-badge. It does not derive locked/available availability from prerequisites
-(task 6.3), explain locked reasons (6.4), open a detail view (6.5), or write
-progress (6.6).
+This is the **catalog list** only. The data layer still owns derivation
+(task 6.3) and this screen only renders the resulting `QuestStatus`; it does not
+explain locked reasons (6.4), open a detail view (6.5), or write progress (6.6).
 
 ## Composition
 
 | Widget | Responsibility |
 | --- | --- |
 | `QuestListScreen` | Owns the query state, debounce timer, pagination and loading/error state. |
-| `QuestFilterBar` | Trader, map, level and state controls plus the active-filter chips. |
-| `QuestListRow` | One fixed-height row: name, trader, level, map and state badge. |
-| `QuestStateBadge` | A plain-Material colored badge for one progress state. |
+| `QuestFilterBar` | Trader, map and level dropdowns, `AppChip` state segments and the active-filter tokens. |
+| `QuestListRow` | The compact card row: name, trader/level/map meta, status badge and progress. |
+| `QuestTableHeader` / `QuestTableRow` | The desktop table from 1100 px, with an extra level column from 1600. |
+| `QuestStateBadge` / `QuestAvailabilityBadge` | `AppStatusBadge` wrappers for a recorded state and a derived availability. |
 
 `QuestListScreen` takes its `QuestRepository`, an optional `profileId`, an
 optional `onQuestSelected`, a `pageSize` (default 50), a `searchDebounce`
@@ -51,11 +51,13 @@ the app shell decides what a row tap means.
   level are excluded because their gate cannot be proven. The list offers
   spaced bounds so the menu stays keyboard-navigable.
 * **State** filters the profile's recorded progress: not started, in progress,
-  completed or failed. There is no derived "available" state here.
+  completed or failed. It is a row of single-select `AppChip` segments; the
+  filter still reaches the repository as `QuestFilters.state`, so it does not
+  add a derived "available" filter.
 * Filters combine with **AND**, with each other and with the search text.
-* Every active filter appears as an `InputChip` with its own remove action.
-  Removing a chip changes only that filter. The `Reset` action clears every
-  filter and the search field.
+* Every active filter appears as a removable `AppChip` token. Removing a token
+  changes only that filter. The `Reset` action clears every filter and the
+  search field.
 * Changing any filter resets pagination to offset 0.
 
 ## Progress state and badges
@@ -65,14 +67,35 @@ quest reads as not started. Two profiles render independent badges over the same
 quest catalog; switching the active profile in the app shell and passing its id
 is enough to change every badge.
 
-The four states use distinct plain-Material colors:
+When the profile exists the screen also reads `QuestRepository.statuses` once
+per reload. That gives each row its derived availability and a required-
+objective fraction without a query per row:
 
-| State | Badge color |
+| Shown state | Source | `AppStatusBadge` |
+| --- | --- | --- |
+| Available | derived availability | `available` (success) |
+| Locked | derived availability | `locked` (dim) |
+| In progress | derived availability | `inProgress` (info) |
+| Completed | derived availability | `completed` (accent) |
+| Failed | recorded state | `failed` (danger) |
+| Not started | recorded state, no profile | `locked`, labelled `Not started` |
+
+The failed override exists because a non-restartable failed quest derives as
+locked; the list keeps the more specific failed word and colour. The progress
+readout is `satisfied required objectives / required objectives`; optional
+objectives are tracked but never enter the denominator.
+
+## Responsive layout
+
+| Content width | Layout |
 | --- | --- |
-| Not started | blue grey |
-| In progress | orange |
-| Completed | green |
-| Failed | red |
+| `< 1100` | Compact card rows, no header. |
+| `1100–1599` | Table: Quest, Trader, Map, Status, Progress. |
+| `≥ 1600` | Adds Level and widens the quest cell. |
+
+The content is capped at `QuestListScreen.maxContentWidth` (1600 logical pixels)
+and centred. Desktop rows are 72 px and alternate `surface`/`background`;
+compact rows keep the touch-sized card shape.
 
 ## Pagination and virtualization
 
@@ -98,9 +121,11 @@ is deterministic and a keyboard user reaches it by tabbing.
 ## Tests
 
 `app/packages/features/test/quests/quest_list_screen_test.dart` runs against an
-in-memory `AppDatabase` seeded with two profiles, fourteen quests and their
-recorded progress, through the real `QuestRepository`. It covers the initial
-load and metadata, debounce timing, diacritic search, every filter alone, a
-combined filter, reset, per-profile badge isolation, the empty state with the
-preserved query and reset, pagination with load-more, and row-tap reporting. No
-test performs network access.
+in-memory `AppDatabase` seeded with two profiles, fourteen quests, objective
+counts and their recorded progress, through the real `QuestRepository`. It
+covers the initial load and metadata, debounce timing, diacritic search, every
+filter alone, a combined filter, reset, per-profile badge isolation, the
+availability/failed badge mapping, the objective fraction, the 1440 and 1920
+table columns, the compact fallback, the 1600 px cap, the empty state with the
+preserved query and reset, pagination with load-more, row-tap reporting, and
+list goldens at 1440 and 1920. No test performs network access.

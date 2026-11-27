@@ -2,8 +2,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import '../catalog/item_detail_screen.dart';
-import '../section_header.dart';
-import 'quest_list_row.dart' show QuestStateBadge, questStateLabel;
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
+import 'quest_list_row.dart'
+    show QuestAvailabilityBadge, QuestStateBadge, questStateLabel;
 
 /// The full, interactive view of one quest.
 ///
@@ -11,14 +13,26 @@ import 'quest_list_row.dart' show QuestStateBadge, questStateLabel;
 /// [QuestRepository.statuses] (availability and the active profile's recorded
 /// progress) and renders:
 ///
-/// * a header with the quest name, recorded state badge, computed availability,
-///   trader and map labels, level, experience, Kappa flag and wiki link;
-/// * every objective with the profile's count and increment/decrement controls;
+/// * a tokenised header with the quest name, recorded state badge, computed
+///   availability, trader and map labels, level, experience, Kappa flag and
+///   wiki link;
+/// * every objective in an [AppPanel] row with its progress rail and the
+///   profile's increment/decrement controls;
 /// * the requirement list and the exact structured reasons the availability
 ///   engine reports, including advisor-only trader loyalty requirements;
-/// * reward items, turn-in/required items and quest unlocks, each item opening
+/// * reward tiles, turn-in/required items and quest unlocks, each item opening
 ///   [ItemDetailScreen] and each quest pushing another detail screen;
 /// * status controls for in progress, completed, failed and revert.
+///
+/// Missing fields render nothing: a quest without a description has no notes
+/// panel, an empty reward block has no rewards panel, and a quest with no
+/// unlocks has no unlocks panel. Derived explanatory copy (the requirement and
+/// objective summaries) is not a placeholder for a missing field.
+///
+/// From 1080 logical pixels the content splits into two columns: objectives,
+/// required items and notes on the left; rewards, requirements, unlocks and
+/// status on the right. Below that the same content is one ordered column. The
+/// content is capped at 1180 logical pixels.
 ///
 /// Marking a quest completed while required objectives are unsatisfied is the
 /// explicit manual override: the screen asks for confirmation and the dialog
@@ -360,8 +374,10 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
 
   Widget _buildBody(QuestDetail? detail) {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(key: Key('quest-detail-loading')),
+      return Center(
+        child: CircularProgressIndicator(
+          key: const Key('quest-detail-loading'),
+        ),
       );
     }
     final error = _error;
@@ -416,6 +432,12 @@ class _DetailBody extends StatelessWidget {
     required this.onObjectiveCount,
   });
 
+  /// The widest the inspector grows, even on a 1920 monitor.
+  static const double maxContentWidth = 1180;
+
+  /// At or above this width, content moves into a second column.
+  static const double twoColumnBreakpoint = 1080;
+
   final QuestDetail detail;
   final QuestStatus? status;
   final Map<String, QuestStatus> statusesById;
@@ -434,72 +456,128 @@ class _DetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final description = detail.description?.trim();
+    final notes = description == null || description.isEmpty
+        ? null
+        : _NotesSection(description: description);
+    final items = _ItemsSection.hasRows(detail)
+        ? _ItemsSection(
+            detail: detail,
+            itemNames: itemNames,
+            onItemTap: onItemTap,
+          )
+        : null;
+    final rewards = detail.rewards.isEmpty
+        ? null
+        : _RewardsSection(
+            detail: detail,
+            itemNames: itemNames,
+            traderLabel: traderLabel,
+            onItemTap: onItemTap,
+          );
+    final unlocks = detail.unlocks.isEmpty
+        ? null
+        : _UnlocksSection(
+            detail: detail,
+            statusesById: statusesById,
+            onQuestTap: onQuestTap,
+          );
+
+    final left = <Widget>[
+      _ObjectivesSection(
+        detail: detail,
+        status: status,
+        hasProfile: profileId != null,
+        busy: busy,
+        itemNames: itemNames,
+        onChanged: onObjectiveCount,
+      ),
+      ?items,
+      ?notes,
+    ];
+    final right = <Widget>[
+      ?rewards,
+      _RequirementsSection(
+        detail: detail,
+        status: status,
+        statusesById: statusesById,
+        traderLabel: traderLabel,
+        hasProfile: profileId != null,
+        onQuestTap: onQuestTap,
+      ),
+      ?unlocks,
+      _StatusSection(
+        status: status,
+        profileId: profileId,
+        busy: busy,
+        actionError: actionError,
+        onStateSelected: onStateSelected,
+        onRevert: onRevert,
+      ),
+    ];
+
     return SingleChildScrollView(
       key: const Key('quest-detail-scroll'),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(tokens.spaceXl),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 960),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Header(
-                detail: detail,
-                status: status,
-                traderLabel: traderLabel,
-                mapLabel: mapLabel,
-                hasProfile: profileId != null,
-              ),
-              const SizedBox(height: 24),
-              _ObjectivesSection(
-                detail: detail,
-                status: status,
-                hasProfile: profileId != null,
-                busy: busy,
-                itemNames: itemNames,
-                onChanged: onObjectiveCount,
-              ),
-              const SizedBox(height: 24),
-              _RequirementsSection(
-                detail: detail,
-                status: status,
-                statusesById: statusesById,
-                traderLabel: traderLabel,
-                hasProfile: profileId != null,
-                onQuestTap: onQuestTap,
-              ),
-              const SizedBox(height: 24),
-              _RewardsSection(
-                detail: detail,
-                itemNames: itemNames,
-                traderLabel: traderLabel,
-                onItemTap: onItemTap,
-              ),
-              const SizedBox(height: 24),
-              _ItemsSection(
-                detail: detail,
-                itemNames: itemNames,
-                onItemTap: onItemTap,
-              ),
-              const SizedBox(height: 24),
-              _UnlocksSection(
-                detail: detail,
-                statusesById: statusesById,
-                onQuestTap: onQuestTap,
-              ),
-              const SizedBox(height: 24),
-              _StatusSection(
-                status: status,
-                profileId: profileId,
-                busy: busy,
-                actionError: actionError,
-                onStateSelected: onStateSelected,
-                onRevert: onRevert,
-              ),
-            ],
+          constraints: const BoxConstraints(maxWidth: maxContentWidth),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final twoColumn =
+                  constraints.maxWidth >= twoColumnBreakpoint &&
+                  right.isNotEmpty;
+              final content = twoColumn
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _Stack(children: left)),
+                        SizedBox(width: tokens.spaceXl),
+                        SizedBox(width: 380, child: _Stack(children: right)),
+                      ],
+                    )
+                  : _Stack(children: [...left, ...right]);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Header(
+                    detail: detail,
+                    status: status,
+                    traderLabel: traderLabel,
+                    mapLabel: mapLabel,
+                    hasProfile: profileId != null,
+                  ),
+                  SizedBox(height: tokens.spaceXl),
+                  content,
+                ],
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A vertical stack with the 16 px section rhythm.
+class _Stack extends StatelessWidget {
+  const _Stack({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var index = 0; index < children.length; index++) ...[
+          if (index > 0) SizedBox(height: tokens.spaceLg),
+          children[index],
+        ],
+      ],
     );
   }
 }
@@ -521,8 +599,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final tokens = AppTokens.of(context);
     final recordedState = status?.recordedState;
     final availability = status?.availability;
     final wikiLink = detail.wikiLink;
@@ -530,15 +607,17 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const AppSectionLabel('Quest detail'),
+        SizedBox(height: tokens.spaceXs),
         Wrap(
-          spacing: 12,
-          runSpacing: 8,
+          spacing: tokens.spaceMd,
+          runSpacing: tokens.spaceSm,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
               detail.name,
               key: const Key('quest-detail-name'),
-              style: theme.textTheme.headlineSmall,
+              style: tokens.h1Style,
             ),
             if (hasProfile && recordedState != null)
               QuestStateBadge(
@@ -546,65 +625,56 @@ class _Header extends StatelessWidget {
                 state: recordedState,
               ),
             if (availability != null)
-              _AvailabilityChip(
+              QuestAvailabilityBadge(
                 key: const Key('quest-detail-availability'),
                 availability: availability,
               ),
             if (!hasProfile)
-              const Chip(
+              const AppChip(
                 key: Key('quest-detail-no-profile'),
-                label: Text('No profile selected'),
-                visualDensity: VisualDensity.compact,
+                label: 'No profile selected',
               ),
             if (status?.manuallyCompleted ?? false)
-              const Chip(
+              const AppChip(
                 key: Key('quest-detail-manual-override'),
-                label: Text('Manual override'),
-                visualDensity: VisualDensity.compact,
+                label: 'Manual override',
+                selected: true,
               ),
           ],
         ),
-        if (detail.description != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            detail.description!,
-            key: const Key('quest-detail-description'),
-            style: theme.textTheme.bodyMedium,
-          ),
-        ],
-        const SizedBox(height: 12),
+        SizedBox(height: tokens.spaceMd),
         Wrap(
           key: const Key('quest-detail-metadata'),
-          spacing: 8,
-          runSpacing: 8,
+          spacing: tokens.spaceSm,
+          runSpacing: tokens.spaceSm,
           children: [
-            _MetadataChip(
+            _MetadataTag(
               key: const Key('quest-detail-trader'),
               icon: Icons.storefront_outlined,
               label: traderLabel == null
                   ? 'No trader recorded'
                   : 'Trader: $traderLabel',
             ),
-            _MetadataChip(
+            _MetadataTag(
               key: const Key('quest-detail-map'),
               icon: Icons.map_outlined,
               label: mapLabel == null ? 'No map recorded' : 'Map: $mapLabel',
             ),
-            _MetadataChip(
+            _MetadataTag(
               key: const Key('quest-detail-level'),
               icon: Icons.person_outline,
               label: detail.minPlayerLevel == null
                   ? 'No level requirement'
                   : 'Level ${detail.minPlayerLevel}',
             ),
-            _MetadataChip(
+            _MetadataTag(
               key: const Key('quest-detail-experience'),
               icon: Icons.stars_outlined,
               label: detail.experience == null
                   ? 'No XP recorded'
                   : '${detail.experience} XP',
             ),
-            _MetadataChip(
+            _MetadataTag(
               key: const Key('quest-detail-kappa'),
               icon: Icons.workspace_premium_outlined,
               label: detail.kappaRequired
@@ -612,30 +682,20 @@ class _Header extends StatelessWidget {
                   : 'Not Kappa required',
             ),
             if (detail.restartable)
-              const _MetadataChip(icon: Icons.refresh, label: 'Restartable'),
+              const _MetadataTag(icon: Icons.refresh, label: 'Restartable'),
           ],
         ),
         if (wikiLink != null) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: tokens.spaceMd),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 56,
-                child: Text(
-                  'Wiki',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
+              SizedBox(width: 56, child: const AppSectionLabel('Wiki')),
               Expanded(
                 child: SelectableText(
                   wikiLink,
                   key: const Key('quest-detail-wiki-link'),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.primary,
-                  ),
+                  style: tokens.bodyStyle.copyWith(color: tokens.info),
                 ),
               ),
             ],
@@ -646,62 +706,62 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _MetadataChip extends StatelessWidget {
-  const _MetadataChip({super.key, required this.icon, required this.label});
+/// A quiet bordered metadata tag that keeps its sentence-case label.
+///
+/// [AppChip] uppercases by design; trader, map and level labels are field
+/// values, so they get the same geometry without the filter treatment.
+class _MetadataTag extends StatelessWidget {
+  const _MetadataTag({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      avatar: Icon(icon, size: 16),
-      label: Text(label),
-      visualDensity: VisualDensity.compact,
+    final tokens = AppTokens.of(context);
+    return Container(
+      height: 24,
+      padding: EdgeInsets.only(left: tokens.spaceSm, right: tokens.spaceMd),
+      decoration: BoxDecoration(
+        color: tokens.surfaceRaised,
+        border: Border.all(color: tokens.borderSoft),
+        borderRadius: BorderRadius.circular(tokens.radiusPill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: tokens.bodySize, color: tokens.dim),
+          SizedBox(width: tokens.spaceXs),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: tokens.bodyStyle.copyWith(
+              fontSize: tokens.dataSize,
+              color: tokens.muted,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _AvailabilityChip extends StatelessWidget {
-  const _AvailabilityChip({super.key, required this.availability});
+class _NotesSection extends StatelessWidget {
+  const _NotesSection({required this.description});
 
-  final QuestAvailability availability;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
-    final (label, background, foreground) = switch (availability) {
-      QuestAvailability.locked => (
-        'Locked',
-        Colors.red.shade100,
-        Colors.red.shade900,
-      ),
-      QuestAvailability.available => (
-        'Available',
-        Colors.teal.shade100,
-        Colors.teal.shade900,
-      ),
-      QuestAvailability.inProgress => (
-        'In progress',
-        Colors.orange.shade100,
-        Colors.orange.shade900,
-      ),
-      QuestAvailability.completed => (
-        'Completed',
-        Colors.green.shade100,
-        Colors.green.shade900,
-      ),
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999),
-      ),
+    final tokens = AppTokens.of(context);
+    return AppPanel(
+      key: const Key('quest-detail-section-notes'),
+      label: 'Notes',
       child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: foreground, fontWeight: FontWeight.w600),
+        description,
+        key: const Key('quest-detail-description'),
+        style: tokens.bodyStyle.copyWith(color: tokens.muted),
       ),
     );
   }
@@ -745,6 +805,7 @@ class _ObjectivesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     final progress = _progress;
     final required = progress.where((entry) => !entry.optional).length;
     final satisfied = progress
@@ -752,41 +813,55 @@ class _ObjectivesSection extends StatelessWidget {
         .length;
     final current = status;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(
-          title: 'Objectives',
-          subtitle: current == null
-              ? 'Counts are recorded per profile.'
-              : current.objectivesSatisfied
-              ? 'All required objectives are satisfied.'
-              : '$satisfied of $required required objectives satisfied.',
-        ),
-        const SizedBox(height: 8),
-        if (progress.isEmpty)
-          const Text('This quest has no objectives in the dataset.')
-        else
-          for (final entry in progress)
-            _ObjectiveRow(
-              key: ValueKey('quest-objective-${entry.objective.id}'),
-              progress: entry,
-              itemNames: itemNames,
-              enabled: hasProfile && !busy,
-              onChanged: (count) => onChanged(entry, count),
+    return AppPanel(
+      key: const Key('quest-detail-section-objectives'),
+      label: 'Objectives',
+      trailing: progress.isEmpty
+          ? null
+          : Text(
+              '$satisfied / $required',
+              style: tokens.dataStyle.copyWith(color: tokens.muted),
             ),
-        if (current != null) ...[
-          const SizedBox(height: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           Text(
-            current.objectivesSatisfied
-                ? 'Quest completion can be recorded without an override.'
-                : 'Marking complete now requires a manual override; the '
-                      'objective counts stay unchanged.',
-            key: const Key('quest-objectives-hint'),
-            style: Theme.of(context).textTheme.bodySmall,
+            current == null
+                ? 'Counts are recorded per profile.'
+                : current.objectivesSatisfied
+                ? 'All required objectives are satisfied.'
+                : '$satisfied of $required required objectives satisfied.',
+            key: const Key('quest-objectives-summary'),
+            style: tokens.bodyStyle.copyWith(color: tokens.muted),
           ),
+          SizedBox(height: tokens.spaceMd),
+          if (progress.isEmpty)
+            Text(
+              'This quest has no objectives in the dataset.',
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            )
+          else
+            for (final entry in progress)
+              _ObjectiveRow(
+                key: ValueKey('quest-objective-${entry.objective.id}'),
+                progress: entry,
+                itemNames: itemNames,
+                enabled: hasProfile && !busy,
+                onChanged: (count) => onChanged(entry, count),
+              ),
+          if (current != null) ...[
+            SizedBox(height: tokens.spaceSm),
+            Text(
+              current.objectivesSatisfied
+                  ? 'Quest completion can be recorded without an override.'
+                  : 'Marking complete now requires a manual override; the '
+                        'objective counts stay unchanged.',
+              key: const Key('quest-objectives-hint'),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -840,7 +915,7 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final progress = widget.progress;
     final objective = progress.objective;
     final required = progress.requiredCount;
@@ -859,28 +934,33 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
       if (objective.targetNames.isNotEmpty) objective.targetNames.join(', '),
       if (itemLabels.isNotEmpty) itemLabels.join(', '),
     ];
+    final fraction = required <= 0 ? 1.0 : count / required;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+    return Container(
+      margin: EdgeInsets.only(bottom: tokens.spaceSm),
+      padding: EdgeInsets.all(tokens.spaceMd),
+      decoration: BoxDecoration(
+        color: tokens.surfaceRaised,
+        border: Border.all(color: tokens.borderSoft),
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 2),
+                padding: EdgeInsets.only(top: tokens.spaceXs / 2),
                 child: Icon(
                   progress.satisfied
-                      ? Icons.check_circle_outline
-                      : Icons.radio_button_unchecked,
-                  size: 18,
-                  color: progress.satisfied
-                      ? Colors.green.shade700
-                      : theme.colorScheme.onSurfaceVariant,
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank,
+                  size: tokens.h2Size,
+                  color: progress.satisfied ? tokens.success : tokens.dim,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: tokens.spaceSm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -890,18 +970,17 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
                       key: ValueKey(
                         'quest-objective-description-${objective.id}',
                       ),
-                      style: theme.textTheme.bodyMedium,
+                      style: tokens.bodyStyle,
                     ),
+                    SizedBox(height: tokens.spaceXs / 2),
                     Text(
                       details.join(' · '),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                      style: tokens.labelStyle.copyWith(color: tokens.muted),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: tokens.spaceMd),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -923,12 +1002,12 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
-                      decoration: const InputDecoration(
+                      style: tokens.dataStyle,
+                      decoration: InputDecoration(
                         isDense: true,
-                        border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 8,
+                          horizontal: tokens.spaceXs,
+                          vertical: tokens.spaceSm,
                         ),
                       ),
                       onSubmitted: _submit,
@@ -937,7 +1016,7 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
                   Text(
                     ' / $required',
                     key: ValueKey('quest-objective-required-${objective.id}'),
-                    style: theme.textTheme.bodyMedium,
+                    style: tokens.dataStyle,
                   ),
                   IconButton(
                     key: ValueKey('quest-objective-increment-${objective.id}'),
@@ -951,6 +1030,12 @@ class _ObjectiveRowState extends State<_ObjectiveRow> {
                 ],
               ),
             ],
+          ),
+          SizedBox(height: tokens.spaceSm),
+          AppProgressBar(
+            value: fraction,
+            trailing: '$count / $required',
+            color: progress.satisfied ? tokens.accent : tokens.info,
           ),
         ],
       ),
@@ -981,79 +1066,96 @@ class _RequirementsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final current = status;
     final blocking = current?.blockingReasons ?? const <QuestLockReason>[];
+    final hasGates =
+        detail.minPlayerLevel != null ||
+        detail.prerequisites.isNotEmpty ||
+        detail.traderRequirements.isNotEmpty;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(
-          title: 'Requirements',
-          subtitle: current == null
-              ? 'Availability is computed for the active profile.'
-              : current.isLocked
-              ? 'Locked: ${blocking.length} blocking requirement(s).'
-              : 'Every blocking requirement is met.',
-        ),
-        const SizedBox(height: 8),
-        if (detail.minPlayerLevel case final level?)
-          _RequirementLine(
-            key: const Key('quest-requirement-level'),
-            icon: Icons.person_outline,
-            title: 'Player level $level',
-            detail: _levelDetail(current, level),
-            satisfied: current == null
-                ? null
-                : !blocking.any((reason) => reason is PlayerLevelTooLow),
-          ),
-        for (final prerequisite in detail.prerequisites)
-          _PrerequisiteLine(
-            key: ValueKey('quest-prerequisite-${prerequisite.taskId}'),
-            prerequisite: prerequisite,
-            state: statusesById[prerequisite.taskId],
-            hasProfile: hasProfile,
-            onTap: statusesById.containsKey(prerequisite.taskId)
-                ? () => onQuestTap(prerequisite.taskId)
-                : null,
-          ),
-        for (final requirement in detail.traderRequirements)
-          _RequirementLine(
-            key: ValueKey('quest-trader-requirement-${requirement.traderId}'),
-            icon: Icons.storefront_outlined,
-            title:
-                'Trader ${requirement.traderId == detail.traderId && traderLabel != null ? traderLabel : requirement.traderId} '
-                '${requirement.isLoyaltyLevel ? 'loyalty level' : requirement.requirementType ?? 'requirement'}',
-            detail:
-                '${requirement.compareMethod ?? '>='} ${requirement.value ?? '?'} '
-                '· advisory only (no local loyalty data)',
-            satisfied: null,
-          ),
-        if (detail.prerequisites.isEmpty &&
-            detail.traderRequirements.isEmpty &&
-            detail.minPlayerLevel == null)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
-            child: Text('No prerequisite quests, trader or level gates.'),
-          ),
-        if (hasProfile && current != null) ...[
-          const SizedBox(height: 12),
-          Text(
-            'Why this state',
-            key: const Key('quest-lock-reasons-title'),
-            style: theme.textTheme.titleSmall,
-          ),
-          const SizedBox(height: 4),
-          if (current.reasons.isEmpty)
-            const Text('No blocking reason is reported for this quest.')
-          else
-            for (var index = 0; index < current.reasons.length; index++)
-              _ReasonLine(
-                key: ValueKey('quest-lock-reason-$index'),
-                reason: current.reasons[index],
+    return AppPanel(
+      key: const Key('quest-detail-section-requirements'),
+      label: 'Requirements',
+      trailing: current == null
+          ? null
+          : Text(
+              current.isLocked ? '${blocking.length} blocking' : 'met',
+              style: tokens.dataStyle.copyWith(
+                color: current.isLocked ? tokens.danger : tokens.success,
               ),
+            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            current == null
+                ? 'Availability is computed for the active profile.'
+                : current.isLocked
+                ? 'Locked: ${blocking.length} blocking requirement(s).'
+                : 'Every blocking requirement is met.',
+            key: const Key('quest-requirements-summary'),
+            style: tokens.bodyStyle.copyWith(color: tokens.muted),
+          ),
+          SizedBox(height: tokens.spaceSm),
+          if (!hasGates)
+            Text(
+              'No prerequisite quests, trader or level gates.',
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
+          if (detail.minPlayerLevel case final level?)
+            _RequirementLine(
+              key: const Key('quest-requirement-level'),
+              icon: Icons.person_outline,
+              title: 'Player level $level',
+              detail: _levelDetail(current, level),
+              satisfied: current == null
+                  ? null
+                  : !blocking.any((reason) => reason is PlayerLevelTooLow),
+            ),
+          for (final prerequisite in detail.prerequisites)
+            _PrerequisiteLine(
+              key: ValueKey('quest-prerequisite-${prerequisite.taskId}'),
+              prerequisite: prerequisite,
+              state: statusesById[prerequisite.taskId],
+              hasProfile: hasProfile,
+              onTap: statusesById.containsKey(prerequisite.taskId)
+                  ? () => onQuestTap(prerequisite.taskId)
+                  : null,
+            ),
+          for (final requirement in detail.traderRequirements)
+            _RequirementLine(
+              key: ValueKey('quest-trader-requirement-${requirement.traderId}'),
+              icon: Icons.storefront_outlined,
+              title:
+                  'Trader ${requirement.traderId == detail.traderId && traderLabel != null ? traderLabel : requirement.traderId} '
+                  '${requirement.isLoyaltyLevel ? 'loyalty level' : requirement.requirementType ?? 'requirement'}',
+              detail:
+                  '${requirement.compareMethod ?? '>='} ${requirement.value ?? '?'} '
+                  '· advisory only (no local loyalty data)',
+              satisfied: null,
+            ),
+          if (hasProfile && current != null) ...[
+            SizedBox(height: tokens.spaceMd),
+            const AppSectionLabel(
+              'Why this state',
+              key: Key('quest-lock-reasons-title'),
+            ),
+            SizedBox(height: tokens.spaceXs),
+            if (current.reasons.isEmpty)
+              Text(
+                'No blocking reason is reported for this quest.',
+                style: tokens.bodyStyle.copyWith(color: tokens.muted),
+              )
+            else
+              for (var index = 0; index < current.reasons.length; index++)
+                _ReasonLine(
+                  key: ValueKey('quest-lock-reason-$index'),
+                  reason: current.reasons[index],
+                ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -1132,25 +1234,29 @@ class _RequirementLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
+    final detail = this.detail;
     final row = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceXs),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(width: 8),
+          Icon(icon, size: tokens.h2Size, color: tokens.dim),
+          SizedBox(width: tokens.spaceSm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: theme.textTheme.bodyMedium),
+                Text(
+                  title,
+                  style: tokens.bodyStyle.copyWith(
+                    color: onTap == null ? tokens.text : tokens.info,
+                  ),
+                ),
                 if (detail != null)
                   Text(
-                    detail!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                    detail,
+                    style: tokens.bodyStyle.copyWith(color: tokens.muted),
                   ),
               ],
             ),
@@ -1158,12 +1264,11 @@ class _RequirementLine extends StatelessWidget {
           if (satisfied != null)
             Icon(
               satisfied! ? Icons.check : Icons.close,
-              size: 18,
-              color: satisfied!
-                  ? Colors.green.shade700
-                  : theme.colorScheme.error,
+              size: tokens.h2Size,
+              color: satisfied! ? tokens.success : tokens.danger,
             ),
-          if (onTap != null) const Icon(Icons.chevron_right, size: 18),
+          if (onTap != null)
+            Icon(Icons.chevron_right, size: tokens.h2Size, color: tokens.dim),
         ],
       ),
     );
@@ -1171,7 +1276,14 @@ class _RequirementLine extends StatelessWidget {
     if (onTap == null) {
       return row;
     }
-    return InkWell(onTap: onTap, child: row);
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: tokens.accent.withValues(alpha: 0.06),
+        child: row,
+      ),
+    );
   }
 }
 
@@ -1182,23 +1294,24 @@ class _ReasonLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final blocking = reason.blocksStart;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceXs / 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             blocking ? Icons.lock_outline : Icons.info_outline,
-            size: 16,
-            color: blocking
-                ? theme.colorScheme.error
-                : theme.colorScheme.onSurfaceVariant,
+            size: tokens.h2Size,
+            color: blocking ? tokens.danger : tokens.dim,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: tokens.spaceSm),
           Expanded(
-            child: Text(reason.description, style: theme.textTheme.bodySmall),
+            child: Text(
+              reason.description,
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            ),
           ),
         ],
       ),
@@ -1226,84 +1339,148 @@ class _RewardsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rewards = detail.rewards;
-    final theme = Theme.of(context);
-    if (rewards.isEmpty) {
-      return const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SectionHeader(title: 'Rewards'),
-          SizedBox(height: 8),
-          Text('No rewards are published for this quest.'),
-        ],
-      );
-    }
+    final tiles = <Widget>[
+      for (final item in rewards.items)
+        _RewardTile(
+          key: ValueKey('quest-reward-item-${item.itemId}'),
+          linkKey: ValueKey('quest-item-link-${item.itemId}'),
+          label: 'Item',
+          value: itemNames[item.itemId] ?? item.itemId,
+          subtitle: '×${item.count}',
+          onTap: () => onItemTap(item.itemId),
+        ),
+      for (final standing in rewards.traderStanding)
+        _RewardTile(
+          key: ValueKey('quest-reward-standing-${standing.traderId}'),
+          label: 'Reputation',
+          value: '${standing.standing >= 0 ? '+' : ''}${standing.standing}',
+          subtitle: standing.traderId == detail.traderId && traderLabel != null
+              ? traderLabel
+              : standing.traderId,
+        ),
+      for (final skill in rewards.skills)
+        _RewardTile(
+          key: ValueKey('quest-reward-skill-${skill.skill}'),
+          label: 'Skill',
+          value: '${skill.skill} +${skill.level}',
+        ),
+      for (final offer in rewards.offerUnlocks)
+        _RewardTile(
+          key: ValueKey('quest-reward-offer-${offer.id}'),
+          linkKey: offer.itemId == null
+              ? null
+              : ValueKey('quest-item-link-${offer.itemId}'),
+          label: 'Trader offer',
+          value: offer.itemId == null
+              ? 'Trader offer ${offer.id}'
+              : itemNames[offer.itemId] ?? offer.itemId!,
+          subtitle: offer.level == null ? null : 'Level ${offer.level}',
+          onTap: offer.itemId == null ? null : () => onItemTap(offer.itemId!),
+        ),
+      for (final craft in rewards.craftUnlocks)
+        _RewardTile(
+          key: ValueKey('quest-reward-craft-${craft.stationId}'),
+          linkKey: craft.itemId == null
+              ? null
+              : ValueKey('quest-item-link-${craft.itemId}'),
+          label: 'Craft',
+          value: craft.itemId == null
+              ? 'Craft at ${craft.stationId}'
+              : itemNames[craft.itemId] ?? craft.itemId!,
+          subtitle: craft.level == null ? null : 'Level ${craft.level}',
+          onTap: craft.itemId == null ? null : () => onItemTap(craft.itemId!),
+        ),
+      for (final customization in rewards.customizations)
+        _RewardTile(
+          key: ValueKey('quest-reward-customization-${customization.id}'),
+          label: 'Customization',
+          value: customization.name ?? customization.id,
+        ),
+      if (rewards.traderUnlockIds.isNotEmpty)
+        _RewardTile(
+          label: 'Traders',
+          value: rewards.traderUnlockIds.join(', '),
+        ),
+      if (rewards.locationUnlockIds.isNotEmpty)
+        _RewardTile(
+          label: 'Locations',
+          value: rewards.locationUnlockIds.join(', '),
+        ),
+      if (rewards.achievementIds.isNotEmpty)
+        _RewardTile(
+          label: 'Achievements',
+          value: rewards.achievementIds.join(', '),
+        ),
+    ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(title: 'Rewards'),
-        const SizedBox(height: 8),
-        for (final item in rewards.items)
-          _ItemLine(
-            key: ValueKey('quest-reward-item-${item.itemId}'),
-            itemId: item.itemId,
-            label: itemNames[item.itemId] ?? item.itemId,
-            trailing: '×${item.count}',
-            onTap: () => onItemTap(item.itemId),
-          ),
-        for (final standing in rewards.traderStanding)
-          Text(
-            'Trader standing ${standing.standing >= 0 ? '+' : ''}'
-            '${standing.standing} with '
-            '${standing.traderId == detail.traderId && traderLabel != null ? traderLabel : standing.traderId}',
-            style: theme.textTheme.bodyMedium,
-          ),
-        for (final skill in rewards.skills)
-          _PlainLine(
-            icon: Icons.trending_up,
-            label: '${skill.skill} +${skill.level}',
-          ),
-        for (final offer in rewards.offerUnlocks)
-          _ItemLine(
-            key: ValueKey('quest-reward-offer-${offer.id}'),
-            itemId: offer.itemId,
-            label: offer.itemId == null
-                ? 'Trader offer ${offer.id}'
-                : itemNames[offer.itemId] ?? offer.itemId!,
-            trailing: offer.level == null ? null : 'Level ${offer.level}',
-            onTap: offer.itemId == null ? null : () => onItemTap(offer.itemId!),
-          ),
-        for (final craft in rewards.craftUnlocks)
-          _ItemLine(
-            key: ValueKey('quest-reward-craft-${craft.stationId}'),
-            itemId: craft.itemId,
-            label: craft.itemId == null
-                ? 'Craft at ${craft.stationId}'
-                : itemNames[craft.itemId] ?? craft.itemId!,
-            trailing: craft.level == null ? null : 'Level ${craft.level}',
-            onTap: craft.itemId == null ? null : () => onItemTap(craft.itemId!),
-          ),
-        for (final customization in rewards.customizations)
-          _PlainLine(
-            icon: Icons.palette_outlined,
-            label: customization.name ?? customization.id,
-          ),
-        if (rewards.traderUnlockIds.isNotEmpty)
-          _PlainLine(
-            icon: Icons.storefront_outlined,
-            label: 'Unlocks traders: ${rewards.traderUnlockIds.join(', ')}',
-          ),
-        if (rewards.locationUnlockIds.isNotEmpty)
-          _PlainLine(
-            icon: Icons.map_outlined,
-            label: 'Unlocks locations: ${rewards.locationUnlockIds.join(', ')}',
-          ),
-        if (rewards.achievementIds.isNotEmpty)
-          _PlainLine(
-            icon: Icons.emoji_events_outlined,
-            label: 'Achievements: ${rewards.achievementIds.join(', ')}',
-          ),
-      ],
+    return AppPanel(
+      key: const Key('quest-detail-section-rewards'),
+      label: 'Rewards',
+      child: _RewardGrid(tiles: tiles),
+    );
+  }
+}
+
+class _RewardGrid extends StatelessWidget {
+  const _RewardGrid({required this.tiles});
+
+  final List<Widget> tiles;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    if (tiles.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = (constraints.maxWidth / 160).floor().clamp(1, 4);
+        final gap = tokens.spaceSm;
+        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final tile in tiles) SizedBox(width: width, child: tile),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _RewardTile extends StatelessWidget {
+  const _RewardTile({
+    super.key,
+    required this.label,
+    required this.value,
+    this.subtitle,
+    this.linkKey,
+    this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final String? subtitle;
+  final Key? linkKey;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    final tile = AppStatTile(label: label, value: value, subtitle: subtitle);
+    if (onTap == null) {
+      return tile;
+    }
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        key: linkKey,
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
+        hoverColor: tokens.accent.withValues(alpha: 0.06),
+        child: tile,
+      ),
     );
   }
 }
@@ -1322,6 +1499,25 @@ class _ItemsSection extends StatelessWidget {
   final QuestDetail detail;
   final Map<String, String> itemNames;
   final ValueChanged<String> onItemTap;
+
+  /// Whether any objective references an item, so the screen can omit the
+  /// section rather than render an empty panel.
+  static bool hasRows(QuestDetail detail) {
+    final seen = <String>{};
+    for (final objective in detail.objectives) {
+      final ids = <String>[
+        ...objective.itemIds,
+        ?objective.questItemId,
+        ...objective.requiredKeyItemIds,
+      ];
+      for (final id in ids) {
+        if (seen.add(id)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1346,20 +1542,22 @@ class _ItemsSection extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(title: 'Turn-in and required items'),
-        const SizedBox(height: 8),
-        for (final row in rows)
-          _ItemLine(
-            key: ValueKey('quest-item-${row.itemId}'),
-            itemId: row.itemId,
-            label: itemNames[row.itemId] ?? row.itemId,
-            trailing: row.turnIn ? 'Turn in' : 'Required',
-            onTap: () => onItemTap(row.itemId),
-          ),
-      ],
+    return AppPanel(
+      key: const Key('quest-detail-section-items'),
+      label: 'Turn-in and required items',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final row in rows)
+            _ItemLine(
+              key: ValueKey('quest-item-${row.itemId}'),
+              itemId: row.itemId,
+              label: itemNames[row.itemId] ?? row.itemId,
+              trailing: row.turnIn ? 'Turn in' : 'Required',
+              onTap: () => onItemTap(row.itemId),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -1381,33 +1579,24 @@ class _UnlocksSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (detail.unlocks.isEmpty) {
-      return const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return AppPanel(
+      key: const Key('quest-detail-section-unlocks'),
+      label: 'Unlocks',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SectionHeader(title: 'Unlocks'),
-          SizedBox(height: 8),
-          Text('No quest in the current dataset requires this one.'),
+          for (final unlock in detail.unlocks)
+            _QuestLine(
+              key: ValueKey('quest-unlock-${unlock.questId}'),
+              name: unlock.name,
+              detail: unlock.requiredStatuses.isEmpty
+                  ? 'Becomes available'
+                  : 'Requires ${unlock.requiredStatuses.join(' or ')}',
+              state: statusesById[unlock.questId],
+              onTap: () => onQuestTap(unlock.questId),
+            ),
         ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(title: 'Unlocks'),
-        const SizedBox(height: 8),
-        for (final unlock in detail.unlocks)
-          _QuestLine(
-            key: ValueKey('quest-unlock-${unlock.questId}'),
-            name: unlock.name,
-            detail: unlock.requiredStatuses.isEmpty
-                ? 'Becomes available'
-                : 'Requires ${unlock.requiredStatuses.join(' or ')}',
-            state: statusesById[unlock.questId],
-            onTap: () => onQuestTap(unlock.questId),
-          ),
-      ],
+      ),
     );
   }
 }
@@ -1435,89 +1624,104 @@ class _StatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final current = status;
     final recorded = current?.recordedState;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(title: 'Track progress'),
-        const SizedBox(height: 8),
-        if (profileId == null)
-          const Text(
-            'Choose a profile to record objective progress and quest state.',
-            key: Key('quest-status-no-profile'),
-          )
-        else ...[
-          if (actionError != null)
-            Container(
-              key: const Key('quest-action-error'),
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Could not save progress: $actionError',
-                style: TextStyle(color: theme.colorScheme.onErrorContainer),
-              ),
-            ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              OutlinedButton(
-                key: const Key('quest-status-mark-in-progress'),
-                onPressed: busy
-                    ? null
-                    : () => onStateSelected(QuestProgressState.inProgress),
-                child: const Text('Mark in progress'),
-              ),
-              FilledButton(
-                key: const Key('quest-status-mark-completed'),
-                onPressed: busy
-                    ? null
-                    : () => onStateSelected(QuestProgressState.completed),
-                child: Text(
-                  recorded == QuestProgressState.completed
-                      ? 'Completed'
-                      : 'Mark completed',
-                ),
-              ),
-              OutlinedButton(
-                key: const Key('quest-status-mark-failed'),
-                onPressed: busy
-                    ? null
-                    : () => onStateSelected(QuestProgressState.failed),
-                child: const Text('Mark failed'),
-              ),
-              if (recorded != null && recorded != QuestProgressState.notStarted)
-                TextButton(
-                  key: const Key('quest-status-revert'),
-                  onPressed: busy ? null : onRevert,
-                  child: const Text('Revert'),
-                ),
-            ],
-          ),
-          if (current != null) ...[
-            const SizedBox(height: 8),
+    return AppPanel(
+      key: const Key('quest-detail-section-status'),
+      label: 'Status',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (profileId == null)
             Text(
-              current.manuallyCompleted
-                  ? 'Completed by manual override. Objective counts were not '
-                        'changed.'
-                  : current.objectivesSatisfied
-                  ? 'Every required objective is recorded; completion needs no '
-                        'override.'
-                  : 'Completing now needs confirmation and leaves objective '
-                        'counts unchanged.',
-              key: const Key('quest-status-hint'),
-              style: theme.textTheme.bodySmall,
+              'Choose a profile to record objective progress and quest state.',
+              key: const Key('quest-status-no-profile'),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
+            )
+          else ...[
+            if (actionError != null)
+              Container(
+                key: const Key('quest-action-error'),
+                margin: EdgeInsets.only(bottom: tokens.spaceSm),
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spaceMd,
+                  vertical: tokens.spaceSm,
+                ),
+                decoration: BoxDecoration(
+                  color: Color.alphaBlend(
+                    tokens.danger.withValues(alpha: 0.12),
+                    tokens.surface,
+                  ),
+                  border: Border.all(
+                    color: tokens.danger.withValues(alpha: 0.6),
+                  ),
+                  borderRadius: BorderRadius.circular(tokens.radiusSm),
+                ),
+                child: Text(
+                  'Could not save progress: $actionError',
+                  style: tokens.bodyStyle.copyWith(color: tokens.danger),
+                ),
+              ),
+            AppButton(
+              key: const Key('quest-status-mark-in-progress'),
+              label: 'Mark in progress',
+              variant: AppButtonVariant.secondary,
+              expand: true,
+              onPressed: busy
+                  ? null
+                  : () => onStateSelected(QuestProgressState.inProgress),
             ),
+            SizedBox(height: tokens.spaceSm),
+            AppButton(
+              key: const Key('quest-status-mark-completed'),
+              label: recorded == QuestProgressState.completed
+                  ? 'Completed'
+                  : 'Mark completed',
+              onPressed: busy
+                  ? null
+                  : () => onStateSelected(QuestProgressState.completed),
+            ),
+            SizedBox(height: tokens.spaceSm),
+            AppButton(
+              key: const Key('quest-status-mark-failed'),
+              label: 'Mark failed',
+              variant: AppButtonVariant.danger,
+              expand: true,
+              onPressed: busy
+                  ? null
+                  : () => onStateSelected(QuestProgressState.failed),
+            ),
+            if (recorded != null &&
+                recorded != QuestProgressState.notStarted) ...[
+              SizedBox(height: tokens.spaceSm),
+              AppButton(
+                key: const Key('quest-status-revert'),
+                label: 'Revert',
+                variant: AppButtonVariant.ghost,
+                expand: true,
+                onPressed: busy ? null : onRevert,
+              ),
+            ],
+            if (current != null) ...[
+              SizedBox(height: tokens.spaceSm),
+              Text(
+                current.manuallyCompleted
+                    ? 'Completed by manual override. Objective counts were not '
+                          'changed.'
+                    : current.objectivesSatisfied
+                    ? 'Every required objective is recorded; completion needs '
+                          'no override.'
+                    : 'Completing now needs confirmation and leaves objective '
+                          'counts unchanged.',
+                key: const Key('quest-status-hint'),
+                style: tokens.bodyStyle.copyWith(color: tokens.muted),
+              ),
+            ],
           ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -1542,47 +1746,50 @@ class _ItemLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final mergedId = itemId;
     final row = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceXs),
       child: Row(
         children: [
           Icon(
             Icons.inventory_2_outlined,
-            size: 18,
-            color: theme.colorScheme.onSurfaceVariant,
+            size: tokens.h2Size,
+            color: tokens.dim,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: tokens.spaceSm),
           Expanded(
             child: Text(
               label,
               key: mergedId == null
                   ? null
                   : ValueKey('quest-item-label-$mergedId'),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: onTap == null ? null : theme.colorScheme.primary,
+              style: tokens.bodyStyle.copyWith(
+                color: onTap == null ? tokens.text : tokens.info,
               ),
             ),
           ),
           if (trailing != null)
             Text(
               trailing!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.dataStyle.copyWith(color: tokens.muted),
             ),
-          if (onTap != null) const Icon(Icons.chevron_right, size: 18),
+          if (onTap != null)
+            Icon(Icons.chevron_right, size: tokens.h2Size, color: tokens.dim),
         ],
       ),
     );
     if (onTap == null) {
       return row;
     }
-    return InkWell(
-      key: mergedId == null ? null : ValueKey('quest-item-link-$mergedId'),
-      onTap: onTap,
-      child: row,
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        key: mergedId == null ? null : ValueKey('quest-item-link-$mergedId'),
+        onTap: onTap,
+        hoverColor: tokens.accent.withValues(alpha: 0.06),
+        child: row,
+      ),
     );
   }
 }
@@ -1603,60 +1810,37 @@ class _QuestLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(
-          children: [
-            const Icon(Icons.flag_outlined, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: theme.textTheme.bodyMedium),
-                  Text(
-                    detail,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+    final tokens = AppTokens.of(context);
+    final state = this.state;
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: tokens.accent.withValues(alpha: 0.06),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spaceXs),
+          child: Row(
+            children: [
+              Icon(Icons.flag_outlined, size: tokens.h2Size, color: tokens.dim),
+              SizedBox(width: tokens.spaceSm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, style: tokens.bodyStyle),
+                    Text(
+                      detail,
+                      style: tokens.bodyStyle.copyWith(color: tokens.muted),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (state != null) QuestStateBadge(state: state!.recordedState),
-            const Icon(Icons.chevron_right, size: 18),
-          ],
+              if (state != null) QuestStateBadge(state: state.recordedState),
+              SizedBox(width: tokens.spaceXs),
+              Icon(Icons.chevron_right, size: tokens.h2Size, color: tokens.dim),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _PlainLine extends StatelessWidget {
-  const _PlainLine({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 18,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
-          ),
-        ],
       ),
     );
   }
@@ -1674,38 +1858,33 @@ class _NotFoundState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.help_outline,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
+            Icon(Icons.help_outline, size: 48, color: tokens.dim),
+            SizedBox(height: tokens.spaceMd),
             Text(
               'Quest not found',
               key: const Key('quest-detail-not-found'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               'Quest $questId is not in the current dataset.',
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
-            const SizedBox(height: 16),
-            FilledButton.tonal(
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
               key: const Key('quest-detail-back'),
+              label: 'Back',
+              variant: AppButtonVariant.secondary,
               onPressed: onBack,
-              child: const Text('Back'),
             ),
           ],
         ),
@@ -1722,10 +1901,10 @@ class _OrphanState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return SingleChildScrollView(
       key: const Key('quest-detail-orphaned'),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(tokens.spaceXl),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
@@ -1734,54 +1913,50 @@ class _OrphanState extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.link_off, color: theme.colorScheme.error),
-                  const SizedBox(width: 8),
+                  Icon(Icons.link_off, color: tokens.danger),
+                  SizedBox(width: tokens.spaceSm),
                   Expanded(
                     child: Text(
                       'Quest unavailable upstream',
-                      style: theme.textTheme.titleLarge,
+                      style: tokens.h1Style,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: tokens.spaceSm),
               Text(
                 'Quest ${orphan.questId} is no longer in the current dataset. '
                 'The progress recorded for this profile is preserved and is '
                 'not used to satisfy other quests.',
-                style: theme.textTheme.bodyMedium,
+                style: tokens.bodyStyle,
               ),
-              const SizedBox(height: 16),
-              Text('Preserved state', style: theme.textTheme.titleSmall),
-              const SizedBox(height: 4),
+              SizedBox(height: tokens.spaceLg),
+              const AppSectionLabel('Preserved state'),
+              SizedBox(height: tokens.spaceXs),
               QuestStateBadge(
                 key: const Key('quest-orphan-state'),
                 state: orphan.state,
               ),
               if (orphan.objectiveCounts.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Text(
-                  'Recorded objective counts',
-                  style: theme.textTheme.titleSmall,
-                ),
-                const SizedBox(height: 4),
+                SizedBox(height: tokens.spaceLg),
+                const AppSectionLabel('Recorded objective counts'),
+                SizedBox(height: tokens.spaceXs),
                 for (final entry in orphan.objectiveCounts.entries)
-                  Text('${entry.key}: ${entry.value}'),
+                  Text('${entry.key}: ${entry.value}', style: tokens.dataStyle),
               ],
               if (orphan.updatedAt != null) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: tokens.spaceMd),
                 Text(
                   'Last updated ${orphan.updatedAt}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                  style: tokens.bodyStyle.copyWith(color: tokens.muted),
                 ),
               ],
-              const SizedBox(height: 16),
-              FilledButton.tonal(
+              SizedBox(height: tokens.spaceLg),
+              AppButton(
                 key: const Key('quest-orphan-back'),
+                label: 'Back',
+                variant: AppButtonVariant.secondary,
                 onPressed: onBack,
-                child: const Text('Back'),
               ),
             ],
           ),
@@ -1799,36 +1974,35 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
-            const SizedBox(height: 12),
+            Icon(Icons.error_outline, size: 48, color: tokens.danger),
+            SizedBox(height: tokens.spaceMd),
             Text(
               'Could not load this quest.',
               key: const Key('quest-detail-error'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               '$error',
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
-            const SizedBox(height: 16),
-            OutlinedButton(
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
               key: const Key('quest-detail-retry'),
+              label: 'Retry',
+              variant: AppButtonVariant.secondary,
               onPressed: onRetry,
-              child: const Text('Retry'),
             ),
           ],
         ),

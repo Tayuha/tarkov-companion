@@ -9,8 +9,9 @@ reference is [`design/README.md`](../design/README.md) and the previews in
 This document covers the shared Flutter layer added in T8.12. It is token,
 theme and primitive code plus the component gallery. T8.13 installed
 `buildAppTheme()` in `app/lib/main.dart` and migrated the Items catalog and
-item detail; Quests still migrate in T8.14. The component gallery and the theme
-tests remain the proof of the system.
+item detail; T8.14 migrated the Quest list and quest detail. Every feature
+screen now reads the same tokens and primitives. The component gallery and the
+theme tests remain the proof of the system.
 
 ## Where it lives
 
@@ -244,4 +245,4 @@ gallery is intentionally small and flat so it remains stable across runs.
 - No rounded glass, gloss or decorative gradients. Two-pixel corners at most.
 - Every screen must stay legible offline and at 100% zoom.
 - Item art remains a placeholder until licensing/branding is decided.
-- Items migrated in T8.13; Quests migrate in T8.14.
+- Items migrated in T8.13; Quests migrated in T8.14.

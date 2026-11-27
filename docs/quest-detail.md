@@ -14,13 +14,34 @@ link is selectable text, not an external browser launch.
 
 | Section | Content |
 | --- | --- |
-| Header | Name, recorded-state badge, computed availability badge, description, trader, map, minimum level, experience, Kappa/Restartable flags and the wiki link. |
-| Objectives | Every objective, its type, description, optional marker, maps/targets/items, required count and the profile's recorded count. |
+| Header | Name, recorded-state badge, computed availability badge, trader, map, minimum level, experience, Kappa/Restartable flags and the wiki link. |
+| Objectives | Every objective in an `AppPanel` card, its type, description, optional marker, maps/targets/items, required count, recorded count and an `AppProgressBar`. |
 | Requirements | Minimum player level, prerequisite quests with their actual state, trader loyalty/reputation advisories and every structured lock reason. |
-| Rewards | Reward item stacks, trader standing, skill levels, trader offers, hideout crafts, customizations and trader/location/achievement unlocks. |
+| Rewards | Reward item stacks, trader standing, skill levels, trader offers, hideout crafts, customizations and trader/location/achievement unlocks, as `AppStatTile` tiles. |
 | Turn-in and required items | Item references projected from objectives (`itemIds`, `questItemId`, `requiredKeyItemIds`). |
 | Unlocks | Quests in the current dataset that require this one, with their recorded state. |
-| Track progress | State controls and write errors. |
+| Notes | The description, when upstream publishes one. |
+| Status | State controls and write errors. |
+
+Everything is rendered with `AppPanel`, `AppSectionLabel`, `AppButton`,
+`AppStatTile` and `AppProgressBar`; the screen writes no colour literal.
+
+Missing fields render nothing: a quest without a description has no Notes
+panel, an empty reward block has no Rewards panel, and a quest with no unlocks
+has no Unlocks panel. The derived requirement/objective summaries are not
+placeholders for missing fields.
+
+## Layout
+
+The content is capped at 1180 logical pixels. From 1080 px it splits into two
+columns:
+
+- left: objectives, turn-in/required items, notes;
+- right: rewards, requirements, unlocks, status.
+
+Below 1080 the same content is one ordered column. The 1920 concept's quest
+chain graph and location panel are not implemented: they are concept-only and
+the data has no chain projection or map artwork.
 
 The header uses two different badges on purpose:
 
@@ -148,14 +169,18 @@ an in-memory `AppDatabase` seeded with two profiles, the quest graph, trader and
 map rows, catalog items and recorded progress. It covers:
 
 - header, objective, requirement and locked-reason rendering;
+- the omission rule for descriptions, rewards, items and unlocks;
+- the two-column and single-column layouts and the 1180 px content cap;
 - level, cycle, malformed-data and trader-advisory reasons;
 - every status action persisting and updating both badges, including revert and
   a non-restartable failure;
-- objective increment, decrement and text entry with the derived hint changing;
+- objective increment, decrement and text entry with the derived hint and
+  progress rail changing;
 - manual override confirmation, cancel and unchanged counts;
 - reward/turn-in item links pushing the item detail;
 - prerequisite and unlock links pushing another quest detail;
 - not-found versus orphaned states;
 - two-profile isolation of states and objective counts;
 - the no-profile read-only mode with no status controls;
-- trader/map label fallback to the upstream id.
+- trader/map label fallback to the upstream id; and
+- detail goldens at 1440 (two columns) and 900 (one column).
