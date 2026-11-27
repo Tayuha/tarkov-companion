@@ -79,6 +79,8 @@ class _QuestListScreenState extends State<QuestListScreen> {
   bool _loading = true;
   bool _loadingMore = false;
   Object? _error;
+  late List<QuestFilterOption> _traderOptions;
+  late List<QuestFilterOption> _mapOptions;
 
   /// Incremented for each repository request. Only the newest response may
   /// write to the state, which makes the debounce and page appends race-free.
@@ -87,15 +89,25 @@ class _QuestListScreenState extends State<QuestListScreen> {
   @override
   void initState() {
     super.initState();
+    _traderOptions = widget.traderOptions;
+    _mapOptions = widget.mapOptions;
+    _fetchFilterOptions();
     _fetchFirstPage(++_requestGeneration);
   }
 
   @override
   void didUpdateWidget(covariant QuestListScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.traderOptions != oldWidget.traderOptions) {
+      _traderOptions = widget.traderOptions;
+    }
+    if (widget.mapOptions != oldWidget.mapOptions) {
+      _mapOptions = widget.mapOptions;
+    }
     if (widget.profileId != oldWidget.profileId ||
         widget.repository != oldWidget.repository ||
         widget.pageSize != oldWidget.pageSize) {
+      _fetchFilterOptions();
       _reload();
     }
   }
@@ -105,6 +117,38 @@ class _QuestListScreenState extends State<QuestListScreen> {
     _searchTimer?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  /// Loads trader and map names for the filters when the caller did not
+  /// supply them. The app shell never supplies them, so this is the production
+  /// path; tests pass explicit options when they need fixed labels.
+  Future<void> _fetchFilterOptions() async {
+    if (_traderOptions.isNotEmpty && _mapOptions.isNotEmpty) {
+      return;
+    }
+    try {
+      final traders = await widget.repository.traderLabels();
+      final maps = await widget.repository.mapLabels();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        if (widget.traderOptions.isEmpty) {
+          _traderOptions = [
+            for (final label in traders)
+              QuestFilterOption(id: label.id, label: label.name),
+          ];
+        }
+        if (widget.mapOptions.isEmpty) {
+          _mapOptions = [
+            for (final label in maps)
+              QuestFilterOption(id: label.id, label: label.name),
+          ];
+        }
+      });
+    } on Object {
+      // Filters remain usable with the ids when labels cannot be loaded.
+    }
   }
 
   bool get _hasMore => _quests.length < _total;
@@ -295,8 +339,8 @@ class _QuestListScreenState extends State<QuestListScreen> {
               const SizedBox(height: 12),
               QuestFilterBar(
                 filters: _filters,
-                traderOptions: widget.traderOptions,
-                mapOptions: widget.mapOptions,
+                traderOptions: _traderOptions,
+                mapOptions: _mapOptions,
                 onTraderSelected: _setTrader,
                 onMapSelected: _setMap,
                 onLevelSelected: _setLevel,
@@ -370,8 +414,8 @@ class _QuestListScreenState extends State<QuestListScreen> {
         final quest = _quests[index];
         return QuestListRow(
           quest: quest,
-          traderLabel: _optionLabel(widget.traderOptions, quest.traderId),
-          mapLabel: _optionLabel(widget.mapOptions, quest.mapId),
+          traderLabel: _optionLabel(_traderOptions, quest.traderId),
+          mapLabel: _optionLabel(_mapOptions, quest.mapId),
           onTap: widget.onQuestSelected == null
               ? null
               : () => widget.onQuestSelected!(quest.id),

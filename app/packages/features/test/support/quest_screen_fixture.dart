@@ -220,6 +220,28 @@ Future<void> seedQuestFixture(AppDatabase database) async {
     );
   }
 
+  for (final (id, name) in [
+    (fixturePrapor, 'Prapor'),
+    (fixtureTherapist, 'Therapist'),
+    (fixtureSkier, 'Skier'),
+  ]) {
+    await database.customStatement(
+      'INSERT INTO traders (id, name, normalizedName, payload) VALUES (?, ?, ?, ?)',
+      [id, name, name.toLowerCase(), '{}'],
+    );
+  }
+
+  for (final (id, name) in [
+    (fixtureCustoms, 'Customs'),
+    (fixtureWoods, 'Woods'),
+    (fixtureInterchange, 'Interchange'),
+  ]) {
+    await database.customStatement(
+      'INSERT INTO maps (id, name, normalizedName, payload) VALUES (?, ?, ?, ?)',
+      [id, name, name.toLowerCase(), '{}'],
+    );
+  }
+
   for (final quest in fixtureQuests) {
     await database.customStatement(
       'INSERT INTO tasks ('

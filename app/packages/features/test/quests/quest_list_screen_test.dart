@@ -71,6 +71,28 @@ void main() {
     expect(find.byType(ListView), findsOneWidget);
   });
 
+  testWidgets('loads trader and map labels from the database', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1000, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: QuestListScreen(
+          repository: repository,
+          profileId: fixtureProfileRegular,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('quest-trader-filter')));
+    await tester.pumpAndSettle();
+    expect(find.text('Prapor'), findsWidgets);
+
+    await tester.tap(find.text('Prapor').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Showing 7 of 7 quests'), findsOneWidget);
+  });
+
   testWidgets('search is debounced and matches name tokens', (tester) async {
     await pumpQuests(tester);
 

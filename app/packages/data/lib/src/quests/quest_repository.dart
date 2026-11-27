@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
+import 'quest_labels.dart';
 import 'quest_availability.dart';
 import 'quest_detail.dart';
 import 'quest_query.dart';
@@ -571,6 +572,28 @@ final class QuestRepository {
   /// Display name from `traders`, without the id fallback used by the screen
   /// lookup: [QuestDetail.traderName] documents `null` when the dataset has no
   /// such trader, so the detail read model keeps that contract.
+  /// Traders for the quest filter dropdown, ordered by display name.
+  Future<List<QuestLabel>> traderLabels() async {
+    final rows =
+        await (_database.select(_database.traders)..orderBy([
+              (row) => OrderingTerm.asc(row.name),
+              (row) => OrderingTerm.asc(row.id),
+            ]))
+            .get();
+    return [for (final row in rows) QuestLabel(id: row.id, name: row.name)];
+  }
+
+  /// Maps for the quest filter dropdown, ordered by display name.
+  Future<List<QuestLabel>> mapLabels() async {
+    final rows =
+        await (_database.select(_database.maps)..orderBy([
+              (row) => OrderingTerm.asc(row.name),
+              (row) => OrderingTerm.asc(row.id),
+            ]))
+            .get();
+    return [for (final row in rows) QuestLabel(id: row.id, name: row.name)];
+  }
+
   Future<String?> _traderName(String? traderId) async {
     if (traderId == null) {
       return null;
