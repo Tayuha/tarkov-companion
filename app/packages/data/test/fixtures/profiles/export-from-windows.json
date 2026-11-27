@@ -1,0 +1,39 @@
+{
+  "format": "tarkov-companion-progress",
+  "formatVersion": 1,
+  "appVersion": "0.1.0",
+  "exportedAt": "2026-11-25T18:45:12.500Z",
+  "profiles": [
+    {
+      "gameMode": "regular",
+      "playerLevel": 31,
+      "quests": [
+        {
+          "questId": "quest-collector",
+          "state": "failed"
+        },
+        {
+          "questId": "quest-debut",
+          "state": "completed"
+        },
+        {
+          "questId": "quest-shootout",
+          "state": "in-progress"
+        }
+      ],
+      "objectives": [
+        {
+          "questId": "quest-checking",
+          "objectiveId": "objective-checking-1",
+          "count": 5
+        },
+        {
+          "questId": "quest-shootout",
+          "objectiveId": "objective-shootout-1",
+          "count": 0
+        }
+      ]
+    }
+  ],
+  "checksum": "sha256:e51720217165749754d93a842c1bda28208a71dd5094ba5faf429623467e3ddb"
+}

@@ -22,6 +22,7 @@ final class AppSessionReady extends AppSession {
     this.catalog,
     this.quests,
     this.activeProfileId,
+    this.profileServices,
     required super.close,
   });
 
@@ -43,6 +44,12 @@ final class AppSessionReady extends AppSession {
 
   /// Active profile id used for quest progress badges, when available.
   final String? activeProfileId;
+
+  /// Profile management services for the Profiles tab.
+  ///
+  /// The shell shows the tab only when this is non-null, so a session built in
+  /// a test without SQLite keeps the original two-tab layout.
+  final ProfileServices? profileServices;
 }
 
 /// The database could not be opened and is available read-only.
@@ -128,8 +135,8 @@ Future<AppSession> openAppSession({
       },
     );
 
-    final profiles = ProfileRepository(database);
-    final activeProfile = await profiles.ensureFirstLaunch();
+    final profileServices = ProfileServices(database);
+    final activeProfile = await profileServices.profiles.ensureFirstLaunch();
 
     // The first-run gate must stay visible until the whole mode is present:
     // a failed sync can leave one or two datasets applied, and until the
@@ -142,6 +149,7 @@ Future<AppSession> openAppSession({
       catalog: CatalogRepository(database),
       quests: QuestRepository(database),
       activeProfileId: activeProfile.id,
+      profileServices: profileServices,
       close: () async {
         client.close();
         await opened.close();

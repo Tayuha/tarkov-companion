@@ -1,0 +1,30 @@
+{
+  "appVersion": "0.1.0",
+  "checksum": "sha256:2759126c0a4035b826347cca1c6389834427705c70102bd83db4f0358942f326",
+  "exportedAt": "2026-11-27T12:00:00.000Z",
+  "format": "tarkov-companion-progress",
+  "formatVersion": 1,
+  "profiles": [
+    {
+      "gameMode": "regular",
+      "objectives": [
+        {
+          "count": 3,
+          "objectiveId": "objective-checking-1",
+          "questId": "quest-checking"
+        }
+      ],
+      "playerLevel": 22,
+      "quests": [
+        {
+          "questId": "quest-checking",
+          "state": "in-progress"
+        },
+        {
+          "questId": "quest-debut",
+          "state": "completed"
+        }
+      ]
+    }
+  ]
+}

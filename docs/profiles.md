@@ -6,9 +6,9 @@ in the `profiles` table of the SQLite database (`docs/schema.md`) and are read
 and written only through `ProfileRepository` in `tarkov_companion_data`
 (`app/packages/data/lib/src/profiles/profile_repository.dart`).
 
-Deletion, reset and export/import are **not** part of this lifecycle. Deleting a
-profile and resetting its progress is task 7.3; the portable format is tasks
-7.4–7.10. This document covers creation, activation and switching only.
+This document covers creation, activation, editing, reset, deletion and the
+Profiles screen. The portable progress file has its own document:
+[`docs/progress-format.md`](progress-format.md).
 
 ## One profile per game mode
 
@@ -112,6 +112,60 @@ repository only, so this is a corruption case, not an expected one.
 - **Schema** — profiles already exist in the v5 schema. This task adds no
   migration and no column.
 
+## Editable facts
+
+The shipped profile model records the player level. **Faction is not a profile
+fact**: the `profiles` table has no faction column, and the quest availability
+engine derives its answer from level, recorded quest states and objective
+counts. Adding a faction later is a schema migration, not a UI change.
+
+`updatePlayerLevel(id, level)` accepts `1`–`99`
+(`ProfileRepository.minPlayerLevel` / `maxPlayerLevel`) and throws
+`ProfileFactValidationError` for anything else before writing. A successful
+update changes `playerLevel` and `updatedAt` only.
+
+Availability is **derived on read**, never stored. After a level change the next
+`QuestRepository.statuses` / `availableQuests` call sees the new level; no
+restart and no cache invalidation is involved. The shell still refreshes the
+Quests tab after a profile edit because the mounted list keeps its last query
+result; `HomeShell` bumps a revision key when `ProfilesScreen.onProfileChanged`
+fires.
+
+## Reset
+
+`resetProgress(id)` clears the profile's `questProgress` and
+`objectiveProgress` rows in one transaction. The profile row, its player level,
+the active id and every other profile stay. It returns
+`ProfileResetResult(questStatesCleared, objectiveCountsCleared)` and refreshes
+`updatedAt`. A reset of an already empty profile returns zero counts.
+
+## Delete
+
+`delete(id)` removes the profile and its progress rows in one transaction. It
+returns `ProfileDeletionResult(deleted, active)`:
+
+* deleting a **non-active** profile leaves the active id alone;
+* deleting the **active** profile activates another one deterministically:
+  `regular` when it still exists, otherwise the oldest remaining profile
+  (`createdAt`, then `id`);
+* deleting the **last** profile removes the active setting entirely and returns
+  `active: null`. `active()` then returns `null`; `ensureFirstLaunch()` creates a
+  fresh regular profile at level 1 on the next start. The Profiles screen shows
+  an empty state with the "add profile" chips instead.
+
+A missing id throws `ProfileNotFoundError` and changes nothing.
+
+## Export and import
+
+The Profiles screen exposes:
+
+* **Export active** and **Export all**, using the platform file dialog;
+* **Import file**, which validates and previews before any write.
+
+Merge is the default and never deletes a row; replace requires a second
+confirmation. The document, checksum algorithm, error messages and recovery
+steps are in [`docs/progress-format.md`](progress-format.md).
+
 ## Tests
 
 `app/packages/data/test/profiles/profile_repository_test.dart` covers, in
@@ -129,3 +183,10 @@ memory and on a reopened file-backed database:
   oldest-profile and id tie-break fallbacks;
 - ids being unique, injected generators being honored and retried, timestamps
   coming from the injected clock, and the active profile surviving a reopen.
+
+`profile_editing_test.dart` covers the level range, a level change unlocking a
+quest on the next read, reset isolation between profiles, deletion of active,
+non-active and last profiles, and first launch after deleting everything.
+`progress_format_test.dart`, `progress_import_test.dart` and the feature
+`profiles_screen_test.dart` cover the portable format, preview, merge, replace,
+rollback, file export and every screen action.
