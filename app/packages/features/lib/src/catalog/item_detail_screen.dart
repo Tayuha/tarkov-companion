@@ -1,7 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
-import '../section_header.dart';
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
 
 /// The full item detail view.
 ///
@@ -12,6 +13,10 @@ import '../section_header.dart';
 /// weapon never shows damage, ammunition never shows ergonomics, and a
 /// barter-only item gets no type-specific section at all. No row is rendered
 /// as zero or "N/A".
+///
+/// The layout caps its width and, from 1080 logical pixels, splits base/typed
+/// facts from categories and links into two columns. Narrow windows keep the
+/// single ordered column.
 ///
 /// Images are a fixed neutral placeholder until task 5.6 adds the image cache.
 /// Acquisition/disposition (5.4), prices (5.5/5.7) and history are deliberately
@@ -106,8 +111,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
   Widget _buildBody(ItemDetail? detail) {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(key: Key('item-detail-loading')),
+      return Center(
+        child: CircularProgressIndicator(key: const Key('item-detail-loading')),
       );
     }
     final error = _error;
@@ -124,111 +129,146 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 class _DetailBody extends StatelessWidget {
   const _DetailBody({required this.detail});
 
+  /// The widest the inspector grows, even on a 1920 monitor.
+  static const double _maxContentWidth = 1180;
+
+  /// At or above this width, related facts move into a second column.
+  static const double _twoColumnBreakpoint = 1080;
+
   final ItemDetail detail;
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     final typed = _buildTypedSection(detail.properties);
-    return SingleChildScrollView(
-      key: const Key('item-detail-scroll'),
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 880),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    final properties = _buildProperties(context, detail);
+    final categories = detail.categories.isEmpty
+        ? null
+        : _DetailSection(
+            title: 'Categories',
             children: [
-              _Header(detail: detail),
-              const SizedBox(height: 24),
-              _DetailSection(
-                title: 'Properties',
+              Wrap(
+                key: const Key('item-detail-categories'),
+                spacing: tokens.spaceSm,
+                runSpacing: tokens.spaceSm,
                 children: [
-                  if (detail.weight != null)
-                    _PropertyRow(
-                      label: 'Weight',
-                      value: '${_formatNumber(detail.weight!)} kg',
-                    ),
-                  if (detail.gridSize != null)
-                    _PropertyRow(
-                      label: 'Grid size',
-                      value: '${detail.gridSize} slots',
-                    ),
-                  if (detail.stackMaxSize != null)
-                    _PropertyRow(
-                      label: 'Stack limit',
-                      value: '${detail.stackMaxSize}',
-                    ),
+                  for (final category in detail.categories)
+                    _TagChip(label: category.name),
                 ],
               ),
-              if (detail.categories.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                _DetailSection(
-                  title: 'Categories',
-                  children: [
-                    Wrap(
-                      key: const Key('item-detail-categories'),
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final category in detail.categories)
-                          Chip(
-                            label: Text(category.name),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-              if (detail.wikiLink != null || detail.link != null) ...[
-                const SizedBox(height: 24),
-                _DetailSection(
-                  title: 'Links',
-                  children: [
-                    if (detail.wikiLink != null)
-                      _PropertyRow(
-                        label: 'Wiki',
-                        child: SelectableText(
-                          detail.wikiLink!,
-                          key: const Key('item-detail-wiki-link'),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ),
-                    if (detail.link != null)
-                      _PropertyRow(
-                        label: 'Page',
-                        child: SelectableText(
-                          detail.link!,
-                          key: const Key('item-detail-page-link'),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-              if (typed != null) ...[const SizedBox(height: 24), typed],
-              if (detail.description != null) ...[
-                const SizedBox(height: 24),
-                _DetailSection(
-                  title: 'Description',
-                  children: [
-                    Text(
-                      detail.description!,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ],
             ],
+          );
+    final links = detail.wikiLink == null && detail.link == null
+        ? null
+        : _DetailSection(
+            title: 'Links',
+            children: [
+              if (detail.wikiLink != null)
+                _PropertyRow(
+                  label: 'Wiki',
+                  child: SelectableText(
+                    detail.wikiLink!,
+                    key: const Key('item-detail-wiki-link'),
+                    style: tokens.bodyStyle.copyWith(color: tokens.info),
+                  ),
+                ),
+              if (detail.link != null)
+                _PropertyRow(
+                  label: 'Page',
+                  child: SelectableText(
+                    detail.link!,
+                    key: const Key('item-detail-page-link'),
+                    style: tokens.bodyStyle.copyWith(color: tokens.info),
+                  ),
+                ),
+            ],
+          );
+    final description = detail.description == null
+        ? null
+        : _DetailSection(
+            title: 'Description',
+            children: [
+              Text(
+                detail.description!,
+                style: tokens.bodyStyle.copyWith(color: tokens.muted),
+              ),
+            ],
+          );
+
+    return SingleChildScrollView(
+      key: const Key('item-detail-scroll'),
+      padding: EdgeInsets.all(tokens.spaceXl),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final twoColumn = constraints.maxWidth >= _twoColumnBreakpoint;
+              final left = <Widget>[?properties, ?typed, ?description];
+              final right = <Widget>[?categories, ?links];
+
+              final content = twoColumn && right.isNotEmpty
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _Stack(children: left)),
+                        SizedBox(width: tokens.spaceXl),
+                        SizedBox(width: 340, child: _Stack(children: right)),
+                      ],
+                    )
+                  : _Stack(
+                      children: [
+                        ?properties,
+                        ?categories,
+                        ?links,
+                        ?typed,
+                        ?description,
+                      ],
+                    );
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Header(detail: detail),
+                  SizedBox(height: tokens.spaceXl),
+                  content,
+                ],
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget? _buildProperties(BuildContext context, ItemDetail detail) {
+    final tokens = AppTokens.of(context);
+    final tiles = <Widget>[
+      if (detail.weight != null)
+        AppStatTile(
+          label: 'Weight',
+          value: '${_formatNumber(detail.weight!)} kg',
+        ),
+      if (detail.gridSize != null)
+        AppStatTile(label: 'Grid size', value: '${detail.gridSize} slots'),
+      if (detail.stackMaxSize != null)
+        AppStatTile(label: 'Stack limit', value: '${detail.stackMaxSize}'),
+    ];
+    if (tiles.isEmpty) {
+      return null;
+    }
+    return _DetailSection(
+      key: const Key('item-detail-section-properties'),
+      title: 'Properties',
+      children: [
+        Wrap(
+          spacing: tokens.spaceSm,
+          runSpacing: tokens.spaceSm,
+          children: [
+            for (final tile in tiles) SizedBox(width: 180, child: tile),
+          ],
+        ),
+      ],
     );
   }
 
@@ -243,6 +283,27 @@ class _DetailBody extends StatelessWidget {
   }
 }
 
+/// A vertical stack with the 16 px section rhythm.
+class _Stack extends StatelessWidget {
+  const _Stack({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var index = 0; index < children.length; index++) ...[
+          if (index > 0) SizedBox(height: tokens.spaceLg),
+          children[index],
+        ],
+      ],
+    );
+  }
+}
+
 class _Header extends StatelessWidget {
   const _Header({required this.detail});
 
@@ -250,53 +311,46 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final tokens = AppTokens.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           key: const Key('item-detail-icon-placeholder'),
-          width: 128,
-          height: 128,
+          width: 120,
+          height: 120,
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12),
+            color: tokens.surfaceRaised,
+            border: Border.all(color: tokens.border),
+            borderRadius: BorderRadius.circular(tokens.radiusSm),
           ),
-          child: Icon(
-            Icons.inventory_2_outlined,
-            size: 56,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          child: Icon(Icons.inventory_2_outlined, size: 52, color: tokens.dim),
         ),
-        const SizedBox(width: 20),
+        SizedBox(width: tokens.spaceXl),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AppSectionLabel('Item ${detail.id}'),
+              SizedBox(height: tokens.spaceXs),
               Text(
                 detail.name,
                 key: const Key('item-detail-name'),
-                style: theme.textTheme.headlineSmall,
+                style: tokens.h1Style,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: tokens.spaceXs),
               Text(
                 detail.shortName,
                 key: const Key('item-detail-short-name'),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: tokens.dataStyle.copyWith(color: tokens.muted),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: tokens.spaceMd),
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: tokens.spaceSm,
+                runSpacing: tokens.spaceSm,
                 children: [
                   for (final type in detail.types)
-                    Chip(
-                      label: Text(humanizeLabel(type)),
-                      visualDensity: VisualDensity.compact,
-                    ),
+                    _TagChip(label: humanizeLabel(type)),
                 ],
               ),
             ],
@@ -359,11 +413,8 @@ class _WeaponSection extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final slot in properties.slots)
-                Chip(
-                  label: Text(
-                    slot.required ? '${slot.name} · required' : slot.name,
-                  ),
-                  visualDensity: VisualDensity.compact,
+                _TagChip(
+                  label: slot.required ? '${slot.name} · required' : slot.name,
                 ),
             ],
           ),
@@ -548,13 +599,13 @@ class _DetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: title),
-        const SizedBox(height: 8),
-        ...children,
-      ],
+    return AppPanel(
+      label: title,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: children,
+      ),
     );
   }
 }
@@ -570,26 +621,64 @@ class _PropertyRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceXs),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 180,
+            width: 170,
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
           ),
           Expanded(
             child:
-                child ?? Text(value ?? '', style: theme.textTheme.bodyMedium),
+                child ??
+                Text(
+                  value ?? '',
+                  style: tokens.dataStyle.copyWith(color: tokens.text),
+                ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A quiet bordered tag that keeps its sentence-case label.
+///
+/// [AppChip] uppercases by design; item categories and slots are proper names,
+/// so they get the same geometry without the case transform.
+class _TagChip extends StatelessWidget {
+  const _TagChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Container(
+      height: 24,
+      padding: EdgeInsets.symmetric(horizontal: tokens.spaceMd),
+      decoration: BoxDecoration(
+        color: tokens.surfaceRaised,
+        border: Border.all(color: tokens.borderSoft),
+        borderRadius: BorderRadius.circular(tokens.radiusPill),
+      ),
+      child: Center(
+        widthFactor: 1,
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: tokens.bodyStyle.copyWith(
+            fontSize: tokens.dataSize,
+            color: tokens.muted,
+          ),
+        ),
       ),
     );
   }
@@ -603,39 +692,34 @@ class _NotFoundState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.inventory_2_outlined,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
+            Icon(Icons.inventory_2_outlined, size: 48, color: tokens.dim),
+            SizedBox(height: tokens.spaceMd),
             Text(
               'Item no longer available',
               key: const Key('item-detail-not-found'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               'Item $itemId is not in the current dataset. It may have been '
               'removed upstream.',
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
-            const SizedBox(height: 16),
-            FilledButton.tonal(
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
               key: const Key('item-detail-back'),
+              label: 'Back to catalog',
+              variant: AppButtonVariant.secondary,
               onPressed: onBack,
-              child: const Text('Back to catalog'),
             ),
           ],
         ),
@@ -652,36 +736,35 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
-            const SizedBox(height: 12),
+            Icon(Icons.error_outline, size: 48, color: tokens.danger),
+            SizedBox(height: tokens.spaceMd),
             Text(
               'Could not load this item.',
               key: const Key('item-detail-error'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               '$error',
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
-            const SizedBox(height: 16),
-            OutlinedButton(
+            SizedBox(height: tokens.spaceLg),
+            AppButton(
               key: const Key('item-detail-retry'),
+              label: 'Retry',
+              variant: AppButtonVariant.secondary,
               onPressed: onRetry,
-              child: const Text('Retry'),
             ),
           ],
         ),

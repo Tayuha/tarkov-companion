@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:material_ui/material_ui.dart';
+import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import 'src/app_paths.dart';
 import 'src/app_root.dart';
@@ -41,9 +42,9 @@ class _TarkovCompanionAppState extends State<TarkovCompanionApp> {
     return MaterialApp(
       title: 'Tarkov Companion',
       navigatorKey: _navigatorKey,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: buildAppTheme(),
+      darkTheme: buildAppTheme(),
+      themeMode: ThemeMode.dark,
       builder: (context, child) {
         return Shortcuts(
           shortcuts: const <ShortcutActivator, Intent>{

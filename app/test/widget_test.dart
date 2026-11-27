@@ -148,6 +148,24 @@ void main() {
     expect(find.byKey(const Key('home-rail-quests-label')), findsOneWidget);
   });
 
+  testWidgets('the app installs the phosphor design system', (tester) async {
+    await tester.pumpWidget(
+      TarkovCompanionApp(openSession: () async => _readySession(hasData: true)),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final theme = Theme.of(tester.element(find.byType(HomeShell)));
+    final tokens = theme.extension<AppTokens>();
+
+    expect(tokens, isNotNull);
+    expect(theme.brightness, Brightness.dark);
+    expect(theme.scaffoldBackgroundColor, tokens!.background);
+    expect(theme.colorScheme.primary, tokens.accent);
+    expect(theme.colorScheme.surface, tokens.surface);
+    expect(theme.textTheme.bodyMedium?.fontFamily, tokens.uiFontFamily);
+  });
+
   testWidgets('the first frame is a local loading shell while the database '
       'opens', (tester) async {
     await tester.pumpWidget(

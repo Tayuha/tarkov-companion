@@ -1,6 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
+
 /// One selectable category in the catalog filter bar.
 ///
 /// The item catalog only stores category ids and the data package does not own
@@ -90,6 +93,7 @@ class CatalogFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     final categoryLabel = _categoryLabel(filters);
     final activeChips = <Widget>[
       if (_text(filters) case final text?)
@@ -122,14 +126,14 @@ class CatalogFilterBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          spacing: 16,
-          runSpacing: 8,
+          spacing: tokens.spaceLg,
+          runSpacing: tokens.spaceSm,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SizedBox(
               width: 230,
-              child: DropdownButton<String>(
-                key: const Key('catalog-category-filter'),
+              child: _DropdownField<String>(
+                fieldKey: const Key('catalog-category-filter'),
                 value: _categoryId(filters) ?? '',
                 isExpanded: true,
                 items: [
@@ -150,8 +154,8 @@ class CatalogFilterBar extends StatelessWidget {
             ),
             SizedBox(
               width: 180,
-              child: DropdownButton<String>(
-                key: const Key('catalog-type-filter'),
+              child: _DropdownField<String>(
+                fieldKey: const Key('catalog-type-filter'),
                 value: _type(filters) ?? '',
                 isExpanded: true,
                 items: [
@@ -167,26 +171,31 @@ class CatalogFilterBar extends StatelessWidget {
                 ),
               ),
             ),
-            FilterChip(
+            AppChip(
               key: const Key('catalog-flea-filter'),
-              label: const Text('Flea eligible'),
+              label: 'Flea eligible',
               selected: filters.fleaEligible == true,
-              onSelected: (selected) =>
-                  onFleaEligibleSelected(selected ? true : null),
+              onTap: () => onFleaEligibleSelected(
+                filters.fleaEligible == true ? null : true,
+              ),
             ),
             if (filters.isNotEmpty)
-              TextButton.icon(
+              AppButton(
                 key: const Key('catalog-reset-filters'),
+                label: 'Reset',
+                variant: AppButtonVariant.ghost,
                 onPressed: onReset,
-                icon: const Icon(Icons.filter_alt_off_outlined, size: 18),
-                label: const Text('Reset'),
               ),
           ],
         ),
         if (activeChips.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Wrap(spacing: 8, runSpacing: 4, children: activeChips),
+            padding: EdgeInsets.only(top: tokens.spaceSm),
+            child: Wrap(
+              spacing: tokens.spaceSm,
+              runSpacing: tokens.spaceXs,
+              children: activeChips,
+            ),
           ),
       ],
     );
@@ -221,6 +230,54 @@ class CatalogFilterBar extends StatelessWidget {
   }
 }
 
+/// A dropdown framed like a phosphor input: raised fill, one-pixel border.
+class _DropdownField<T> extends StatelessWidget {
+  const _DropdownField({
+    required this.fieldKey,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.isExpanded,
+  });
+
+  final Key fieldKey;
+  final T value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Container(
+      height: 30,
+      padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+      decoration: BoxDecoration(
+        color: tokens.surfaceRaised,
+        border: Border.all(color: tokens.border),
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          key: fieldKey,
+          value: value,
+          isExpanded: isExpanded,
+          isDense: true,
+          dropdownColor: tokens.surfaceRaised,
+          icon: Icon(Icons.expand_more, size: tokens.h2Size, color: tokens.dim),
+          style: tokens.bodyStyle,
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
+/// An active filter rendered as a removable token.
+///
+/// It deliberately keeps the sentence-case label and the close icon that the
+/// existing filter tests drive, while the container uses the chip geometry.
 class _ActiveFilterChip extends StatelessWidget {
   const _ActiveFilterChip({
     super.key,
@@ -233,11 +290,38 @@ class _ActiveFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InputChip(
-      label: Text(label),
-      onDeleted: onDeleted,
-      deleteIcon: const Icon(Icons.close, size: 16),
-      visualDensity: VisualDensity.compact,
+    final tokens = AppTokens.of(context);
+    return Container(
+      height: 24,
+      padding: EdgeInsets.only(left: tokens.spaceMd, right: tokens.spaceXs),
+      decoration: BoxDecoration(
+        color: tokens.accentDeep,
+        border: Border.all(color: tokens.accent),
+        borderRadius: BorderRadius.circular(tokens.radiusPill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: tokens.labelStyle.copyWith(
+              color: tokens.accent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(width: tokens.spaceXs),
+          InkWell(
+            onTap: onDeleted,
+            borderRadius: BorderRadius.circular(tokens.radiusPill),
+            child: Padding(
+              padding: EdgeInsets.all(tokens.spaceXs),
+              child: Icon(Icons.close, size: 12, color: tokens.accent),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
