@@ -1598,18 +1598,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 85,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
+      "notes": "Merged as a620d94. Shell renders from any applied dataset, background update after first frame; startup_flow_test holds the manifest future.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795759028454,
-      "archived": false,
-      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
+      "updatedAt": 1795759973901,
+      "archived": false
     },
     {
       "id": "task_impl_8_3",
@@ -1620,18 +1619,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 85,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
+      "notes": "Merged as a620d94. Footer update controls: off/daily/weekly, Check now, last outcome/error, thin progress, persisted settings keys.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795759028454,
-      "archived": false,
-      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
+      "updatedAt": 1795759973901,
+      "archived": false
     },
     {
       "id": "task_impl_8_4",
@@ -1726,18 +1724,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 2,
+      "categoryID": "done",
+      "position": 85,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
+      "notes": "Merged as a620d94. About screen: app/bundle versions, dataset age, MIT, tarkov.dev attribution, trademark and no-art notice; golden about_900.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795759028454,
-      "archived": false,
-      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
+      "updatedAt": 1795759973901,
+      "archived": false
     },
     {
       "id": "task_impl_8_9",
