@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarkov Companion — Visual Concept</title>
+<style>
+  :root {
+    --void:#0C0E0C; --surface:#141714; --surface2:#1A1E1A; --border:#2C332C;
+    --bone:#E8E2CF; --muted:#8F9385; --dim:#5E655B; --orange:#E08A3C;
+    --green:#6FA96F; --red:#C05A4A; --cyan:#6FB7C4; --gold:#C9A35C;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--void); color:var(--bone);
+    font-family: "Fira Sans Condensed", system-ui, sans-serif; }
+  header { padding: 48px 48px 24px; border-bottom: 1px solid var(--border); }
+  .kicker { font: 10px "DejaVu Sans Mono", monospace; letter-spacing: 1.6px;
+    text-transform: uppercase; color: var(--orange); }
+  h1 { margin: 10px 0 8px; font-size: 44px; letter-spacing: .4px; }
+  header p { margin: 0; max-width: 900px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .tokens { display:flex; flex-wrap:wrap; gap:14px; padding: 24px 48px; }
+  .swatch { width: 120px; }
+  .swatch i { display:block; height: 48px; border:1px solid var(--border); border-radius:2px; }
+  .swatch b { display:block; margin-top:6px; font: 10px "DejaVu Sans Mono", monospace;
+    letter-spacing:1px; text-transform:uppercase; }
+  .swatch span { color: var(--dim); font: 9px "DejaVu Sans Mono", monospace; }
+  main { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; padding: 24px 48px 64px; }
+  figure { margin:0; border:1px solid var(--border); background: var(--surface); }
+  figure img { display:block; width:100%; height:auto; }
+  figcaption { display:flex; justify-content:space-between; align-items:baseline;
+    padding: 12px 14px; border-top:1px solid var(--border); font-size: 13px; }
+  figcaption span { font: 9px "DejaVu Sans Mono", monospace; letter-spacing:1px;
+    text-transform:uppercase; color: var(--dim); }
+  .wide { grid-column: 1 / -1; }
+  footer { padding: 0 48px 48px; color: var(--dim); font: 10px "DejaVu Sans Mono", monospace;
+    letter-spacing: 1px; text-transform: uppercase; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } header { padding: 28px 20px 18px; }
+    .tokens { padding: 18px 20px; } main { padding: 18px 20px 48px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Tarkov Companion / Visual System v0.1</div>
+  <h1>Dense data. Quiet chrome. Local first.</h1>
+  <p>Database for Tarkov density and hierarchy, with Tarkov Tracker's olive palette, monospace stats and
+  confirmed-progress language. Concept only — the Linux app currently uses plain Material widgets.</p>
+</header>
+<section class="tokens">
+  <div class="swatch"><i style="background:#0C0E0C"></i><b>Void</b><span>#0C0E0C</span></div>
+  <div class="swatch"><i style="background:#141714"></i><b>Surface</b><span>#141714</span></div>
+  <div class="swatch"><i style="background:#1A1E1A"></i><b>Surface 2</b><span>#1A1E1A</span></div>
+  <div class="swatch"><i style="background:#2C332C"></i><b>Border</b><span>#2C332C</span></div>
+  <div class="swatch"><i style="background:#E8E2CF"></i><b>Bone</b><span>#E8E2CF</span></div>
+  <div class="swatch"><i style="background:#E08A3C"></i><b>Orange</b><span>#E08A3C</span></div>
+  <div class="swatch"><i style="background:#6FA96F"></i><b>Green</b><span>#6FA96F</span></div>
+  <div class="swatch"><i style="background:#C05A4A"></i><b>Red</b><span>#C05A4A</span></div>
+</section>
+<main>
+  <figure class="wide">
+    <img src="01-items.png" alt="Desktop Items screen">
+    <figcaption>01 · Desktop · Items <span>1440 × 900</span></figcaption>
+  </figure>
+  <figure class="wide">
+    <img src="02-quests.png" alt="Desktop Quests screen">
+    <figcaption>02 · Desktop · Quests <span>1440 × 900</span></figcaption>
+  </figure>
+  <figure>
+    <img src="03-mobile-items.png" alt="Mobile Items screen">
+    <figcaption>03 · Mobile · Items <span>390 × 844</span></figcaption>
+  </figure>
+  <figure>
+    <img src="04-mobile-quests.png" alt="Mobile Quests screen">
+    <figcaption>04 · Mobile · Quests <span>390 × 844</span></figcaption>
+  </figure>
+  <figure class="wide">
+    <img src="00-tokens.png" alt="Visual system tokens page">
+    <figcaption>00 · Tokens &amp; Type <span>Palette, scale, components</span></figcaption>
+  </figure>
+</main>
+<footer>Independent fan project · not affiliated with Battlestate Games · no game art bundled</footer>
+</body>
+</html>

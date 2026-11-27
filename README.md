@@ -11,6 +11,8 @@ flea market, and track quest progress — on your machine, offline, without an a
 > AppImage packaging. The Linux approval gate and the remaining backlog are tracked in
 > [`HANDOFF.md`](HANDOFF.md) and `kanban-board.json`. Windows and mobile are deferred until the Linux
 > build is approved.
+>
+> Visual concept: [`design/README.md`](design/README.md) — FigCraft pages, tokens and previews.
 
 ## Why
 
