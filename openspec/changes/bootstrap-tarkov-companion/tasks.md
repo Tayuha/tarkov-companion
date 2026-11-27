@@ -50,14 +50,14 @@
 - [x] 5.1 Implement the catalog query layer with pagination, category/type/flea filters, and sorting, verified by query tests covering each filter alone and in combination
 - [x] 5.2 Build the catalog screen with virtualized rows, debounced search, active-filter chips, and a reset action, verified by a widget test covering typing, filtering, empty state, and reset
 - [x] 5.3 Implement the item detail view with type-specific property rendering and omission of non-applicable properties, verified by golden widget tests for a weapon, ammunition, armor, and a barter-only item
-- [ ] 5.4 Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships
-- [ ] 5.5 Implement price presentation with source, observation time, 48-hour direction, and explicit missing-data states, verified by widget tests for complete, missing-flea, and zero-price fixtures
-- [ ] 5.6 Implement the disk-backed image cache with lazy loading, placeholder fallback, and a size budget, verified by tests for cache hit offline, failed fetch, and eviction at the budget
-- [ ] 5.7 Implement on-demand price history fetch, caching with TTL, and the chart view including the offline-without-cache state, verified by tests for fetch, cache hit, TTL expiry, and offline miss
-- [ ] 5.8 Implement item deep links by game identifier with resolved and removed-item states, verified by tests opening a known id and a deleted id against a fixture dataset
-- [ ] 5.9 Add a catalog performance test asserting p95 query latency under 50 ms and initial render under 1.5 s with the full fixture set, verified by the test running in CI
+- [x] 5.4 Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships
+- [x] 5.5 Implement price presentation with source, observation time, 48-hour direction, and explicit missing-data states, verified by widget tests for complete, missing-flea, and zero-price fixtures
+- [x] 5.6 Implement the disk-backed image cache with lazy loading, placeholder fallback, and a size budget, verified by tests for cache hit offline, failed fetch, and eviction at the budget
+- [x] 5.7 Implement on-demand price history fetch, caching with TTL, and the chart view including the offline-without-cache state, verified by tests for fetch, cache hit, TTL expiry, and offline miss
+- [x] 5.8 Implement item deep links by game identifier with resolved and removed-item states, verified by tests opening a known id and a deleted id against a fixture dataset
+- [x] 5.9 Add a catalog performance test asserting p95 query latency under 50 ms and initial render under 1.5 s with the full fixture set, verified by the test running in CI
 
-- [ ] 5.10 Expose item category labels from the bundle categories/`gameRecords` so the catalog filter uses real names, verified by a category query test returning id/name pairs and a widget test using the loaded options
+- [x] 5.10 Expose item category labels from the bundle categories/`gameRecords` so the catalog filter uses real names, verified by a category query test returning id/name pairs and a widget test using the loaded options
 
 ## 6. Quest tracker
 
@@ -94,8 +94,8 @@
 - [ ] 8.2 Implement non-blocking startup that renders from the last dataset before any network call, verified by a test that delays the manifest response and asserts the first frame still renders
 - [ ] 8.3 Implement update check controls (schedule, manual check, last check time/outcome) with non-modal indicators, verified by widget tests for each outcome and preference combination
 - [ ] 8.4 Implement offline and upstream-error states across catalog, quests, and history views with retry, verified by widget tests with a failing network layer
-- [ ] 8.5 Implement window geometry persistence with display clamping and a minimum size, verified by tests for restored geometry and an off-screen saved position
-- [ ] 8.6 Implement single-instance focusing on Linux, verified by a manual test launching twice and observing one window is focused
+- [x] 8.5 Implement window geometry persistence with display clamping and a minimum size, verified by tests for restored geometry and an off-screen saved position
+- [x] 8.6 Implement single-instance focusing on Linux, verified by a manual test launching twice and observing one window is focused
 - [ ] 8.7 Implement keyboard navigation and visible focus for the catalog and quest lists, verified by widget tests driving focus traversal without pointer input
 - [ ] 8.8 Implement the about screen showing app version, data bundle version, dataset age, license, and attribution, verified by a golden widget test
 - [x] 8.9 Build the Linux package (AppImage preferred, .deb optional) in CI with version metadata and checksums, verified by running it on a clean Linux environment and launching, syncing, and browsing; this is the gate before Windows/mobile packaging resumes
