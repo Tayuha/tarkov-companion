@@ -1299,17 +1299,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 6,
+      "categoryID": "done",
+      "position": 53,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
+      "notes": "Merged as 015228a. Unavailable-upstream panel for orphaned progress, Catalog/Available segment with Level/Trader/Map/Name ordering and empty state, game-mode scoping from task payload, docs/quest-tracking.md state table. +14 data/+4 feature tests; list goldens refreshed.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
+      "updatedAt": 1795758495844,
+      "archived": false
     },
     {
       "id": "task_impl_6_9",
@@ -1320,17 +1319,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 7,
+      "categoryID": "done",
+      "position": 54,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
+      "notes": "Merged as 015228a. Unavailable-upstream panel for orphaned progress, Catalog/Available segment with Level/Trader/Map/Name ordering and empty state, game-mode scoping from task payload, docs/quest-tracking.md state table. +14 data/+4 feature tests; list goldens refreshed.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
+      "updatedAt": 1795758495844,
+      "archived": false
     },
     {
       "id": "task_impl_6_10",
@@ -1341,17 +1339,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 8,
+      "categoryID": "done",
+      "position": 55,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
+      "notes": "Merged as 015228a. Unavailable-upstream panel for orphaned progress, Catalog/Available segment with Level/Trader/Map/Name ordering and empty state, game-mode scoping from task payload, docs/quest-tracking.md state table. +14 data/+4 feature tests; list goldens refreshed.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
+      "updatedAt": 1795758495844,
+      "archived": false
     },
     {
       "id": "task_impl_6_11",
@@ -1362,17 +1359,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 9,
+      "categoryID": "done",
+      "position": 56,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
+      "notes": "Merged as 015228a. Unavailable-upstream panel for orphaned progress, Catalog/Available segment with Level/Trader/Map/Name ordering and empty state, game-mode scoping from task payload, docs/quest-tracking.md state table. +14 data/+4 feature tests; list goldens refreshed.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
+      "updatedAt": 1795758495844,
+      "archived": false
     },
     {
       "id": "task_impl_7_1",

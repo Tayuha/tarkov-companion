@@ -68,10 +68,10 @@
 - [x] 6.5 Build the quest detail view with objectives, requirements, rewards, unlocks, maps, and wiki link, verified by golden widget tests for quests with item, kill, and visit objectives
 - [x] 6.6 Implement quest state transitions with immediate persistence and dependency recomputation, verified by integration tests for complete, revert, and unaffected-sibling cases
 - [x] 6.7 Implement objective-level counters with derived quest completion and a confirmed manual override, verified by tests for partial progress, derived completion, and override without altering counts
-- [ ] 6.8 Implement separation of progress that references quests missing from the active dataset, verified by a test loading a profile that references a removed quest and asserting it is listed as unavailable and excluded from dependency math
-- [ ] 6.9 Implement the available-quests view with selectable ordering and an explanatory empty state, verified by widget tests for a populated list and for a profile with nothing available
-- [ ] 6.10 Implement game-mode scoping so the tracker reads only the active mode's quest dataset, verified by a test asserting a PvE-only quest is absent under the regular profile
-- [ ] 6.11 Document quest state semantics and override behavior in `docs/quest-tracking.md`, verified by the documented state table matching the implementation tests
+- [x] 6.8 Implement separation of progress that references quests missing from the active dataset, verified by a test loading a profile that references a removed quest and asserting it is listed as unavailable and excluded from dependency math
+- [x] 6.9 Implement the available-quests view with selectable ordering and an explanatory empty state, verified by widget tests for a populated list and for a profile with nothing available
+- [x] 6.10 Implement game-mode scoping so the tracker reads only the active mode's quest dataset, verified by a test asserting a PvE-only quest is absent under the regular profile
+- [x] 6.11 Document quest state semantics and override behavior in `docs/quest-tracking.md`, verified by the documented state table matching the implementation tests
 
 - [x] 6.12 Expose trader and map labels for the quest filters from the traders/maps tables (or gameRecords) instead of caller-supplied options, verified by a label query test and a widget test using the loaded labels
 
