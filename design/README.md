@@ -22,6 +22,7 @@ This is an independent fan project. No game artwork is bundled; item images are 
 | `preview/04-mobile-quests.png` | Mobile Quests |
 | `preview/05-items-night-vision.png` | Items in the chosen phosphor variant |
 | `preview/06-items-1920-nv.png` | Phosphor Items at 1920×1080 |
+| `preview/07-quests-1920-nv.png` | Phosphor Quests at 1920×1080 |
 | `preview/index.html` | Gallery of the five previews |
 
 ## Pages
@@ -37,6 +38,8 @@ This is an independent fan project. No game artwork is bundled; item images are 
    phosphor green; the original document is untouched.
 7. **05 · Wide · Items 1920** — 1920×1080 in the phosphor file. Extra width buys two columns
    (Buy Limit, Updated) and a 506 px inspector; 11 rows fit without scrolling.
+8. **06 · Wide · Quests 1920** — 1920×1080. A 104 px trader strip, 580 px task list and 1152 px detail;
+   the extra height is used for a quest chain and a location panel under the objectives.
 
 ## Items refinement (option 1)
 
@@ -78,7 +81,7 @@ The layout is adaptive, not scaled:
 | 1024–1279 | Compact: hide Slots and Weight, keep Item/Flea/24h/Trader; inspector narrows. |
 | 1280–1439 | Standard: hide Slots; keep Weight and trader summary. |
 | 1440–1919 | Full: the six-column Items page in this document. |
-| 1920+ | Wide (second monitor): add Buy Limit and Updated, 1330 px table + 506 px inspector. |
+| 1920+ | Wide (second monitor): Items adds Buy Limit/Updated with a 1330 px table + 506 px inspector; Quests uses a 580 px list + 1152 px detail with quest chain and map. |
 | ≥ 2560 | Cap the content width; do not stretch the table further. |
 
 The 1920 page is the reference for the second-monitor case. It is not a 1.33× scale of the 1440 page: it
