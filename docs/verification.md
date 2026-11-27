@@ -68,7 +68,7 @@ Record the exact window title, any status strip text, and the result for each ro
 | O10 | Profiles tab: activate a profile, export it, then re-import it. | All three actions work with networking off because they use local files and SQLite. The confirmation names the written path. | ☐ pass ☐ fail |
 | O11 | About screen from the footer. | App version `0.1.0`, bundle version/age, dataset counts, MIT licence, tarkov.dev attribution, and the no-bundled-game-art statement render. | ☐ pass ☐ fail |
 | O12 | Footer update control. | Last outcome is **Offline** or **Last update check failed**; **Check now** returns to idle without a crash or a dialog that blocks browsing. | ☐ pass ☐ fail |
-| O13 | Image cache (known gap). | **Blocked in this build.** `ItemImageCache` is implemented and unit-tested, but `HomeShell` does not receive one, so images render as placeholders and no `assets.tarkov.dev` request is made. The cache hit/miss/eviction behaviour must be re-checked once the shell wires the cache. | ☐ pass ☐ fail |
+| O13 | Image cache. | Open an item with artwork: the image loads through `assets.tarkov.dev` and a file appears under `<data>/cache/images`. Restart offline and reopen the item: the same image loads from disk without a request. `du -sh` stays at or below 32 MiB. | ☐ pass ☐ fail |
 | O14 | Reconnect and press **Retry** / **Check now**. | The check reaches the manifest, reports the current data, and the offline strip clears. No data is lost. | ☐ pass ☐ fail |
 
 ### First run with no network
@@ -222,7 +222,7 @@ result of each step.
 | Gap | Evidence |
 |---|---|
 | Recovery offers no export or restore action. | `app/lib/src/app_root.dart` renders static recovery text: “Export and recovery actions arrive in the release-readiness task.” Task 9.3 requires an export offer. |
-| Item artwork is not wired into the preview shell. | No `ItemImageCache` is constructed under `app/lib`. `HomeShell` has no `imageCache` parameter, so catalog/detail widgets always receive `null` and render placeholders. The cache itself passes its unit tests. |
+| Price history has no production source. | The published bundle has no history endpoint. `PriceHistoryRepository` is injectable and tested; the detail screen shows the documented unavailable state until a history source is allowlisted. |
 | `host_allowlist.dart` still says GitHub hosts an app-update release page. | The client has no URL launcher and no self-updater; this document corrects the claim, but the code comment is out of scope for this change. |
 
 ## Sign-off

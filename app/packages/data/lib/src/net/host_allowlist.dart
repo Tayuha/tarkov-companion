@@ -14,9 +14,10 @@ abstract final class NetworkAllowlist {
   /// The production allowlist.
   ///
   /// * `github.com` — the stable release-manifest URL
-  ///   (`https://github.com/Tayuha/tarkov-companion/releases/download/...`)
-  ///   and the release page that hosts app-update links. GitHub answers a
-  ///   release-asset download with a redirect to a CDN host below.
+  ///   (`https://github.com/Tayuha/tarkov-companion/releases/download/...`).
+  ///   GitHub answers a release-asset download with a redirect to a CDN host
+  ///   below. The client has no browser/update launcher, so no release page is
+  ///   opened from here.
   /// * `objects.githubusercontent.com` — one of the two hosts GitHub redirects
   ///   release-asset downloads to. It is where the manifest and the
   ///   `.jsonl.zst` dataset bytes are actually served.
