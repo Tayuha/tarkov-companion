@@ -1996,16 +1996,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 46,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_design"
       ],
-      "notes": "In progress in worktree t812-design-system. Phosphor tokens ThemeExtension, dark ThemeData, type/spacing, primitives (panel/button/chip/status/stat/progress), bundled Fira Sans Condensed + DejaVu Sans Mono, contrast and golden tests. No screen migration yet.",
+      "notes": "Completed 2026-11-26 in worktree t812-design-system (session ses_de4a81ec8ffevNZXgQj5Datuzm), merged as 6f1b63a. AppTokens ThemeExtension, dark ThemeData, 8 primitives, bundled Fira/DejaVu fonts + licenses, contrast tests (15.87:1 text/surface), 1x gallery golden, 21 tests. Not installed in main.dart yet; T8.13/T8.14 install and migrate screens. Branch 51a1b18.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795755083511,
+      "updatedAt": 1795755694913,
       "archived": false,
       "sessionID": "ses_de4a81ec8ffevNZXgQj5Datuzm"
     },
