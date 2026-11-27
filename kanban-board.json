@@ -47,55 +47,6 @@
       "color": "#06b6d4"
     }
   ],
-  "tagsByProject": {
-    "6a899da73a686420004607329ac3b196effb3411": [
-      {
-        "id": "tag_decision",
-        "name": "decision",
-        "color": "#c69026"
-      },
-      {
-        "id": "tag_spike",
-        "name": "spike",
-        "color": "#5b8def"
-      },
-      {
-        "id": "tag_legal",
-        "name": "legal",
-        "color": "#b05ccc"
-      },
-      {
-        "id": "tag_data",
-        "name": "data",
-        "color": "#2f9e6e"
-      },
-      {
-        "id": "tag_infra",
-        "name": "infra",
-        "color": "#8a8f98"
-      },
-      {
-        "id": "tag_design",
-        "name": "design",
-        "color": "#e0638c"
-      },
-      {
-        "id": "tag_planning",
-        "name": "planning",
-        "color": "#64748b"
-      },
-      {
-        "id": "tag_implementation",
-        "name": "implementation",
-        "color": "#f59e0b"
-      },
-      {
-        "id": "tag_app",
-        "name": "app",
-        "color": "#06b6d4"
-      }
-    ]
-  },
   "categories": [
     {
       "id": "backlog",
@@ -411,10 +362,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_dec1a9b3cffeu6w8Wia010VBXL",
       "notes": "Completed 2026-11-25 in session ses_dec1a9b3cffeu6w8Wia010VBXL. 1,665,700 bytes total (1.59 MB). Regular: 60 items, 80 tasks, 16 traders, 26 hideout, 20 crafts, 20 barters, 2 maps + mobs, 120 price points. pve/pvp-season markers plus season and status. Deterministic capture script (npm run fixtures) and pure trim module. 44 tests, lint/build/validate green. Commit a0c3437. Known: 2 upstream-stale item pointers, 14 task pointers (11 upstream, 3 trimming), 1 maps btrStops, 9 mode-marker pointers; all recorded in manifests, no missing dictionary keys.",
       "createdAt": 1795630277636,
-      "updatedAt": 1795631014762,
+      "updatedAt": 1795743597686,
       "archived": false
     },
     {
@@ -432,10 +382,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_dec0a0ce5ffeaJuDXfHPDKkC0U",
       "notes": "Completed 2026-11-25 in session ses_dec0a0ce5ffeaJuDXfHPDKkC0U. 14 zod modules + registry + fixtures CLI; 12 dataset files, 8 dictionaries PASS. Tolerant of unknown fields, strict on known ones; mutation and registry-coverage tests. 72 tests at handoff, 73 after review fix. Commits f46884e, 6692800. Review fix: pve/pvp-season datasets now resolve through the regular contract instead of returning undefined and silently skipping validation.",
       "createdAt": 1795631224402,
-      "updatedAt": 1795631933222,
+      "updatedAt": 1795743597693,
       "archived": false
     },
     {
@@ -453,10 +402,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_debfe5fa6ffeS7SVlc0I6Q0KoX",
       "notes": "Completed 2026-11-25 in session ses_debfe5fa6ffeS7SVlc0I6Q0KoX. Conditional If-None-Match / If-Modified-Since per dataset and dictionary, explicit not-modified union (no body read), SHA-256 over canonical localized JSON with changed flag, atomic per-key file cache under .cache/pipeline (gitignored), 88 tests across 7 files, statuses 200/304/429/500/404 covered. Commit 08230bd. Capture script forces refresh on 304.",
       "createdAt": 1795631992415,
-      "updatedAt": 1795632359393,
+      "updatedAt": 1795743597698,
       "archived": false
     },
     {
@@ -474,10 +422,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_debf743f9ffemMNoSQBc5F5nXY",
       "notes": "Completed 2026-11-25 in session ses_debf743f9ffemMNoSQBc5F5nXY. 7 dataset normalizers emitting kind-tagged JSONL with stable camelCase fields, *Id references, price objects, 23 typed objective variants, deterministic kind+id ordering, golden files (890,950 bytes), 103 tests. Commits e4434a1, a126026. Review fix: buy offers now preserve currencyItemId, restockAmount, taskUnlockId; sell offers preserve currencyItemId, so items dropped fields went 138 -> 0. Remaining drops: 16 denormalized worn-item names and one craftUnlock.trader_name, both joined by id in the client.",
       "createdAt": 1795632452691,
-      "updatedAt": 1795633340775,
+      "updatedAt": 1795743597702,
       "archived": false
     },
     {
@@ -495,10 +442,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_debe2f492ffearfEQWeOWDHkNU",
       "notes": "Completed 2026-11-25 in session ses_debe2f492ffearfEQWeOWDHkNU. Node built-in zstd (level 3, requires Node >=24), per-mode manifest + .jsonl.zst layout, canonical manifest, SHA-256/sizes/records/source metadata, stale asset cleanup, manifest written last. Regular bundle: 7 datasets, 1,064 records, 890,950 B -> 133,008 B (6.70x). Two builds byte-identical. Commit 3231a0a. Review: aligned design layout and root README Node 24+; per-mode manifest is now the documented contract.",
       "createdAt": 1795633787042,
-      "updatedAt": 1795634292884,
+      "updatedAt": 1795743597716,
       "archived": false
     },
     {
@@ -516,10 +462,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_debdb6fe2ffexwZSmEj2TUo6jH",
       "notes": "Completed 2026-11-25 in session ses_debdb6fe2ffexwZSmEj2TUo6jH. compareBundles with added/changed/unchanged/removed and reasons, content-only comparison (timestamps ignored), contract bumps force changed, typed manifest errors, compare CLI with --json, bundle --previous no-op writes nothing and exits 0. 135 tests. Commit 16f48cf.",
       "createdAt": 1795634292884,
-      "updatedAt": 1795634683547,
+      "updatedAt": 1795743597725,
       "archived": false
     },
     {
@@ -538,10 +483,9 @@
         "tag_data",
         "tag_infra"
       ],
-      "sessionID": "ses_debd54a65ffeZJJCjKWemkbwZ4",
       "notes": "Completed 2026-11-25 in session ses_debd54a65ffeZJJCjKWemkbwZ4. Per-mode rolling releases data-<mode>-latest with stable manifest URL; content-addressed <dataset>-<sha12>.jsonl.zst assets uploaded first, manifest last; no-op on identical content; optional --prune. GhReleaseClient via execFile with GH_TOKEN mapping. Manual test release created, published twice (second no-op), manifest downloaded and verified, release deleted. 167 tests. Commit 16e5858.",
       "createdAt": 1795634683547,
-      "updatedAt": 1795635475815,
+      "updatedAt": 1795743597730,
       "archived": false
     },
     {
@@ -560,10 +504,9 @@
         "tag_data",
         "tag_infra"
       ],
-      "sessionID": "ses_debc9307cffeZjp8XBkW5muRiC",
       "notes": "Completed 2026-11-26 in session ses_debc9307cffeZjp8XBkW5muRiC. Sync CLI: fetch -> zod -> normalize -> bundle -> publish with conditional cache and normalized JSONL reuse; 304 without cache forces one refetch; validation failure blocks the mode. Workflow: cron 0 */6 * * *, dispatch, contents/issues write, concurrency, 30 min, Actions cache, failure issue #1 lifecycle. Live: run 45801870719 initial publish (8050/8048/8018 records), 45802212812 republished volatile items/traders, 45802439739 true no-op (0 uploads, 7 skips). Releases data-{regular,pve,pvp-season}-latest verified by manifest/asset sha256. 195 tests. Commits 5ec0857, 15b66ef.",
       "createdAt": 1795635475815,
-      "updatedAt": 1795689349262,
+      "updatedAt": 1795743597733,
       "archived": false
     },
     {
@@ -581,10 +524,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_de892b956ffeeJhFxMQLceT17q",
       "notes": "Completed 2026-11-26 in session ses_de892b956ffeeJhFxMQLceT17q. docs/data-bundles.md completed: layout, manifest field table, localization contract, normalization conventions, zstd/determinism, client resolution algorithm, versioning policy, hand-build tutorial. validate:bundle CLI checks manifest schema, paths, sizes, sha256, zstd, JSONL, kind/id, duplicates, count, placeholders, minAppSchemaVersion. Hand-built 2-record fixture passes; failure modes tested. 213 tests. Commit 1e50fb2.",
       "createdAt": 1795689376218,
-      "updatedAt": 1795690041383,
+      "updatedAt": 1795743597745,
       "archived": false
     },
     {
@@ -602,10 +544,9 @@
         "tag_implementation",
         "tag_data"
       ],
-      "sessionID": "ses_de8889ff3ffenHuxJGgtArG1A3",
       "notes": "Completed 2026-11-26 in session ses_de8889ff3ffenHuxJGgtArG1A3. gateBundle: 10 MiB compressed cap computed from files, zero surviving placeholders, missingKeys threshold (default 0), failed pointers fail, stale pointers warn; sync blocks publication and exits 1. Sync report now carries per-mode localization metrics and gate result. gate CLI with --dir/--report/--max-bytes/--json and exit 0/1/2. 231 tests. Commit 5fc4dee. Live check: published regular bundle 2.26 MiB, 0 missing, 0 failed, 2 prune warnings (old items/traders versions), PASS.",
       "createdAt": 1795690041383,
-      "updatedAt": 1795690706668,
+      "updatedAt": 1795743597751,
       "archived": false
     },
     {
@@ -645,10 +586,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de854269effeAE1RR3fEqQirHX",
       "notes": "Completed 2026-11-26 in session ses_de854269effeAE1RR3fEqQirHX. Flutter 3.50.1 / Dart 3.14. Generated windows, linux and android runners (Windows runner generated on Linux; only compile delegated to CI). Display name set in main.cpp, Runner.rc, GTK title, Android label and MaterialApp.title. analyze clean, 1/1 tests, linux debug bundle built. tasks.md 1.4 checked with the Windows caveat. Commit b4446f1.",
       "createdAt": 1795693478390,
-      "updatedAt": 1795693641828,
+      "updatedAt": 1795743597756,
       "archived": false
     },
     {
@@ -667,10 +607,9 @@
         "tag_infra",
         "tag_app"
       ],
-      "sessionID": "ses_de851ab55ffeEUY6AhvRSU2xXS",
       "notes": "Completed 2026-11-26 in session ses_de851ab55ffeEUY6AhvRSU2xXS. ci.yml: pipeline job (ubuntu, Node 24, lint/test/build/fixtures/bundle/gate), App Windows (windows-latest, Flutter 3.50.1, analyze/test/windows debug build), App Linux (ubuntu, fast feedback). Read-only permissions, concurrency cancel. Run 45813896386: all three jobs success; Windows produced build\\windows\\x64\\runner\\Debug\\tarkov_companion.exe. Badges added. tasks.md 1.6 checked. Commit dbb839d.",
       "createdAt": 1795693641828,
-      "updatedAt": 1795694158638,
+      "updatedAt": 1795743597761,
       "archived": false
     },
     {
@@ -688,10 +627,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de849c807ffewBbdpV0kkoGzR1",
       "notes": "Completed 2026-11-26 in session ses_de849c807ffewBbdpV0kkoGzR1. Pub workspace rooted at app/pubspec.yaml with core (pure Dart Result), data (DatasetKind, core dep), features (Flutter SectionHeader), app. tool/check_architecture.dart enforces layer and Flutter bans with synthetic violation tests plus a real-tree regression test. 11 app tests, core 3/data 2/features 2, linux build green, CI run 45815874587 all jobs success. Commit 4852e41. Review fix 6417590: commit app/pubspec.lock and ignore only member lockfiles.",
       "createdAt": 1795694158638,
-      "updatedAt": 1795694907782,
+      "updatedAt": 1795743597775,
       "archived": false
     },
     {
@@ -709,10 +647,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de83e5b24ffeVgr5porfzQ057W",
       "notes": "Completed 2026-11-26 in session ses_de83e5b24ffeVgr5porfzQ057W. drift 2.35.4 + sqlite3 3.9.2 (sqlite3_flutter_libs is EOL; sqlite3 3.x bundles SQLite via build hooks, verified in Linux and Windows builds). 10 game tables incl. items FTS5 (unicode61 remove_diacritics 2) and 4 player tables; no player->game FK, only in-half taskObjectives->tasks and progress->profiles. WAL journal, foreign_keys ON, synchronous NORMAL. sqlite_master snapshot golden with UPDATE_GOLDENS. 29 data tests. CI 45818743008 green. Commit 0660433.",
       "createdAt": 1795694907782,
-      "updatedAt": 1795695940777,
+      "updatedAt": 1795743597782,
       "archived": false
     },
     {
@@ -730,10 +667,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de82e9d50ffezuCRM5auYHg0vK",
       "notes": "Completed 2026-11-26 in session ses_de82e9d50ffezuCRM5auYHg0vK. Sealed DatabaseOpened/DatabaseRecovery lifecycle; raw user_version check before drift; WAL checkpoint + VACUUM INTO backups named <base>.v<from>-to-v<to>.<utc>.sqlite with retention 3 and pattern-only pruning; failed migration rolls back and leaves the original intact, opens read-only recovery; explicit restoreFromBackup; newer/corrupt files enter recovery. 39 data tests. CI 45821094158 green. Commit ad7fbe2.",
       "createdAt": 1795695940777,
-      "updatedAt": 1795696802363,
+      "updatedAt": 1795743597786,
       "archived": false
     },
     {
@@ -752,10 +688,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de821755fffe8ILg2pUJcjF62H",
       "notes": "Completed 2026-11-26 in session ses_de821755fffe8ILg2pUJcjF62H. BundleManifest/ManifestDataset with typed ManifestFormatException paths, GameMode enum, BundleContract compatibility (bundleUnsupported/appUpdateRequired/compatible), DatasetStateRepository with inserted/updated/unchanged (unchanged performs no write) and newer-schema refusal. Real manifest fixture trimmed to items+tasks. 79 data tests. CI 45823002464 green. Commit 78aee18. Contract fix b364648/c845bb7: producer manifest now enforces the closed seven-dataset enum and a non-empty list, matching the client and docs; tests repaired.",
       "createdAt": 1795696802363,
-      "updatedAt": 1795697801523,
+      "updatedAt": 1795743597792,
       "archived": false
     },
     {
@@ -773,10 +708,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de8123dd7ffeiw9IQUr7LgH59E",
       "notes": "Completed 2026-11-26 in session ses_de8123dd7ffeiw9IQUr7LgH59E. Exact HTTPS allowlist (github.com, objects.githubusercontent.com, release-assets.githubusercontent.com, assets.tarkov.dev), manual redirect handling with per-hop validation and 5-hop cap, no HTTP downgrade, no userinfo, Authorization/Cookie dropped on redirect, TLS defaults untouched. Typed errors incl. status 404/304. 17 net tests prove zero transport calls for disallowed hosts. 96 data tests. CI 45825362797 green. Commit 8cf18be.",
       "createdAt": 1795697801523,
-      "updatedAt": 1795698485492,
+      "updatedAt": 1795743597801,
       "archived": false
     },
     {
@@ -794,10 +728,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de807c699ffed7kqJVdyknmpxD",
       "notes": "Completed 2026-11-26 in session ses_de807c699ffed7kqJVdyknmpxD. JSONL rotating sink (1 MiB x 5 defaults), rotate-before-write, serialized appends with flush, no handle held, best-effort no-throw logger. Export ZIP with logs/ + metadata.json, works empty. 22 logging tests (118 data). CI 45827082197 green. Commit 041bef5.",
       "createdAt": 1795698485492,
-      "updatedAt": 1795699144988,
+      "updatedAt": 1795743597806,
       "archived": false
     },
     {
@@ -815,10 +748,9 @@
         "tag_implementation",
         "tag_app"
       ],
-      "sessionID": "ses_de7fdb2e1ffexfhI0JTztk3QQS",
       "notes": "Completed 2026-11-26 in session ses_de7fdb2e1ffexfhI0JTztk3QQS. AppSettings with defaults and range validation, JSON-encoded settings.* keys, transactional write with obsolete-key cleanup, corrupt/missing fallback with onWarning, reset, reopen persistence. 138 data tests. CI 45828484870 green. Commit 153de85. Group 3 complete.",
       "createdAt": 1795699144988,
-      "updatedAt": 1795699651658,
+      "updatedAt": 1795743597812,
       "archived": false
     },
     {
@@ -837,10 +769,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de7f5f922ffeGp0xBmlNELhtw5",
       "notes": "Completed 2026-11-26 in session ses_de7f5f922ffeGp0xBmlNELhtw5. Schema v2 remoteManifest with a real 1->2 migration inside the backup/recovery lifecycle; v1 rows survive and the backup is pre-migration. ManifestRepository with content hash and injected clock; ManifestFetcher sends If-None-Match/If-Modified-Since, 304 returns cached manifest and requests zero datasets, typed 404/invalid/mode-mismatch. 157 data tests. CI 45830785394 green. Commit 0796f44.",
       "createdAt": 1795699651658,
-      "updatedAt": 1795700496202,
+      "updatedAt": 1795743597818,
       "archived": false
     },
     {
@@ -859,10 +790,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de7e91c2cffe53n6LNv1f6E7LR",
       "notes": "Completed 2026-11-26 in session ses_de7e91c2cffe53n6LNv1f6E7LR. Allowlisted streaming send() preserving policy, manual redirects and draining; chunked download to .part with monotonic progress, cancellation between chunks, size+SHA-256 verification, atomic replace keeping the old dataset on failure. Typed errors. 9 downloader + 4 streaming tests (170 data). CI 45832947945 green. Commit 03dc687.",
       "createdAt": 1795700496202,
-      "updatedAt": 1795701301293,
+      "updatedAt": 1795743597834,
       "archived": false
     },
     {
@@ -881,10 +811,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de7dccd9effeKq9uliIvmkyXPL",
       "notes": "Completed 2026-11-26 in session ses_de7dccd9effeKq9uliIvmkyXPL. archive 4.7.1 pure-Dart ZstdDecoder.decodeLazy streaming (64 KiB chunks) from verified .jsonl.zst; schema v3 gameRecords catch-all with 2->3 and 1->3 migrations; kind routing to dedicated tables plus gameRecords; one transaction per dataset with 500-row batches, datasetState update and full rollback. Real fixture (items+tasks slices, 4,826 B compressed). 182 data tests. CI green. Commit 7cd4131. Follow-up ec9e0a8 adds ingested diacritic folding (183 tests).",
       "createdAt": 1795701301293,
-      "updatedAt": 1795702401024,
+      "updatedAt": 1795743597840,
       "archived": false
     },
     {
@@ -924,7 +853,7 @@
         "tag_app",
         "tag_data"
       ],
-      "notes": "FTS5 external-content table with unicode61 remove_diacritics 2 and insert/update/delete triggers (T3.2). Ingestion relies on the triggers; dataset_ingestor_test asserts search by colt/m4a1/m855 after ingest, and ec9e0a8 adds an ingested \"Caf\u00e9 Cr\u00e8me\" matched by \"cafe\". 183 data tests.",
+      "notes": "FTS5 external-content table with unicode61 remove_diacritics 2 and insert/update/delete triggers (T3.2). Ingestion relies on the triggers; dataset_ingestor_test asserts search by colt/m4a1/m855 after ingest, and ec9e0a8 adds an ingested \"Café Crème\" matched by \"cafe\". 183 data tests.",
       "createdAt": 1795702401024,
       "updatedAt": 1795702401024,
       "archived": false
@@ -945,10 +874,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de7cb820dffeBteHM54bTCN0EH",
       "notes": "Completed 2026-11-26 in session ses_de7cb820dffeBteHM54bTCN0EH. Pure-Dart scheduler with injected clock/timers/network/visibility/state store. Policy order: auto-update off, background, offline, metered, backoff, 6h interval; manual bypasses preferences but requires online. Backoff 15/30/60 min then 6h, cap 3. Event-driven due checks on foreground+online. 32 scheduler tests (215 data). CI 45838143336 green. Commit 061ca66.",
       "createdAt": 1795702401024,
-      "updatedAt": 1795703164511,
+      "updatedAt": 1795743597848,
       "archived": false
     },
     {
@@ -967,10 +895,9 @@
         "tag_app",
         "tag_data"
       ],
-      "sessionID": "ses_de7c05c6affeFYn0KPZN4zFggp",
       "notes": "Completed 2026-11-26 in session ses_de7c05c6affeFYn0KPZN4zFggp. Schema v4 items.priceObservedAt (migration 3->4) populated by ingestion; FreshnessPolicy with strict age > threshold (24h fresh, +1s stale), unknown for null, future clamped; repository query and settings-derived threshold. 15 tests (230 data). CI 45847616886 green. Commit 7c3a543.",
       "createdAt": 1795703164511,
-      "updatedAt": 1795706618965,
+      "updatedAt": 1795743597855,
       "archived": false
     },
     {
@@ -983,7 +910,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 29,
+      "position": 30,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -991,9 +918,8 @@
       ],
       "notes": "Completed 2026-11-26 in session ses_de78b339dffetxvxX27ctBtgiK. Real published fixture items-ed751dcd264d.jsonl.zst (1,433,154 B, sha ed751dcd..., 6,015 records / 5,498 items). Benchmark tagged benchmark, Timeout.none: compressed <= 10 MiB, ingest <= 4,000 ms (local median 1.0s, Windows CI 1.93s), maxRss delta <= 256 MiB. Runs in Windows CI; Linux excludes the tag. Fixed a real ingestion blocker: one live item has an empty shortName; allowEmpty now matches the schema/contract. 231 normal data tests + benchmark. CI 45849801370 green. Commit 158f750.",
       "createdAt": 1795706618965,
-      "updatedAt": 1795707404936,
-      "archived": false,
-      "sessionID": "ses_de78b339dffetxvxX27ctBtgiK"
+      "updatedAt": 1795743597892,
+      "archived": false
     },
     {
       "id": "task_impl_1_3",
@@ -1025,16 +951,15 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 30,
+      "position": 31,
       "tagIDs": [
         "tag_implementation",
         "tag_data"
       ],
       "notes": "Completed 2026-11-26 in worktree t49-sync-docs (session ses_de785dd6effepYqbtvNKy3xZEL), merged as 280a4ba. docs/sync.md (562 lines): startup, manifest/compat, download/verify, ingest/activation, failure and backoff, offline, catalog vs price freshness, recovery. 72-state table mapped to exact test file/name. Added 8 tests for implemented states previously untested (offline/5xx/timeout manifest, stalled download cleanup, newer schema/duplicate/invalid UTF-8/missing field rollback). 241 data tests after merge, analyze/architecture/strict validate green. Branch commit b472fec.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795707535829,
-      "archived": false,
-      "sessionID": "ses_de785dd6effepYqbtvNKy3xZEL"
+      "updatedAt": 1795743597901,
+      "archived": false
     },
     {
       "id": "task_impl_5_1",
@@ -1046,7 +971,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 31,
+      "position": 32,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1054,9 +979,8 @@
       ],
       "notes": "Completed 2026-11-26 in worktree t51-catalog-queries (session ses_de785dd6dffew8mfUWURx9bW2U), merged as 351d502. Schema v5: items.minLevelForFlea/fleaEligible plus indexed itemTypes and itemCategories (game-data FK, cascade; no player->game FK). CatalogQuery/CatalogFilters/ItemSummary/CatalogPage with AND-combined search/category/type/flea/price filters, 5 sort fields both directions, nulls last, pagination clamp 1..200. Ingestor populates and clears the new tables. 31 query tests + v5 migrations; p95 1.00 ms on the fixture. 274 data tests incl. benchmark (1.96s). Branch commit ad5b569.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708124579,
-      "archived": false,
-      "sessionID": "ses_de785dd6dffew8mfUWURx9bW2U"
+      "updatedAt": 1795743597905,
+      "archived": false
     },
     {
       "id": "task_impl_5_2",
@@ -1068,16 +992,15 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 34,
+      "position": 35,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
       "notes": "Completed 2026-11-26 in worktree t52-catalog-screen (session ses_de765a0aaffe61gnsoFUV1fXZx), merged as 57a4a15. CatalogScreen/CatalogFilterBar/CatalogItemRow with 300ms debounce, stale-response generation guard, AND category/type/flea filters, per-chip removal, reset, 4 sort fields both directions, ListView.builder + Load more, total count, loading/error/empty states, row callback. Plain Material placeholder icon until 5.6. 8 widget tests (10 features), 11 app, linux debug build. Branch 84efc45. Gap: category labels are a starter set because the query layer does not yet expose bundle category names; tracked as 5.10.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795709662442,
-      "archived": false,
-      "sessionID": "ses_de765a0aaffe61gnsoFUV1fXZx"
+      "updatedAt": 1795743597911,
+      "archived": false
     },
     {
       "id": "task_impl_5_3",
@@ -1089,16 +1012,15 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 37,
+      "position": 38,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
       "notes": "Completed 2026-11-26 in worktree t53-item-detail (session ses_de753bfefffe30GzE07kKQERE2), merged as 424cef8. CatalogRepository.itemDetail with typed properties (weapon/ammo/armor/medical/generic), category labels from gameRecords, strict omission (no zero/N/A rows), header/base/categories/links, not-found and corrupt-payload states. 4 Linux goldens + 9 structural tests (13 features, 6 data); 346 data / 41 features. Branch 36fb9e6. Home now wires quests and item detail; commit after merge.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710935253,
-      "archived": false,
-      "sessionID": "ses_de753bfefffe30GzE07kKQERE2"
+      "updatedAt": 1795743597924,
+      "archived": false
     },
     {
       "id": "task_impl_5_4",
@@ -1110,7 +1032,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 9,
+      "position": 5,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1130,7 +1052,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 10,
+      "position": 6,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1150,7 +1072,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 11,
+      "position": 7,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1170,7 +1092,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 12,
+      "position": 8,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1190,7 +1112,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 13,
+      "position": 9,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1210,7 +1132,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 14,
+      "position": 10,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1230,7 +1152,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 33,
+      "position": 34,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1238,9 +1160,8 @@
       ],
       "notes": "Completed 2026-11-26 in worktree t61-quest-queries (session ses_de773489affewVfXCuHHwly7rX), merged as 23a82cf. QuestRepository.query/count with text, traderId, mapId, exact/at-or-below level, and profile-scoped progress state (notStarted/inProgress/completed/failed; missing row = notStarted). Sorting on name/level/trader/map both ways, nulls last, stable ties; pagination 1..200 with totals and hasMore. No schema change (normalizedName read from payload JSON). 42 tests; 330 data tests. Branch commit 8c03f6c. Merge resolved a barrel-export conflict with profiles.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795709043624,
-      "archived": false,
-      "sessionID": "ses_de773489affewVfXCuHHwly7rX"
+      "updatedAt": 1795743597929,
+      "archived": false
     },
     {
       "id": "task_impl_6_2",
@@ -1252,16 +1173,15 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 36,
+      "position": 37,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
       "notes": "Completed 2026-11-26 in worktree t62-quest-screen (session ses_de753bfeefferKWXkyNr01ULep), merged as 913ad15. QuestListScreen with 300ms debounce, trader/map/level(at-or-below)/state filters, removable chips, reset, colored state badges, ListView.builder + load more, total, loading/error/empty states, profile-scoped badges, row callback. 12 widget tests (28 features), 17 app, linux debug build. Branch f23e6ee. Gap: trader/map labels are caller-supplied (ids only), tracked as 6.12.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710691454,
-      "archived": false,
-      "sessionID": "ses_de753bfeefferKWXkyNr01ULep"
+      "updatedAt": 1795743597933,
+      "archived": false
     },
     {
       "id": "task_impl_6_3",
@@ -1273,7 +1193,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 39,
+      "position": 40,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1281,9 +1201,8 @@
       ],
       "notes": "Availability engine merged as 0214618: locked/available/inProgress/completed, level/prerequisite reasons, unmet-edge cycle detection, deterministic available ordering, failed-quest restartable rule. 83 quest tests total (388 data).",
       "createdAt": 1795706841847,
-      "updatedAt": 1795715263217,
-      "archived": false,
-      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
+      "updatedAt": 1795743597941,
+      "archived": false
     },
     {
       "id": "task_impl_6_4",
@@ -1295,7 +1214,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 43,
+      "position": 44,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1315,41 +1234,19 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 42,
+      "position": 43,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
       "notes": "Completed 2026-11-26 in worktree t65-quest-detail (session ses_de7072deaffeNoUd9Pgss9hspQ), merged as 80db97f and wired into HomeShell. QuestDetailScreen: header with trader/map labels, state badge, objectives with counters, requirements/lock reasons, rewards/turn-in items, unlocks, status controls with override dialog, orphaned/not-found/read-only states. Reward/turn-in items push ItemDetail; prerequisites/unlocks push another quest detail. Label lookups traderName/mapName. 52 features tests, 24 app. Wiring commit follows.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795716126853,
-      "archived": false,
-      "sessionID": "ses_de7072deaffeNoUd9Pgss9hspQ"
+      "updatedAt": 1795743597964,
+      "archived": false
     },
     {
       "id": "task_impl_6_6",
       "title": "T6.6 Implement quest state transitions with immediate persistence and depen",
-      "projectID": "6a899da73a686420004607329ac3b196effb3411",
-      "projectRoot": "/home/tayuha/Projects/tarkov-companion",
-      "projectName": "tarkov-companion",
-      "serverID": "sidecar",
-      "branch": "main",
-      "baseBranch": "main",
-      "categoryID": "done",
-      "position": 40,
-      "tagIDs": [
-        "tag_implementation",
-        "tag_app"
-      ],
-      "notes": "State transitions merged with the engine: notStarted/inProgress/completed/failed, transactional persistence, revert dependency recomputation, failed-vs-restartable handling.",
-      "createdAt": 1795706841847,
-      "updatedAt": 1795715263217,
-      "archived": false,
-      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
-    },
-    {
-      "id": "task_impl_6_7",
-      "title": "T6.7 Implement objective-level counters with derived quest completion and a",
       "projectID": "6a899da73a686420004607329ac3b196effb3411",
       "projectRoot": "/home/tayuha/Projects/tarkov-companion",
       "projectName": "tarkov-companion",
@@ -1362,11 +1259,30 @@
         "tag_implementation",
         "tag_app"
       ],
+      "notes": "State transitions merged with the engine: notStarted/inProgress/completed/failed, transactional persistence, revert dependency recomputation, failed-vs-restartable handling.",
+      "createdAt": 1795706841847,
+      "updatedAt": 1795743597941,
+      "archived": false
+    },
+    {
+      "id": "task_impl_6_7",
+      "title": "T6.7 Implement objective-level counters with derived quest completion and a",
+      "projectID": "6a899da73a686420004607329ac3b196effb3411",
+      "projectRoot": "/home/tayuha/Projects/tarkov-companion",
+      "projectName": "tarkov-companion",
+      "serverID": "sidecar",
+      "branch": "main",
+      "baseBranch": "main",
+      "categoryID": "done",
+      "position": 42,
+      "tagIDs": [
+        "tag_implementation",
+        "tag_app"
+      ],
       "notes": "Objective counters merged: 0..requiredCount validation, auto-start on first count, derived completion readiness, explicit completion, manual override flagged without altering counts.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795715263217,
-      "archived": false,
-      "sessionID": "ses_de713692dffeN1Dz5skvmPWBCI"
+      "updatedAt": 1795743597941,
+      "archived": false
     },
     {
       "id": "task_impl_6_8",
@@ -1378,7 +1294,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 22,
+      "position": 11,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1398,7 +1314,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 23,
+      "position": 12,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1418,7 +1334,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 24,
+      "position": 13,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1438,7 +1354,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 25,
+      "position": 14,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1458,7 +1374,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 32,
+      "position": 33,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1466,9 +1382,8 @@
       ],
       "notes": "Completed 2026-11-26 in worktree t71-profiles (session ses_de7734899fferplwbjv8e9WuU9), merged as 8ec5205. ProfileRepository: list/byId/active/ensureFirstLaunch/createForMode/activate; one profile per game mode, activation and creation transactional, duplicate mode returns ProfileAlreadyExists without changing the active profile, missing activation id throws ProfileNotFoundError, deterministic repair of a dangling active id via onRepair. Injectable clock and secure id generator. 14 tests; 288 data tests incl. benchmark (2.04s). Branch commit c51c94b.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708559444,
-      "archived": false,
-      "sessionID": "ses_de7734899fferplwbjv8e9WuU9"
+      "updatedAt": 1795743597970,
+      "archived": false
     },
     {
       "id": "task_impl_7_2",
@@ -1480,7 +1395,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 27,
+      "position": 15,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1500,7 +1415,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 28,
+      "position": 16,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1520,7 +1435,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 29,
+      "position": 17,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1541,7 +1456,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 30,
+      "position": 18,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1561,7 +1476,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 31,
+      "position": 19,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1582,7 +1497,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 32,
+      "position": 20,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1602,7 +1517,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 33,
+      "position": 21,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1623,7 +1538,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 34,
+      "position": 22,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1643,7 +1558,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 35,
+      "position": 23,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
@@ -1663,7 +1578,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 35,
+      "position": 36,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1671,9 +1586,8 @@
       ],
       "notes": "Completed 2026-11-26 in worktree t81-first-run (session ses_de765a0acffe1D3uFdzHLls9TV), merged as ad8fdc2 plus wiring fab5adc. SyncCoordinator: prepare (manifest/compat/pending/bytes) and run (download/verify/ingest, skip current, progress, cancel/resume, typed errors). FirstRunScreen states loading/estimate/downloading/cancelling/error/ready. App paths under XDG_DATA_HOME, migration lifecycle, rotating logger, loopback integration test with test-only allowInsecureLocalhost. Ready screen now opens CatalogScreen. 340 data + 17 app + 16 features tests; linux debug build green.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795710212966,
-      "archived": false,
-      "sessionID": "ses_de765a0acffe1D3uFdzHLls9TV"
+      "updatedAt": 1795743597978,
+      "archived": false
     },
     {
       "id": "task_impl_8_2",
@@ -1685,7 +1599,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 37,
+      "position": 24,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1706,7 +1620,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 38,
+      "position": 25,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1727,7 +1641,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 39,
+      "position": 26,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1748,7 +1662,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 40,
+      "position": 27,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1769,7 +1683,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 41,
+      "position": 28,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1790,7 +1704,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 42,
+      "position": 29,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1811,7 +1725,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 43,
+      "position": 30,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1853,7 +1767,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 45,
+      "position": 31,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1874,7 +1788,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 46,
+      "position": 32,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1895,7 +1809,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 47,
+      "position": 33,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1916,7 +1830,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 48,
+      "position": 34,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1937,7 +1851,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 49,
+      "position": 35,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1958,7 +1872,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 50,
+      "position": 36,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -1979,7 +1893,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 51,
+      "position": 37,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -2000,7 +1914,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 52,
+      "position": 38,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -2021,7 +1935,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "backlog",
-      "position": 60,
+      "position": 39,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -2042,7 +1956,7 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 44,
+      "position": 45,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
@@ -2063,16 +1977,64 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "done",
-      "position": 38,
+      "position": 39,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
       "notes": "Completed 2026-11-26 in worktree t811-nav-shell (session ses_de713692fffejg6rtPzucQHER3), merged as 8f4b22d. HomeShell: NavigationRail >=700px, NavigationBar below, IndexedStack preserving search/filter/scroll, Items->Catalog->ItemDetail, Quests->QuestList with active profile and selection callback, Escape pops. HomePlaceholder removed. 23 app tests, 41 features, linux debug build. Branch 387d508.",
-      "sessionID": "ses_de713692fffejg6rtPzucQHER3",
       "createdAt": 1795714499951,
-      "updatedAt": 1795715000563,
+      "updatedAt": 1795743597985,
       "archived": false
     }
-  ]
+  ],
+  "tagsByProject": {
+    "6a899da73a686420004607329ac3b196effb3411": [
+      {
+        "id": "tag_decision",
+        "name": "decision",
+        "color": "#c69026"
+      },
+      {
+        "id": "tag_spike",
+        "name": "spike",
+        "color": "#5b8def"
+      },
+      {
+        "id": "tag_legal",
+        "name": "legal",
+        "color": "#b05ccc"
+      },
+      {
+        "id": "tag_data",
+        "name": "data",
+        "color": "#2f9e6e"
+      },
+      {
+        "id": "tag_infra",
+        "name": "infra",
+        "color": "#8a8f98"
+      },
+      {
+        "id": "tag_design",
+        "name": "design",
+        "color": "#e0638c"
+      },
+      {
+        "id": "tag_planning",
+        "name": "planning",
+        "color": "#64748b"
+      },
+      {
+        "id": "tag_implementation",
+        "name": "implementation",
+        "color": "#f59e0b"
+      },
+      {
+        "id": "tag_app",
+        "name": "app",
+        "color": "#06b6d4"
+      }
+    ]
+  }
 }
