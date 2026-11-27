@@ -3,12 +3,27 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
-import '../section_header.dart';
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
 import 'quest_filter_bar.dart';
 import 'quest_list_row.dart';
 
 export 'quest_filter_bar.dart' show QuestFilterOption;
-export 'quest_list_row.dart' show QuestStateBadge, questStateLabel;
+export 'quest_list_row.dart'
+    show
+        QuestAvailabilityBadge,
+        QuestLayout,
+        QuestListRow,
+        QuestStateBadge,
+        QuestTableHeader,
+        QuestTableRow,
+        formatQuestProgress,
+        questAvailabilityAppStatus,
+        questLayoutForWidth,
+        questListAppStatus,
+        questProgressFraction,
+        questStateAppStatus,
+        questStateLabel;
 
 /// The searchable, filterable quest catalog.
 ///
@@ -23,13 +38,18 @@ export 'quest_list_row.dart' show QuestStateBadge, questStateLabel;
 ///   response that belongs to an older query is discarded, so fast typing
 ///   cannot make an old result overwrite a newer one;
 /// * trader, map, level and state filters combine with AND with the search
-///   text; each active filter appears as a removable chip and the reset action
+///   text; each active filter appears as a removable token and the reset action
 ///   clears every filter and the search field;
 /// * progress state is read for [profileId] only, so two profiles render
-///   independent badges over the same catalog;
+///   independent badges over the same catalog; when a profile exists the badge
+///   and progress fraction use the derived availability and objective counts;
 /// * rows are built on demand by a `ListView.builder` and pages are appended
 ///   with the explicit load-more control, so a large catalog never
 ///   materializes as one widget tree;
+/// * the layout is adaptive: a five-column table at 1100 logical pixels, an
+///   extra `Level` column at 1600, and compact card rows below 1100;
+/// * content width is capped at 1600 logical pixels so an ultra-wide monitor
+///   never stretches the table into unreadable columns;
 /// * there is no network access: every row, count and page is local.
 class QuestListScreen extends StatefulWidget {
   const QuestListScreen({
@@ -42,6 +62,9 @@ class QuestListScreen extends StatefulWidget {
     this.traderOptions = const [],
     this.mapOptions = const [],
   });
+
+  /// The widest the quest chrome and table may grow.
+  static const double maxContentWidth = 1600;
 
   final QuestRepository repository;
 
@@ -75,6 +98,7 @@ class _QuestListScreenState extends State<QuestListScreen> {
   QuestFilters _filters = const QuestFilters();
 
   final List<QuestSummary> _quests = <QuestSummary>[];
+  Map<String, QuestStatus> _statusById = const <String, QuestStatus>{};
   int _total = 0;
   bool _loading = true;
   bool _loadingMore = false;
@@ -151,6 +175,24 @@ class _QuestListScreenState extends State<QuestListScreen> {
     }
   }
 
+  /// Reads the derived status for every quest so rows can show availability
+  /// and an objective fraction. Without a profile there is nothing to derive;
+  /// a profile that no longer exists also falls back to the recorded state.
+  Future<Map<String, QuestStatus>> _loadStatuses() async {
+    final profileId = widget.profileId;
+    if (profileId == null) {
+      return const <String, QuestStatus>{};
+    }
+    try {
+      final statuses = await widget.repository.statuses(profileId);
+      return <String, QuestStatus>{
+        for (final status in statuses) status.id: status,
+      };
+    } on Object {
+      return const <String, QuestStatus>{};
+    }
+  }
+
   bool get _hasMore => _quests.length < _total;
 
   QuestQuery _queryForOffset(int offset) => QuestQuery(
@@ -162,7 +204,10 @@ class _QuestListScreenState extends State<QuestListScreen> {
 
   Future<void> _fetchFirstPage(int generation) async {
     try {
-      final page = await widget.repository.query(_queryForOffset(0));
+      final pageFuture = widget.repository.query(_queryForOffset(0));
+      final statusFuture = _loadStatuses();
+      final page = await pageFuture;
+      final statusById = await statusFuture;
       if (!mounted || generation != _requestGeneration) {
         return;
       }
@@ -171,6 +216,7 @@ class _QuestListScreenState extends State<QuestListScreen> {
           ..clear()
           ..addAll(page.quests);
         _total = page.total;
+        _statusById = statusById;
         _loading = false;
         _loadingMore = false;
         _error = null;
@@ -302,76 +348,88 @@ class _QuestListScreenState extends State<QuestListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      key: const Key('quest-search-field'),
-                      controller: _searchController,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: 'Search quests',
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchController.text.isEmpty
-                            ? null
-                            : IconButton(
-                                key: const Key('quest-clear-search'),
-                                tooltip: 'Clear search',
-                                onPressed: _clearSearch,
-                                icon: const Icon(Icons.close),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            key: const Key('quest-content'),
+            constraints: const BoxConstraints(
+              maxWidth: QuestListScreen.maxContentWidth,
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final layout = questLayoutForWidth(constraints.maxWidth);
+                return Padding(
+                  padding: EdgeInsets.all(tokens.spaceLg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              key: const Key('quest-search-field'),
+                              controller: _searchController,
+                              textInputAction: TextInputAction.search,
+                              style: tokens.bodyStyle,
+                              decoration: InputDecoration(
+                                hintText: 'Search quests',
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: _searchController.text.isEmpty
+                                    ? null
+                                    : IconButton(
+                                        key: const Key('quest-clear-search'),
+                                        tooltip: 'Clear search',
+                                        onPressed: _clearSearch,
+                                        icon: const Icon(Icons.close),
+                                      ),
                               ),
-                        border: const OutlineInputBorder(),
-                        isDense: true,
+                              onChanged: _onSearchChanged,
+                              onSubmitted: _onSearchSubmitted,
+                            ),
+                          ),
+                        ],
                       ),
-                      onChanged: _onSearchChanged,
-                      onSubmitted: _onSearchSubmitted,
-                    ),
+                      SizedBox(height: tokens.spaceMd),
+                      QuestFilterBar(
+                        filters: _filters,
+                        traderOptions: _traderOptions,
+                        mapOptions: _mapOptions,
+                        onTraderSelected: _setTrader,
+                        onMapSelected: _setMap,
+                        onLevelSelected: _setLevel,
+                        onStateSelected: _setState,
+                        onRemoveText: _clearSearch,
+                        onReset: _resetFilters,
+                      ),
+                      SizedBox(height: tokens.spaceLg),
+                      _QuestHeading(resultCount: _resultCountLabel),
+                      SizedBox(height: tokens.spaceSm),
+                      if (layout != QuestLayout.compact)
+                        QuestTableHeader(layout: layout),
+                      if (_loading && _quests.isNotEmpty)
+                        LinearProgressIndicator(
+                          key: const Key('quest-loading-bar'),
+                          color: tokens.accent,
+                          backgroundColor: tokens.surfaceRaised,
+                          minHeight: 2,
+                        ),
+                      if (_error != null)
+                        _QuestErrorBanner(
+                          message: 'Could not load quests.',
+                          detail: '$_error',
+                          onRetry: _reload,
+                        ),
+                      if (layout == QuestLayout.compact)
+                        SizedBox(height: tokens.spaceSm),
+                      Expanded(child: _buildBody(layout)),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              QuestFilterBar(
-                filters: _filters,
-                traderOptions: _traderOptions,
-                mapOptions: _mapOptions,
-                onTraderSelected: _setTrader,
-                onMapSelected: _setMap,
-                onLevelSelected: _setLevel,
-                onStateSelected: _setState,
-                onRemoveText: _clearSearch,
-                onReset: _resetFilters,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const SectionHeader(title: 'Quest catalog'),
-                  const Spacer(),
-                  Text(
-                    _resultCountLabel,
-                    key: const Key('quest-result-count'),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (_loading && _quests.isNotEmpty)
-                const LinearProgressIndicator(key: Key('quest-loading-bar')),
-              if (_error != null)
-                _QuestErrorBanner(
-                  message: 'Could not load quests.',
-                  detail: '$_error',
-                  onRetry: _reload,
-                ),
-              const SizedBox(height: 4),
-              Expanded(child: _buildBody()),
-            ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -385,11 +443,11 @@ class _QuestListScreenState extends State<QuestListScreen> {
     return 'Showing ${_quests.length} of $_total quests';
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(QuestLayout layout) {
     if (_quests.isEmpty) {
       if (_loading) {
-        return const Center(
-          child: CircularProgressIndicator(key: Key('quest-loading')),
+        return Center(
+          child: CircularProgressIndicator(key: const Key('quest-loading')),
         );
       }
       if (_error != null) {
@@ -412,13 +470,27 @@ class _QuestListScreenState extends State<QuestListScreen> {
           );
         }
         final quest = _quests[index];
-        return QuestListRow(
+        final status = _statusById[quest.id];
+        final onTap = widget.onQuestSelected == null
+            ? null
+            : () => widget.onQuestSelected!(quest.id);
+        if (layout == QuestLayout.compact) {
+          return QuestListRow(
+            quest: quest,
+            status: status,
+            traderLabel: _optionLabel(_traderOptions, quest.traderId),
+            mapLabel: _optionLabel(_mapOptions, quest.mapId),
+            onTap: onTap,
+          );
+        }
+        return QuestTableRow(
           quest: quest,
+          layout: layout,
+          status: status,
+          index: index,
           traderLabel: _optionLabel(_traderOptions, quest.traderId),
           mapLabel: _optionLabel(_mapOptions, quest.mapId),
-          onTap: widget.onQuestSelected == null
-              ? null
-              : () => widget.onQuestSelected!(quest.id),
+          onTap: onTap,
         );
       },
     );
@@ -437,6 +509,39 @@ class _QuestListScreenState extends State<QuestListScreen> {
   }
 }
 
+/// The quest title and the result count.
+class _QuestHeading extends StatelessWidget {
+  const _QuestHeading({required this.resultCount});
+
+  final String resultCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AppSectionLabel('Quests'),
+              SizedBox(height: tokens.spaceXs),
+              Text('Quest catalog', style: tokens.h1Style),
+            ],
+          ),
+        ),
+        Text(
+          resultCount,
+          key: const Key('quest-result-count'),
+          style: tokens.dataStyle.copyWith(color: tokens.muted),
+        ),
+      ],
+    );
+  }
+}
+
 class _LoadMoreFooter extends StatelessWidget {
   const _LoadMoreFooter({
     required this.loaded,
@@ -452,26 +557,22 @@ class _LoadMoreFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: tokens.spaceLg),
       child: Column(
         children: [
           Text(
             '$loaded of $total loaded',
             key: const Key('quest-loaded-count'),
-            style: Theme.of(context).textTheme.bodySmall,
+            style: tokens.dataStyle.copyWith(color: tokens.muted),
           ),
-          const SizedBox(height: 8),
-          OutlinedButton(
+          SizedBox(height: tokens.spaceSm),
+          AppButton(
             key: const Key('quest-load-more'),
+            label: 'Load more',
+            variant: AppButtonVariant.secondary,
             onPressed: loading ? null : onLoadMore,
-            child: loading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Load more'),
           ),
         ],
       ),
@@ -487,7 +588,7 @@ class _QuestEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final tokens = AppTokens.of(context);
     final query = filters.text?.trim();
     final headline = query != null && query.isNotEmpty
         ? 'No quests match "$query".'
@@ -506,32 +607,27 @@ class _QuestEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
+            Icon(Icons.search_off, size: 48, color: tokens.dim),
+            SizedBox(height: tokens.spaceMd),
             Text(
               headline,
               key: const Key('quest-empty-title'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
+              style: tokens.h2Style,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spaceXs),
             Text(
               detail,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: tokens.bodyStyle.copyWith(color: tokens.muted),
             ),
             if (filters.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              FilledButton.tonal(
+              SizedBox(height: tokens.spaceLg),
+              AppButton(
                 key: const Key('quest-empty-reset'),
+                label: 'Reset filters',
+                variant: AppButtonVariant.secondary,
                 onPressed: onReset,
-                child: const Text('Reset filters'),
               ),
             ],
           ],
@@ -554,41 +650,48 @@ class _QuestErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final tokens = AppTokens.of(context);
     return Container(
       key: const Key('quest-error-banner'),
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: EdgeInsets.only(bottom: tokens.spaceSm),
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spaceMd,
+        vertical: tokens.spaceSm,
+      ),
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        color: Color.alphaBlend(
+          tokens.danger.withValues(alpha: 0.12),
+          tokens.surface,
+        ),
+        border: Border.all(color: tokens.danger.withValues(alpha: 0.6)),
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
-          const SizedBox(width: 8),
+          Icon(Icons.error_outline, color: tokens.danger),
+          SizedBox(width: tokens.spaceSm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   message,
-                  style: TextStyle(color: colorScheme.onErrorContainer),
+                  style: tokens.bodyStyle.copyWith(color: tokens.danger),
                 ),
                 Text(
                   detail,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: colorScheme.onErrorContainer),
+                  style: tokens.bodyStyle.copyWith(color: tokens.muted),
                 ),
               ],
             ),
           ),
-          TextButton(
+          AppButton(
             key: const Key('quest-retry'),
+            label: 'Retry',
+            variant: AppButtonVariant.ghost,
             onPressed: onRetry,
-            child: const Text('Retry'),
           ),
         ],
       ),

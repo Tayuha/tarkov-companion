@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
+import '../theme/app_primitives.dart';
+import '../theme/app_tokens.dart';
 import 'quest_list_row.dart' show questStateLabel;
 
 /// One selectable trader or map in the quest filter bar.
@@ -41,7 +43,8 @@ const questLevelFilterOptions = <int>[
 /// The trader, map, level and state controls plus the active-filter chips.
 ///
 /// The bar is stateless: the screen owns [filters] and receives one callback per
-/// individual change, so removing one chip never disturbs the others.
+/// individual change, so removing one chip never disturbs the others. State is
+/// a row of [AppChip] segments; trader, map and level are framed dropdowns.
 class QuestFilterBar extends StatelessWidget {
   const QuestFilterBar({
     super.key,
@@ -68,6 +71,7 @@ class QuestFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
     final traderId = _nonBlank(filters.traderId);
     final mapId = _nonBlank(filters.mapId);
     final text = _nonBlank(filters.text);
@@ -111,14 +115,14 @@ class QuestFilterBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          spacing: 16,
-          runSpacing: 8,
+          spacing: tokens.spaceLg,
+          runSpacing: tokens.spaceSm,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SizedBox(
               width: 220,
-              child: DropdownButton<String>(
-                key: const Key('quest-trader-filter'),
+              child: _DropdownField<String>(
+                fieldKey: const Key('quest-trader-filter'),
                 value: traderId ?? '',
                 isExpanded: true,
                 items: [
@@ -136,9 +140,9 @@ class QuestFilterBar extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 220,
-              child: DropdownButton<String>(
-                key: const Key('quest-map-filter'),
+              width: 200,
+              child: _DropdownField<String>(
+                fieldKey: const Key('quest-map-filter'),
                 value: mapId ?? '',
                 isExpanded: true,
                 items: [
@@ -154,8 +158,8 @@ class QuestFilterBar extends StatelessWidget {
             ),
             SizedBox(
               width: 170,
-              child: DropdownButton<int>(
-                key: const Key('quest-level-filter'),
+              child: _DropdownField<int>(
+                fieldKey: const Key('quest-level-filter'),
                 value: filters.maxPlayerLevel ?? 0,
                 isExpanded: true,
                 items: [
@@ -170,39 +174,46 @@ class QuestFilterBar extends StatelessWidget {
                     onLevelSelected(value == null || value == 0 ? null : value),
               ),
             ),
-            SizedBox(
-              width: 190,
-              child: DropdownButton<String>(
-                key: const Key('quest-state-filter'),
-                value: filters.state?.name ?? 'any',
-                isExpanded: true,
-                items: [
-                  const DropdownMenuItem(
-                    value: 'any',
-                    child: Text('Any state'),
-                  ),
-                  for (final state in QuestProgressState.values)
-                    DropdownMenuItem(
-                      value: state.name,
-                      child: Text(questStateLabel(state)),
-                    ),
-                ],
-                onChanged: (value) => onStateSelected(_stateFor(value)),
-              ),
-            ),
             if (filters.isNotEmpty)
-              TextButton.icon(
+              AppButton(
                 key: const Key('quest-reset-filters'),
+                label: 'Reset',
+                variant: AppButtonVariant.ghost,
                 onPressed: onReset,
-                icon: const Icon(Icons.filter_alt_off_outlined, size: 18),
-                label: const Text('Reset'),
               ),
           ],
         ),
+        Padding(
+          padding: EdgeInsets.only(top: tokens.spaceSm),
+          child: Wrap(
+            key: const Key('quest-state-filter'),
+            spacing: tokens.spaceSm,
+            runSpacing: tokens.spaceXs,
+            children: [
+              AppChip(
+                key: const Key('quest-state-filter-any'),
+                label: 'All states',
+                selected: filters.state == null,
+                onTap: () => onStateSelected(null),
+              ),
+              for (final state in QuestProgressState.values)
+                AppChip(
+                  key: Key('quest-state-filter-${state.name}'),
+                  label: questStateLabel(state),
+                  selected: filters.state == state,
+                  onTap: () => onStateSelected(state),
+                ),
+            ],
+          ),
+        ),
         if (activeChips.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Wrap(spacing: 8, runSpacing: 4, children: activeChips),
+            padding: EdgeInsets.only(top: tokens.spaceSm),
+            child: Wrap(
+              spacing: tokens.spaceSm,
+              runSpacing: tokens.spaceXs,
+              children: activeChips,
+            ),
           ),
       ],
     );
@@ -237,20 +248,56 @@ class QuestFilterBar extends StatelessWidget {
     }
     return id;
   }
+}
 
-  static QuestProgressState? _stateFor(String? value) {
-    if (value == null || value == 'any') {
-      return null;
-    }
-    for (final state in QuestProgressState.values) {
-      if (state.name == value) {
-        return state;
-      }
-    }
-    return null;
+/// A dropdown framed like a phosphor input: raised fill, one-pixel border.
+class _DropdownField<T> extends StatelessWidget {
+  const _DropdownField({
+    required this.fieldKey,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.isExpanded,
+  });
+
+  final Key fieldKey;
+  final T value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppTokens.of(context);
+    return Container(
+      height: 30,
+      padding: EdgeInsets.symmetric(horizontal: tokens.spaceSm),
+      decoration: BoxDecoration(
+        color: tokens.surfaceRaised,
+        border: Border.all(color: tokens.border),
+        borderRadius: BorderRadius.circular(tokens.radiusSm),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          key: fieldKey,
+          value: value,
+          isExpanded: isExpanded,
+          isDense: true,
+          dropdownColor: tokens.surfaceRaised,
+          icon: Icon(Icons.expand_more, size: tokens.h2Size, color: tokens.dim),
+          style: tokens.bodyStyle,
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
+    );
   }
 }
 
+/// An active filter token.
+///
+/// It reuses the [AppChip] geometry and accent fill and removes itself when
+/// tapped, so the filter bar never grows a separate control vocabulary.
 class _ActiveFilterChip extends StatelessWidget {
   const _ActiveFilterChip({
     super.key,
@@ -263,11 +310,9 @@ class _ActiveFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InputChip(
-      label: Text(label),
-      onDeleted: onDeleted,
-      deleteIcon: const Icon(Icons.close, size: 16),
-      visualDensity: VisualDensity.compact,
+    return Tooltip(
+      message: 'Remove filter',
+      child: AppChip(label: label, selected: true, onTap: onDeleted),
     );
   }
 }

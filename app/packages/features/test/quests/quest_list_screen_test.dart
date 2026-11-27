@@ -4,11 +4,17 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
 
 import '../support/quest_screen_fixture.dart';
+import '../theme/support/load_fonts.dart';
 
 void main() {
   late AppDatabase database;
   late QuestRepository repository;
   late List<String> selectedIds;
+
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await loadDesignFonts();
+  });
 
   setUp(() async {
     database = await openQuestFixtureDatabase();
@@ -22,11 +28,17 @@ void main() {
     WidgetTester tester, {
     String? profileId = fixtureProfileRegular,
     int pageSize = 50,
+    Size size = const Size(1000, 1400),
   }) async {
-    await tester.binding.setSurfaceSize(const Size(1000, 1400));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.binding.setSurfaceSize(size);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.binding.setSurfaceSize(null);
+      tester.view.reset();
+    });
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildAppTheme(),
         home: QuestListScreen(
           repository: repository,
           profileId: profileId,
@@ -51,10 +63,22 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> selectState(
+    WidgetTester tester,
+    QuestProgressState state,
+  ) async {
+    await tester.tap(find.byKey(Key('quest-state-filter-${state.name}')));
+    await tester.pumpAndSettle();
+  }
+
   Finder badgeIn(String questId, String label) => find.descendant(
     of: find.byKey(ValueKey('quest-row-$questId')),
     matching: find.text(label),
   );
+
+  AppStatus statusIn(WidgetTester tester, String questId) => tester
+      .widget<AppStatusBadge>(find.byKey(ValueKey('quest-state-$questId')))
+      .status;
 
   testWidgets('initial load renders rows, metadata and state badges', (
     tester,
@@ -64,10 +88,10 @@ void main() {
     expect(find.text('Showing 14 of 14 quests'), findsOneWidget);
     expect(find.text('Debut'), findsOneWidget);
     expect(find.text('Prapor · Level 1 · Customs'), findsOneWidget);
-    expect(badgeIn('quest-debut', 'Completed'), findsOneWidget);
-    expect(badgeIn('quest-checking', 'In progress'), findsOneWidget);
-    expect(badgeIn('quest-shootout', 'Failed'), findsOneWidget);
-    expect(badgeIn('quest-collector', 'Not started'), findsOneWidget);
+    expect(badgeIn('quest-debut', 'COMPLETED'), findsOneWidget);
+    expect(badgeIn('quest-checking', 'IN PROGRESS'), findsOneWidget);
+    expect(badgeIn('quest-shootout', 'FAILED'), findsOneWidget);
+    expect(badgeIn('quest-collector', 'LOCKED'), findsOneWidget);
     expect(find.byType(ListView), findsOneWidget);
   });
 
@@ -76,6 +100,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildAppTheme(),
         home: QuestListScreen(
           repository: repository,
           profileId: fixtureProfileRegular,
@@ -160,7 +185,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byKey(const Key('quest-filter-chip-level')),
-        matching: find.text('Level ≤ 10'),
+        matching: find.text('LEVEL ≤ 10'),
       ),
       findsOneWidget,
     );
@@ -171,12 +196,16 @@ void main() {
   ) async {
     await pumpQuests(tester);
 
-    await selectDropdown(tester, 'quest-state-filter', 'Completed');
+    await selectState(tester, QuestProgressState.completed);
 
     expect(find.text('Showing 2 of 2 quests'), findsOneWidget);
     expect(find.byKey(const Key('quest-filter-chip-state')), findsOneWidget);
     expect(find.text('Debut'), findsOneWidget);
     expect(find.text('The Punisher - Part 1'), findsOneWidget);
+    final selected = tester.widget<AppChip>(
+      find.byKey(const Key('quest-state-filter-completed')),
+    );
+    expect(selected.selected, isTrue);
   });
 
   testWidgets('combined filters intersect and reset clears everything', (
@@ -187,7 +216,7 @@ void main() {
     await selectDropdown(tester, 'quest-trader-filter', 'Prapor');
     await selectDropdown(tester, 'quest-map-filter', 'Customs');
     await selectDropdown(tester, 'quest-level-filter', 'Level ≤ 20');
-    await selectDropdown(tester, 'quest-state-filter', 'Not started');
+    await selectState(tester, QuestProgressState.notStarted);
 
     expect(find.text('Showing 1 of 1 quests'), findsOneWidget);
     expect(find.text('The Punisher - Part 2'), findsOneWidget);
@@ -209,15 +238,32 @@ void main() {
   testWidgets('progress badges are isolated per profile', (tester) async {
     await pumpQuests(tester, profileId: fixtureProfileRegular);
 
-    expect(badgeIn('quest-debut', 'Completed'), findsOneWidget);
-    expect(badgeIn('quest-checking', 'In progress'), findsOneWidget);
-    expect(badgeIn('quest-shootout', 'Failed'), findsOneWidget);
+    expect(badgeIn('quest-debut', 'COMPLETED'), findsOneWidget);
+    expect(badgeIn('quest-checking', 'IN PROGRESS'), findsOneWidget);
+    expect(badgeIn('quest-shootout', 'FAILED'), findsOneWidget);
 
     await pumpQuests(tester, profileId: fixtureProfilePve);
 
-    expect(badgeIn('quest-debut', 'In progress'), findsOneWidget);
-    expect(badgeIn('quest-checking', 'Completed'), findsOneWidget);
-    expect(badgeIn('quest-shootout', 'Not started'), findsOneWidget);
+    expect(badgeIn('quest-debut', 'IN PROGRESS'), findsOneWidget);
+    expect(badgeIn('quest-checking', 'COMPLETED'), findsOneWidget);
+    expect(badgeIn('quest-shootout', 'AVAILABLE'), findsOneWidget);
+  });
+
+  testWidgets('status badges map availability and keep failed distinct', (
+    tester,
+  ) async {
+    await pumpQuests(tester, size: const Size(1440, 1000));
+
+    expect(statusIn(tester, 'quest-debut'), AppStatus.completed);
+    expect(statusIn(tester, 'quest-checking'), AppStatus.inProgress);
+    expect(statusIn(tester, 'quest-shootout'), AppStatus.failed);
+    expect(statusIn(tester, 'quest-cafe'), AppStatus.available);
+    expect(statusIn(tester, 'quest-collector'), AppStatus.locked);
+
+    await pumpQuests(tester, profileId: null, size: const Size(1440, 1000));
+    expect(statusIn(tester, 'quest-collector'), AppStatus.locked);
+    expect(badgeIn('quest-collector', 'NOT STARTED'), findsOneWidget);
+    expect(badgeIn('quest-debut', 'NOT STARTED'), findsOneWidget);
   });
 
   testWidgets('empty results keep the query and reset restores the list', (
@@ -272,5 +318,150 @@ void main() {
     await tester.pump();
 
     expect(selectedIds, ['quest-debut']);
+  });
+
+  group('layout helpers', () {
+    test('breakpoints separate compact, standard and wide', () {
+      expect(questLayoutForWidth(1099), QuestLayout.compact);
+      expect(questLayoutForWidth(1100), QuestLayout.standard);
+      expect(questLayoutForWidth(1599), QuestLayout.standard);
+      expect(questLayoutForWidth(1600), QuestLayout.wide);
+    });
+
+    test('progress fraction ignores optional objectives and empty states', () {
+      expect(formatQuestProgress(null), '—');
+    });
+  });
+
+  group('responsive table', () {
+    testWidgets('1440 shows the five-column header and table rows', (
+      tester,
+    ) async {
+      await pumpQuests(tester, size: const Size(1440, 1000));
+
+      final header = find.byKey(const Key('quest-table-header'));
+      expect(header, findsOneWidget);
+      for (final label in ['QUEST', 'TRADER', 'MAP', 'STATUS', 'PROGRESS']) {
+        expect(
+          find.descendant(of: header, matching: find.text(label)),
+          findsOneWidget,
+        );
+      }
+      expect(find.text('LEVEL'), findsNothing);
+      expect(find.byType(QuestTableRow), findsWidgets);
+      expect(find.byType(QuestListRow), findsNothing);
+
+      final row = tester.widget<QuestTableRow>(
+        find.byType(QuestTableRow).first,
+      );
+      expect(row.layout, QuestLayout.standard);
+    });
+
+    testWidgets('1920 adds the level column and a wider quest cell', (
+      tester,
+    ) async {
+      await pumpQuests(tester, size: const Size(1440, 1000));
+      final standardCell = tester
+          .getSize(find.byKey(const ValueKey('quest-row-quest-quest-debut')))
+          .width;
+
+      await pumpQuests(tester, size: const Size(1920, 1080));
+
+      final header = find.byKey(const Key('quest-table-header'));
+      expect(
+        find.descendant(of: header, matching: find.text('LEVEL')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('quest-row-level-quest-debut')),
+        findsOneWidget,
+      );
+      final row = tester.widget<QuestTableRow>(
+        find.byType(QuestTableRow).first,
+      );
+      expect(row.layout, QuestLayout.wide);
+      final wideCell = tester
+          .getSize(find.byKey(const ValueKey('quest-row-quest-quest-debut')))
+          .width;
+      expect(wideCell, greaterThan(standardCell));
+    });
+
+    testWidgets('below 1100 drops the header for compact card rows', (
+      tester,
+    ) async {
+      await pumpQuests(tester, size: const Size(900, 900));
+
+      expect(find.byKey(const Key('quest-table-header')), findsNothing);
+      expect(find.byType(QuestListRow), findsWidgets);
+      expect(find.byType(QuestTableRow), findsNothing);
+
+      await tester.tap(find.text('Debut'));
+      await tester.pump();
+      expect(selectedIds, ['quest-debut']);
+    });
+
+    testWidgets('content width is capped on an ultra-wide window', (
+      tester,
+    ) async {
+      await pumpQuests(tester, size: const Size(2560, 1440));
+
+      final content = find.byKey(const Key('quest-content'));
+      expect(tester.getSize(content).width, QuestListScreen.maxContentWidth);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('quest-table-header')),
+          matching: find.text('LEVEL'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('table rows alternate their resting surface', (tester) async {
+      await pumpQuests(tester, size: const Size(1440, 1000));
+      final tokens = Theme.of(tester.element(find.byType(QuestListScreen)))
+          .extension<AppTokens>()!;
+
+      Color? surfaceFor(String id) {
+        final container = tester.widget<Container>(
+          find.byKey(ValueKey('quest-row-surface-$id')),
+        );
+        return (container.decoration! as BoxDecoration).color;
+      }
+
+      // Default repository order is name ascending: Café is row 0, Car row 1.
+      expect(surfaceFor('quest-cafe'), tokens.surface);
+      expect(surfaceFor('quest-car-repair'), tokens.background);
+    });
+
+    testWidgets('list fraction comes from required objective counts', (
+      tester,
+    ) async {
+      await pumpQuests(tester, size: const Size(1440, 1000));
+
+      final progress = tester.widget<Text>(
+        find.byKey(const ValueKey('quest-row-progress-quest-cafe')),
+      );
+      expect(progress.data, '1 / 3');
+    });
+  });
+
+  group('golden', () {
+    testWidgets('quest list at 1440', (tester) async {
+      await pumpQuests(tester, size: const Size(1440, 900));
+
+      await expectLater(
+        find.byType(QuestListScreen),
+        matchesGoldenFile('goldens/quest_list_1440.png'),
+      );
+    });
+
+    testWidgets('quest list at 1920', (tester) async {
+      await pumpQuests(tester, size: const Size(1920, 1080));
+
+      await expectLater(
+        find.byType(QuestListScreen),
+        matchesGoldenFile('goldens/quest_list_1920.png'),
+      );
+    });
   });
 }
