@@ -38,3 +38,6 @@ Out of scope:
 The application has no accounts, no telemetry, and no backend. Player progress is stored only on the
 device. Network access is limited to the documented allowlist, and downloaded datasets are verified by
 SHA-256 before they are applied.
+
+The full threat model, data-at-rest notes, and recovery guarantees are in [`docs/security.md`](docs/security.md).
+The host allowlist and request rules are in [`docs/network.md`](docs/network.md).

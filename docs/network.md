@@ -17,7 +17,7 @@ allow `api.github.com`, `github.com.evil.example`, `evilgithub.com`, or any subd
 
 | Host | Why the client needs it |
 |---|---|
-| `github.com` | The stable per-mode manifest URL, `https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json`. It is also the release page the app opens when an app update is available (no silent self-updater). |
+| `github.com` | The stable per-mode manifest URL, `https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json`. The client has no self-updater and does not open the release page; an incompatible manifest only raises a compatibility error. |
 | `objects.githubusercontent.com` | GitHub answers a release-asset download with a redirect to this CDN host. The manifest and the `.jsonl.zst` dataset bytes are served from here. |
 | `release-assets.githubusercontent.com` | The newer GitHub release-asset CDN host. GitHub has used both asset hosts and can move a download between them, so both must be allowed for the same release URL to keep working. |
 | `assets.tarkov.dev` | Item, task, and category images (`iconLink`, `imageLink`, `gridImageLink`, ...) referenced by the tarkov.dev dataset. |
@@ -34,6 +34,37 @@ Not allowed, deliberately:
 The list is the same for every game mode, platform, and feature. Adding a host is a security and privacy
 change: update the constant, this table, and the tests, and treat it as part of the periodic network audit
 in task 9.4.
+
+## Text-only hosts
+
+These strings appear in the interface as unformatted text. They are not links, and no code path requests
+them:
+
+- `tarkov.dev` — the About screen prints the community project URL as plain text. Only its
+  `assets.tarkov.dev` image host is on the request allowlist.
+
+`docs/network.md` is the only documentation source the audit script reads, so a new display-only host must
+be recorded here as well as in the UI copy.
+
+## Destinations, triggers and payloads
+
+The current client has three request shapes. None sends a request body, a cookie, an account token, or a
+device identifier.
+
+| Destination | Purpose | Trigger | Request | Response |
+|---|---|---|---|---|
+| `https://github.com/Tayuha/tarkov-companion/releases/download/data-<mode>-latest/manifest.json` | Fetch the versioned manifest for `regular`, `pve`, or `pvp-season`. | First-run gate `prepare`, a scheduled background update check, **Check now**, or a retry after an offline/upstream error. | `GET`; `Accept`, `Accept-Encoding: identity`, the client `User-Agent`, and `If-None-Match` / `If-Modified-Since` when a cached manifest is revalidated. | `200` with manifest JSON, `304` when unchanged, or a typed status error (`404`, `5xx`). |
+| `objects.githubusercontent.com` or `release-assets.githubusercontent.com` | Serve the manifest bytes and each changed `.jsonl.zst` dataset after GitHub redirects the release-asset URL. | The same manifest request, and a dataset download when `prepare` finds a dataset that is not current. | `GET`; no body; the client re-applies the allowlist and the HTTPS rule to every redirect hop. | Manifest JSON or compressed JSONL bytes. Each dataset is length-checked and SHA-256-checked against the manifest before ingestion. |
+| `assets.tarkov.dev` | Item, task, and category artwork referenced by `iconLink`, `imageLink`, `gridImageLink`, and similar bundle fields. | Building a visible item row or item detail with an image cache. The cache reads disk first and fetches only on a miss. | `GET`; no body, no cookies. | Image bytes stored in the bounded disk cache and rendered by the widget. A failed fetch renders the placeholder, not an error. |
+
+### Wiring status in the preview build
+
+The manifest and dataset paths are wired through `AppSessionReady.sync`. The image cache
+(`ItemImageCache` and `AllowlistedItemImageFetcher`) is implemented and unit-tested, but the preview shell
+does not yet pass an `ItemImageCache` to `HomeShell`; the current build therefore makes no
+`assets.tarkov.dev` request and renders item placeholders. The host stays on the allowlist because it is
+the only destination the cache may use once it is wired. See
+[`verification.md`](verification.md) for the resulting manual-check status.
 
 ## Rules enforced by the client
 
@@ -113,11 +144,10 @@ TLS verification is **not** weakened anywhere:
 
 ## Requests the client makes
 
-The app is expected to contact only:
-
-- the stable manifest URL on `github.com` (and the GitHub asset host it redirects to);
-- per-dataset `.jsonl.zst` URLs resolved relative to that manifest (same GitHub hosts);
-- image URLs on `assets.tarkov.dev` from the dataset.
+The client constructs exactly one URL itself: the stable manifest URL on `github.com`. Dataset URLs are
+resolved relative to that manifest and therefore stay on the GitHub hosts above. Image URLs come from the
+dataset and may target `assets.tarkov.dev` only; the image cache is not yet wired into the preview shell,
+as described above. No other URL builder exists in `app/lib` or `app/packages/*/lib`.
 
 The `User-Agent` identifies the app and its repository:
 `tarkov-companion/0.1.0 (+https://github.com/Tayuha/tarkov-companion)`. No cookies are persisted, no
@@ -139,11 +169,27 @@ underlying `dart:io` exceptions rather than being disguised as policy errors.
 
 ## Verification
 
+Static audit, from the repository root:
+
+```bash
+bash scripts/audit-network.sh
+```
+
+The script parses `NetworkAllowlist.productionHosts` and the “Allowed hosts” table above, fails when they
+disagree, then scans production Dart sources for literal hosts. It makes no network requests and needs no
+root. It is deliberately conservative: it catches `http(s)://` URLs and bare domains with common TLDs, not
+every possible string that could be assembled into a host.
+
+Automated policy tests:
+
 ```bash
 cd app
 dart test packages/data/test/net/allowlisted_http_client_test.dart
 dart run tool/check_architecture.dart
 ```
+
+A captured-request review (a proxy or packet capture while running a sync) remains a manual release-gate
+step in [`verification.md`](verification.md).
 
 The tests cover the exact allowlist contents; rejection with zero inner-client calls for a disallowed host, a
 lookalike or subdomain, an empty host, URL credentials, and plain HTTP; the user-agent and 2xx body; a

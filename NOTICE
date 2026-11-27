@@ -23,5 +23,7 @@ here for identification and interoperability purposes only.
 
 ## Assets
 
-The application does not bundle official game artwork. Images are fetched at runtime from the upstream
-community asset host and cached locally for offline display.
+The application does not bundle official game artwork. The client is designed to fetch images at runtime
+from the upstream community asset host (`assets.tarkov.dev`) and cache them locally for offline display.
+The `0.1.0` preview shell does not yet wire the image cache, so it renders placeholders and makes no image
+request; see [`docs/verification.md`](docs/verification.md).
