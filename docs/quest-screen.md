@@ -5,16 +5,21 @@ view of the quest tracker. It is presentation-only: every row, count and page
 comes from `QuestRepository` in the data package, so the screen works entirely
 against the local database with no network request.
 
-This is the **catalog list** only. The data layer still owns derivation
-(task 6.3) and this screen only renders the resulting `QuestStatus`; it does not
-explain locked reasons (6.4), open a detail view (6.5), or write progress (6.6).
+The screen has two views behind one route: the **catalog** (search, filters,
+pagination) and **Available** (quests the active profile can start now, with
+its own ordering). The data layer still owns derivation and this screen only
+renders the resulting `QuestStatus`; it does not explain locked reasons, open a
+detail view, or write progress.
 
 ## Composition
 
 | Widget | Responsibility |
 | --- | --- |
-| `QuestListScreen` | Owns the query state, debounce timer, pagination and loading/error state. |
+| `QuestListScreen` | Owns the query state, view segment, debounce timer, pagination and loading/error state. |
 | `QuestFilterBar` | Trader, map and level dropdowns, `AppChip` state segments and the active-filter tokens. |
+| `_QuestViewSegment` | Switches between **Catalog** and **Available** without a route change. |
+| `_AvailableToolbar` | Level / trader / map / name ordering for the available view. |
+| `_UnavailableQuestsPanel` | Lists preserved progress for quests missing from the active dataset. |
 | `QuestListRow` | The compact card row: name, trader/level/map meta, status badge and progress. |
 | `QuestTableHeader` / `QuestTableRow` | The desktop table from 1100 px, with an extra level column from 1600. |
 | `QuestStateBadge` / `QuestAvailabilityBadge` | `AppStatusBadge` wrappers for a recorded state and a derived availability. |
@@ -23,6 +28,41 @@ explain locked reasons (6.4), open a detail view (6.5), or write progress (6.6).
 optional `onQuestSelected`, a `pageSize` (default 50), a `searchDebounce`
 (default 300 ms), and optional trader/map option lists. It never pushes a route;
 the app shell decides what a row tap means.
+
+## Views
+
+The **Catalog** / **Available** segment is shown only when a profile is active.
+It stays on the same route, so the shell's navigation contract is unchanged.
+
+The available view calls `QuestRepository.availableQuests(profileId, sort:)`
+and renders only `available` statuses. It hides search and the catalog filters,
+because "what can I start now" is its whole question, and offers four ordering
+criteria: **Level** (default), **Trader**, **Map** and **Name**. The result
+count reads `N available quests`. Rows reuse the same table and compact card, so
+the status badge is `AVAILABLE` and the progress fraction is still the required
+objective fraction.
+
+With nothing available, the view renders an explanatory empty state:
+"Nothing is available to start." plus the reason that every remaining quest is
+locked by a level, trader, or prerequisite requirement, in progress, or
+completed, with a button back to the catalog. The state is not a generic "no
+results": it names the possibilities and keeps lock reasons one tap away.
+
+The catalog header count remains `Showing X of Y quests`; the available view
+uses its own count and does not paginate.
+
+## Unavailable upstream panel
+
+When `QuestRepository.orphanedProgress` returns rows, a panel above the table
+lists each quest id, its preserved recorded state and how many objective counts
+survive. The panel states that the quests are missing from the active dataset
+and excluded from requirement calculations. It never removes the catalog or
+turns a missing quest into a fake row; the detail screen has the matching
+"Quest unavailable upstream" state.
+
+A quest that exists in another game mode is not listed here: it is excluded
+from this profile's catalog by mode scoping and returns when that mode's
+profile is active.
 
 ## Search and debounce
 
@@ -62,10 +102,13 @@ the app shell decides what a row tap means.
 
 ## Progress state and badges
 
-`profileId` scopes the progress read. With `null` there is no profile, so every
-quest reads as not started. Two profiles render independent badges over the same
-quest catalog; switching the active profile in the app shell and passing its id
-is enough to change every badge.
+`profileId` scopes the progress read and the game mode. With `null` there is no
+profile, so every quest reads as not started and the catalog is unscoped. Two
+profiles render independent badges; switching the active profile in the app
+shell and passing its id is enough to change every badge and the visible task
+set. A task whose bundle `gameMode` list does not contain the profile's mode is
+absent from the catalog and the available view (a PvE-only quest does not appear
+under a regular profile).
 
 When the profile exists the screen also reads `QuestRepository.statuses` once
 per reload. That gives each row its derived availability and a required-
@@ -121,11 +164,13 @@ is deterministic and a keyboard user reaches it by tabbing.
 ## Tests
 
 `app/packages/features/test/quests/quest_list_screen_test.dart` runs against an
-in-memory `AppDatabase` seeded with two profiles, fourteen quests, objective
-counts and their recorded progress, through the real `QuestRepository`. It
-covers the initial load and metadata, debounce timing, diacritic search, every
-filter alone, a combined filter, reset, per-profile badge isolation, the
-availability/failed badge mapping, the objective fraction, the 1440 and 1920
-table columns, the compact fallback, the 1600 px cap, the empty state with the
-preserved query and reset, pagination with load-more, row-tap reporting, and
-list goldens at 1440 and 1920. No test performs network access.
+in-memory `AppDatabase` seeded with two profiles, fifteen quests (fourteen
+shared plus one PvE-only), objective counts and their recorded progress, through
+the real `QuestRepository`. It covers the initial load and metadata, debounce
+timing, diacritic search, every filter alone, a combined filter, reset,
+per-profile badge isolation, the availability/failed badge mapping, the
+objective fraction, the 1440 and 1920 table columns, the compact fallback, the
+1600 px cap, the empty state with the preserved query and reset, pagination with
+load-more, row-tap reporting, game-mode scoping, the populated available view
+with ordering, the explanatory available empty state, the unavailable-upstream
+panel, and list goldens at 1440 and 1920. No test performs network access.

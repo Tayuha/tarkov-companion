@@ -17,6 +17,7 @@ final class QuestFixtureQuest {
     this.mapId,
     this.minPlayerLevel,
     this.experience,
+    this.gameMode,
   });
 
   final String id;
@@ -26,6 +27,9 @@ final class QuestFixtureQuest {
   final String? mapId;
   final int? minPlayerLevel;
   final int? experience;
+
+  /// Bundle `gameMode` list; `null` means every mode.
+  final List<String>? gameMode;
 }
 
 const fixtureProfileRegular = 'profile-regular';
@@ -178,6 +182,15 @@ const fixtureQuests = <QuestFixtureQuest>[
     minPlayerLevel: 20,
     experience: 8000,
   ),
+  QuestFixtureQuest(
+    id: 'quest-pve-only',
+    name: 'PvE Only Raid',
+    normalizedName: 'pve-only-raid',
+    traderId: fixturePrapor,
+    minPlayerLevel: 5,
+    experience: 1200,
+    gameMode: ['pve'],
+  ),
 ];
 
 /// Recorded progress per profile. Every quest absent here is not started.
@@ -256,7 +269,10 @@ Future<void> seedQuestFixture(AppDatabase database) async {
         quest.minPlayerLevel,
         quest.experience,
         0,
-        jsonEncode({'normalizedName': quest.normalizedName}),
+        jsonEncode({
+          'normalizedName': quest.normalizedName,
+          'gameMode': ?quest.gameMode,
+        }),
       ],
     );
   }

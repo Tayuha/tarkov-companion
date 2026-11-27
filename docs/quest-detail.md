@@ -53,10 +53,12 @@ The header uses two different badges on purpose:
 
 ## Data API used
 
-`QuestRepository.detail(id)` supplies the quest, objectives, prerequisites,
-rewards and unlocks. `QuestRepository.statuses(profileId)` supplies every
-derived status once per load, so the screen can show prerequisites and unlocks
-without one full derivation per row.
+`QuestRepository.detail(id, profileId: …)` supplies the quest, objectives,
+prerequisites, rewards and unlocks, scoped to the profile's game mode: a
+PvE-only quest opened under a regular profile reads as not found instead of
+showing content the profile cannot use. `QuestRepository.statuses(profileId)`
+supplies every derived status once per load, so the screen can show
+prerequisites and unlocks without one full derivation per row.
 
 Two small label lookups were added to `QuestRepository`:
 

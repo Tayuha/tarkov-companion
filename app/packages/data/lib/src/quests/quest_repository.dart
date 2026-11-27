@@ -94,6 +94,16 @@ final class QuestProgressValidationError implements Exception {
 /// Rows whose quest disappeared from the dataset are preserved; use
 /// [orphanedProgress] to list them. They are excluded from prerequisite math
 /// because the current dataset can no longer confirm them.
+///
+/// ## Game modes
+///
+/// The bundle marks a task with a `gameMode` list. A task without the field (or
+/// with an empty list) belongs to every mode, which keeps older bundles and
+/// hand-written fixtures readable. When a profile is supplied, reads keep only
+/// tasks whose list is empty or contains the profile's `profiles.gameMode`.
+/// A PvE-only task is therefore absent from a regular profile's catalog,
+/// statuses and available list, and a write for it is rejected like any other
+/// quest that is not in the active dataset.
 final class QuestRepository {
   /// Creates the repository over [database].
   ///
@@ -142,7 +152,8 @@ final class QuestRepository {
       );
     }
 
-    final parts = _buildParts(query, tokens);
+    final gameMode = await _profileGameMode(query.profileId);
+    final parts = _buildParts(query, tokens, gameMode: gameMode);
 
     return _database.transaction(() async {
       final totalRow = await _database
@@ -195,7 +206,8 @@ final class QuestRepository {
       return 0;
     }
 
-    final parts = _buildParts(query, tokens);
+    final gameMode = await _profileGameMode(query.profileId);
+    final parts = _buildParts(query, tokens, gameMode: gameMode);
     final row = await _database
         .customSelect(
           'SELECT count(*) AS n ${parts.fromSql} ${parts.whereSql}',
@@ -209,22 +221,34 @@ final class QuestRepository {
   // Detail
   // -------------------------------------------------------------------------
 
-  /// One quest's detail, or `null` when the id is not in the dataset.
+  /// One quest's detail, or `null` when the id is not in the active dataset.
   ///
   /// Objectives come from `taskObjectives`, ordered by objective id. Unlocks
   /// are the quests whose `taskRequirements` name this quest, so they always
   /// agree with the current dataset. Trader and map display names are joined
   /// locally when those datasets are present.
-  Future<QuestDetail?> detail(String id) async {
+  ///
+  /// Passing [profileId] scopes the lookup to that profile's game mode: a task
+  /// that exists for another mode reads as `null`, exactly like one removed
+  /// upstream. Omitting it keeps the mode-agnostic lookup used by detail links
+  /// and tests that have no profile.
+  Future<QuestDetail?> detail(String id, {String? profileId}) async {
     final task = await _taskById(id);
     if (task == null) {
+      return null;
+    }
+    final profile = await _profileByIdOrNull(profileId);
+    if (profileId != null && profileId.trim().isNotEmpty && profile == null) {
+      return null;
+    }
+    if (profile != null && !_taskVisibleInMode(task, profile.gameMode)) {
       return null;
     }
     final payload = _decodePayload(task.payload) ?? const <String, Object?>{};
     final objectives = await objectivesFor(id);
     final traderName = await _traderName(task.traderId);
     final mapName = await _mapName(task.mapId);
-    final unlocks = await _unlocksFor(id);
+    final unlocks = await _unlocksFor(id, gameMode: profile?.gameMode);
 
     return QuestDetail.fromTaskRecord(
       id: task.id,
@@ -273,9 +297,10 @@ final class QuestRepository {
   Future<List<QuestStatus>> statuses(String profileId) async {
     final profile = await _requireProfile(profileId);
 
-    final tasks = await (_database.select(
+    final allTasks = await (_database.select(
       _database.tasks,
     )..orderBy([(row) => OrderingTerm.asc(row.id)])).get();
+    final tasks = _visibleTasks(allTasks, profile.gameMode);
     final objectiveRows = await _database
         .select(_database.taskObjectives)
         .get();
@@ -338,22 +363,36 @@ final class QuestRepository {
   /// Quests the profile can start now, in deterministic order.
   ///
   /// Only [QuestAvailability.available] quests are returned: not started, and
-  /// every blocking requirement met. The order is:
+  /// every blocking requirement met.
+  ///
+  /// Without [sort] the order is "recommended":
   ///
   /// 1. minimum player level ascending (quests without a level last),
   /// 2. trader id ascending (missing last),
   /// 3. normalized name ascending,
   /// 4. quest id ascending.
   ///
+  /// [sort] replaces the primary criterion; ties are still broken by
+  /// normalized name and then quest id, and values missing from the sorted
+  /// field stay last in both directions, like [QuestQuery]'s sort. The
+  /// available view exposes level, trader, map and name.
+  ///
   /// Trader loyalty/reputation advisories are included in each status's
   /// reasons but never remove a quest from this list.
-  Future<List<QuestStatus>> availableQuests(String profileId) async {
+  Future<List<QuestStatus>> availableQuests(
+    String profileId, {
+    QuestSort? sort,
+  }) async {
     final all = await statuses(profileId);
     final available = [
       for (final status in all)
         if (status.isAvailable) status,
     ];
-    available.sort(_compareAvailable);
+    available.sort(
+      sort == null
+          ? _compareAvailable
+          : (left, right) => _compareBySort(left, right, sort),
+    );
     return List.unmodifiable(available);
   }
 
@@ -400,15 +439,17 @@ final class QuestRepository {
   /// so dependents lock or unlock immediately after this transaction commits.
   ///
   /// Throws [QuestProfileNotFoundError] for an unknown profile and
-  /// [QuestNotFoundError] for a quest absent from the current dataset.
+  /// [QuestNotFoundError] for a quest absent from the active dataset, including
+  /// a quest scoped to another game mode.
   Future<void> setQuestState(
     String profileId,
     String questId,
     QuestProgressState state,
   ) {
     return _database.transaction(() async {
-      await _requireProfile(profileId);
-      if (await _taskById(questId) == null) {
+      final profile = await _requireProfile(profileId);
+      final task = await _taskById(questId);
+      if (task == null || !_taskVisibleInMode(task, profile.gameMode)) {
         throw QuestNotFoundError(questId);
       }
 
@@ -444,7 +485,8 @@ final class QuestRepository {
   /// counts never change a completion on their own.
   ///
   /// Throws [QuestProfileNotFoundError], [QuestNotFoundError],
-  /// [QuestObjectiveNotFoundError] or [QuestProgressValidationError].
+  /// [QuestObjectiveNotFoundError] or [QuestProgressValidationError]. A quest
+  /// scoped to another game mode is treated as absent from the active dataset.
   Future<void> setObjectiveCount(
     String profileId,
     String questId,
@@ -452,8 +494,9 @@ final class QuestRepository {
     int count,
   ) {
     return _database.transaction(() async {
-      await _requireProfile(profileId);
-      if (await _taskById(questId) == null) {
+      final profile = await _requireProfile(profileId);
+      final task = await _taskById(questId);
+      if (task == null || !_taskVisibleInMode(task, profile.gameMode)) {
         throw QuestNotFoundError(questId);
       }
 
@@ -554,14 +597,65 @@ final class QuestRepository {
   DateTime _now() => _clock?.call() ?? DateTime.now();
 
   Future<Profile> _requireProfile(String profileId) async {
-    final profile = await (_database.select(
-      _database.profiles,
-    )..where((row) => row.id.equals(profileId))).getSingleOrNull();
+    final profile = await _profileByIdOrNull(profileId);
     if (profile == null) {
       throw QuestProfileNotFoundError(profileId);
     }
     return profile;
   }
+
+  Future<Profile?> _profileByIdOrNull(String? profileId) async {
+    final id = _nonBlank(profileId);
+    if (id == null) {
+      return null;
+    }
+    return (_database.select(
+      _database.profiles,
+    )..where((row) => row.id.equals(id))).getSingleOrNull();
+  }
+
+  /// The game mode of a query's profile, or `null` when there is none.
+  ///
+  /// An unknown profile id deliberately reads as "no mode": the catalog query
+  /// has always tolerated it and reports every row as not started. Only a real
+  /// profile can scope a read.
+  Future<String?> _profileGameMode(String? profileId) async =>
+      (await _profileByIdOrNull(profileId))?.gameMode;
+
+  /// Tasks visible in [gameMode], preserving the incoming order.
+  List<Task> _visibleTasks(List<Task> tasks, String gameMode) => [
+    for (final task in tasks)
+      if (_taskVisibleInMode(task, gameMode)) task,
+  ];
+
+  bool _taskVisibleInMode(Task task, String gameMode) =>
+      _payloadVisibleInMode(_decodePayload(task.payload), gameMode);
+
+  /// Whether a task payload belongs to [gameMode].
+  ///
+  /// A missing, non-array or empty `gameMode` is mode-agnostic: old bundles and
+  /// hand-written test records predate the field, and hiding every one of them
+  /// would silently empty the catalog. An explicit list is authoritative; a
+  /// malformed list is treated as unscoped rather than dropping the quest.
+  static bool _payloadVisibleInMode(
+    Map<String, Object?>? payload,
+    String gameMode,
+  ) {
+    final raw = payload?['gameMode'];
+    if (raw == null || raw is! List || raw.isEmpty) {
+      return true;
+    }
+    final mode = _modeKey(gameMode);
+    for (final entry in raw) {
+      if (entry is String && _modeKey(entry) == mode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Case-insensitive spelling of a game mode, as stored and bundled.
+  static String _modeKey(String value) => value.trim().toLowerCase();
 
   Future<Task?> _taskById(String id) {
     return (_database.select(
@@ -616,13 +710,22 @@ final class QuestRepository {
   }
 
   /// Quests whose `taskRequirements` include [questId], ordered by name then id.
-  Future<List<QuestUnlock>> _unlocksFor(String questId) async {
+  ///
+  /// With [gameMode], unlock rows from another mode are omitted so a detail
+  /// view never names a quest the active profile cannot see.
+  Future<List<QuestUnlock>> _unlocksFor(
+    String questId, {
+    String? gameMode,
+  }) async {
     final tasks = await _database.select(_database.tasks).get();
     final unlocks = <QuestUnlock>[];
     final normalized = <String, String>{};
 
     for (final task in tasks) {
       if (task.id == questId) {
+        continue;
+      }
+      if (gameMode != null && !_taskVisibleInMode(task, gameMode)) {
         continue;
       }
       final view = _viewOf(task);
@@ -769,6 +872,8 @@ final class QuestRepository {
       traderId: task.traderId,
       mapId: task.mapId,
       minPlayerLevel: task.minPlayerLevel,
+      experience: task.experience,
+      kappaRequired: task.kappaRequired,
       availability: availability,
       recordedState: state,
       reasons: List.unmodifiable(reasons),
@@ -829,6 +934,87 @@ final class QuestRepository {
     }
     final byName = left.normalizedName.compareTo(right.normalizedName);
     return byName != 0 ? byName : left.id.compareTo(right.id);
+  }
+
+  /// One primary criterion followed by the same name/id tie-breakers as the
+  /// catalog, with missing values last in both directions.
+  static int _compareBySort(
+    QuestStatus left,
+    QuestStatus right,
+    QuestSort sort,
+  ) {
+    final primary = switch (sort.field) {
+      QuestSortField.name => _compareDirectionalString(
+        left.normalizedName,
+        right.normalizedName,
+        sort.descending,
+      ),
+      QuestSortField.minPlayerLevel => _compareNullableDirectionalInt(
+        left.minPlayerLevel,
+        right.minPlayerLevel,
+        sort.descending,
+      ),
+      QuestSortField.traderId => _compareNullableDirectionalString(
+        left.traderId,
+        right.traderId,
+        sort.descending,
+      ),
+      QuestSortField.mapId => _compareNullableDirectionalString(
+        left.mapId,
+        right.mapId,
+        sort.descending,
+      ),
+    };
+    if (primary != 0) {
+      return primary;
+    }
+    final byName = left.normalizedName.compareTo(right.normalizedName);
+    return byName != 0 ? byName : left.id.compareTo(right.id);
+  }
+
+  static int _compareDirectionalString(
+    String left,
+    String right,
+    bool descending,
+  ) {
+    final result = left.compareTo(right);
+    return descending ? -result : result;
+  }
+
+  static int _compareNullableDirectionalInt(
+    int? left,
+    int? right,
+    bool descending,
+  ) {
+    if (left == right) {
+      return 0;
+    }
+    if (left == null) {
+      return 1;
+    }
+    if (right == null) {
+      return -1;
+    }
+    final result = left.compareTo(right);
+    return descending ? -result : result;
+  }
+
+  static int _compareNullableDirectionalString(
+    String? left,
+    String? right,
+    bool descending,
+  ) {
+    if (left == right) {
+      return 0;
+    }
+    if (left == null) {
+      return 1;
+    }
+    if (right == null) {
+      return -1;
+    }
+    final result = left.compareTo(right);
+    return descending ? -result : result;
   }
 
   static int _compareNullableInt(int? left, int? right) {
@@ -984,13 +1170,33 @@ final class QuestRepository {
     return null;
   }
 
-  _QueryParts _buildParts(QuestQuery query, List<String> tokens) {
+  _QueryParts _buildParts(
+    QuestQuery query,
+    List<String> tokens, {
+    String? gameMode,
+  }) {
     final filters = query.filters;
     final profileId = _nonBlank(query.profileId);
     final where = _WhereBuilder();
 
     for (final token in tokens) {
       where.add('$_normalizedNameSql LIKE ?', Variable<String>('%$token%'));
+    }
+
+    if (gameMode != null) {
+      // Mirrors _payloadVisibleInMode: a missing, non-array or empty list is
+      // mode-agnostic; otherwise one entry must equal the profile's mode. The
+      // CASE keeps a malformed payload readable instead of failing the query.
+      where.add(
+        r"CASE WHEN json_valid(tasks.payload) THEN "
+        r"(json_type(tasks.payload, '$.gameMode') IS NULL "
+        r"OR json_type(tasks.payload, '$.gameMode') <> 'array' "
+        r"OR json_array_length(tasks.payload, '$.gameMode') = 0 "
+        r"OR EXISTS (SELECT 1 FROM json_each(tasks.payload, '$.gameMode') "
+        r'AS gameModeEntry WHERE lower(gameModeEntry.value) = ?)) '
+        r'ELSE 1 END',
+        Variable<String>(_modeKey(gameMode)),
+      );
     }
 
     final traderId = _nonBlank(filters.traderId);

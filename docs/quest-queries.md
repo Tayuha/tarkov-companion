@@ -12,7 +12,7 @@ The quest catalog reads the local database only. `QuestRepository`
 
 This is a read/query layer. It reports recorded progress; it does **not** derive
 locked/available availability from prerequisites, level and progress. That is
-the availability engine (`docs/quest-tracking.md`, task 6.3).
+the availability engine (see [`quest-tracking.md`](quest-tracking.md)).
 
 ## Usage
 
@@ -60,6 +60,23 @@ others.
 Set `minPlayerLevel` and `maxPlayerLevel` to the same value for "exactly this
 level"; setting them to different values yields the intersection, so
 `minPlayerLevel: 42, maxPlayerLevel: 9` matches nothing.
+
+### Game-mode scoping
+
+`QuestQuery.profileId` does more than read progress: when it names a real
+profile, the query also keeps only tasks visible in that profile's
+`profiles.gameMode`. A task payload's `gameMode` list is checked as follows:
+
+- missing, empty, non-array or malformed -> visible in every mode (this keeps
+  older bundles and hand-written fixtures readable);
+- otherwise the list must contain the profile's mode (`regular`, `pve` or
+  `pvp-season`).
+
+`query` and `count` apply the same filter, and `statuses` / `availableQuests`
+apply it in memory. Without a profile there is no active mode, so the catalog
+is unscoped. An unknown profile id is also unscoped: the catalog has always
+tolerated it and reports every row as `notStarted`. See
+[`quest-tracking.md`](quest-tracking.md) for the user-facing rule.
 
 ### Search tokens
 

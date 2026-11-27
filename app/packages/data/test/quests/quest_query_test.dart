@@ -779,7 +779,10 @@ void main() {
         const QuestFilters(state: QuestProgressState.notStarted),
         profileId: 'profile-b',
       );
-      expect(notStartedB.total, 78);
+      // The published fixture carries two `regular`-only tasks; the PvE
+      // profile never sees them, so 78 mode-visible tasks minus its two
+      // recorded states leave 76.
+      expect(notStartedB.total, 76);
       expect(_ids(notStartedB.quests), isNot(contains(_debut)));
       expect(_ids(notStartedB.quests), isNot(contains(_backgroundCheck)));
       expect(_ids(notStartedB.quests), contains(_shootoutPicnic));
