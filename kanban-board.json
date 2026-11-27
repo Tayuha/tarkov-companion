@@ -1703,18 +1703,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 97,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in final batch workstream ses_de45cb799ffe15mA53P2X180Qp.",
+      "notes": "On main after the final batch. Focus ring token + AppFocusRing overlay, one tab stop per row, / and Escape, Enter/Space, scroll reveal; 18 keyboard tests.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795760024044,
-      "archived": false,
-      "sessionID": "ses_de45cb799ffe15mA53P2X180Qp"
+      "updatedAt": 1795762396592,
+      "archived": false
     },
     {
       "id": "task_impl_8_8",
@@ -1788,18 +1787,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 1,
+      "categoryID": "done",
+      "position": 91,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in final batch workstream ses_de45cb798ffe4WBjD2m3aikpBT.",
+      "notes": "On main after the final batch. Headless e2e in app/test/e2e drives first run -> search -> detail -> quest completion -> level edit -> export -> delete -> import; temp DB, fake sync transport.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795760024044,
-      "archived": false,
-      "sessionID": "ses_de45cb798ffe4WBjD2m3aikpBT"
+      "updatedAt": 1795762396592,
+      "archived": false
     },
     {
       "id": "task_impl_9_2",
@@ -1833,17 +1831,17 @@
       "branch": "main",
       "baseBranch": "main",
       "categoryID": "inprogress",
-      "position": 3,
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
+      "notes": "Recovery export implementation running in feat-recovery-export.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795760024044,
+      "updatedAt": 1795762396592,
       "archived": false,
-      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
+      "sessionID": "ses_de43897d8ffewDlDEn2BtSbS9V"
     },
     {
       "id": "task_impl_9_4",
@@ -1854,18 +1852,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 4,
+      "categoryID": "done",
+      "position": 94,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
+      "notes": "On main after the final batch. Network audit script passes; four allowlisted hosts documented; allowlist comment corrected.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795760024044,
-      "archived": false,
-      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
+      "updatedAt": 1795762396592,
+      "archived": false
     },
     {
       "id": "task_impl_9_5",
@@ -1876,18 +1873,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 5,
+      "categoryID": "done",
+      "position": 95,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Running in final batch workstream ses_de45cb797ffeAt6aQ4EsnP28HZ.",
+      "notes": "On main after the final batch. README finalized with screenshots, Linux-first build, attribution, privacy, verification paths.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795760024044,
-      "archived": false,
-      "sessionID": "ses_de45cb797ffeAt6aQ4EsnP28HZ"
+      "updatedAt": 1795762396592,
+      "archived": false
     },
     {
       "id": "task_impl_9_6",
