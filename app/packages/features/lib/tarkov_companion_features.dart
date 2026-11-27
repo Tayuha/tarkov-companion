@@ -11,3 +11,4 @@ export 'src/first_run/first_run_screen.dart';
 export 'src/quests/quest_detail_screen.dart';
 export 'src/quests/quest_list_screen.dart';
 export 'src/section_header.dart';
+export 'src/theme/theme.dart';
