@@ -50,6 +50,9 @@ Windows and mobile packaging resume only after T8.9 is approved.
 
 ## Build and run on the home desktop
 
+Repository on the home desktop: **`/home/tayuha/Projects/tarkov-companion`** (user `tayuha`). The SDK lives
+at `~/.local/flutter`; the interactive shell is fish and already has it on `PATH`.
+
 Prerequisites: Flutter **3.50.1**, Dart 3.14, Node **24**, `ninja`, clang/cmake/GTK3.
 
 ```bash
@@ -85,17 +88,15 @@ Data directory on Linux: `~/.local/share/tarkov_companion/{db,logs,downloads}`.
 
 ## Resume this conversation
 
-The full session was exported to **`~/tarkov-companion-session.json`** (≈4 MB, mode 600, sanitized only for
-the local OpenCode service password). It contains local paths and tool output; treat it as private and do
-**not** commit it.
+The latest full session export is the git-ignored **`homework/conversation.json`** (≈4 MB, mode 600, local
+service password redacted). It contains local paths and tool output; keep it private and do not commit it.
 
-Transfer it privately (USB, `scp`, Syncthing — not a public repo), then on the home desktop:
+On the home desktop:
 
 ```bash
-git clone https://github.com/Tayuha/tarkov-companion.git
-cd tarkov-companion
+cd /home/tayuha/Projects/tarkov-companion
 
-opencode session import ~/tarkov-companion-session.json --directory "$PWD"
+opencode session import homework/conversation.json --directory "$PWD"
 opencode session list
 
 # The original id is preserved by the export:
