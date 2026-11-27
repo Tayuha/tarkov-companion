@@ -1598,17 +1598,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 24,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement non-blocking startup that renders from the last dataset before any network call, verified by a test that delays the manifest response and asserts the first frame still renders",
+      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795759028454,
+      "archived": false,
+      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
     },
     {
       "id": "task_impl_8_3",
@@ -1619,17 +1620,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 25,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement update check controls (schedule, manual check, last check time/outcome) with non-modal indicators, verified by widget tests for each outcome and preference combination",
+      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795759028454,
+      "archived": false,
+      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
     },
     {
       "id": "task_impl_8_4",
@@ -1640,17 +1642,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 26,
+      "categoryID": "inprogress",
+      "position": 3,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement offline and upstream-error states across catalog, quests, and history views with retry, verified by widget tests with a failing network layer",
+      "notes": "Running in shell batch workstream ses_de46be31fffeHCZkisgzaeifKD.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795759028454,
+      "archived": false,
+      "sessionID": "ses_de46be31fffeHCZkisgzaeifKD"
     },
     {
       "id": "task_impl_8_5",
@@ -1724,17 +1727,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 30,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement the about screen showing app version, data bundle version, dataset age, license, and attribution, verified by a golden widget test",
+      "notes": "Running in shell batch workstream ses_de46be320ffeu5J24e4weVf3lY.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795759028454,
+      "archived": false,
+      "sessionID": "ses_de46be320ffeu5J24e4weVf3lY"
     },
     {
       "id": "task_impl_8_9",
