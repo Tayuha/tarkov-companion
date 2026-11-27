@@ -75,3 +75,30 @@ A price is only meaningful with the time it was observed:
 The data layer exposes the verdict, not a label: wording, icon and layout belong
 to the catalog UI (task 5.5). These rules apply to the catalog rows as well as
 the item detail view.
+
+## Price-history cache TTL
+
+The on-demand chart cache (`priceHistory`, task 5.7) has a **separate** TTL
+from the freshness policy above. `PriceHistoryRepository` defaults to 6 hours
+and measures expiry from the newest stored observation, because the bundle
+contract has no history dataset and the cache table has no fetch timestamp; the
+alternative would be a schema migration for a cache. A snapshot whose newest
+point is already older than the TTL is therefore refetched on the next online
+visit. Offline reads ignore the TTL: a stale cache is still shown, labelled
+stale, instead of pretending there is no history. No cache offline is the
+explicit unavailable state in `PriceHistoryChart`.
+
+## Detail price states
+
+The item detail panel (task 5.5) renders three distinct states and never
+collapses them:
+
+| State | Condition | Rendering |
+|---|---|---|
+| Complete | `lastLow` and/or `avg24h` present | Rouble values, 48 h direction, observation timestamp, base price |
+| Missing flea | both flea fields `null` | `No flea price observed yet.` (or `Not available on the flea market.` for a `noFlea` item) |
+| Zero | `lastLow == 0` | `No flea offers (0 ₽)`; not treated as missing |
+
+A trader-only item keeps its base price even when the flea fields are absent,
+matching the rule that "we have no observation" is not the same as "the
+observation is old".

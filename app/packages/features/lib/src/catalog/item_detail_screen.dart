@@ -3,30 +3,38 @@ import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import '../theme/app_primitives.dart';
 import '../theme/app_tokens.dart';
+import 'catalog_item_row.dart' show changeColor, formatChange, formatRoubles;
+import 'item_image.dart';
+import 'price_history_chart.dart';
 
 /// The full item detail view.
 ///
-/// The screen reads one [ItemDetail] through [CatalogRepository] and renders a
-/// header, the base properties every item has, and one type-specific section.
-/// Sections and rows are built from the typed [ItemProperties] subclass, so a
-/// property that does not apply to the item's kind cannot reach the tree: a
-/// weapon never shows damage, ammunition never shows ergonomics, and a
-/// barter-only item gets no type-specific section at all. No row is rendered
-/// as zero or "N/A".
+/// The screen reads one [ItemDetail] and its [ItemRelations] through
+/// [CatalogRepository] and renders a header, the base properties every item
+/// has, prices, acquisition/disposition relationships and one type-specific
+/// section. Sections and rows are built from the typed [ItemProperties]
+/// subclass, so a property that does not apply to the item's kind cannot reach
+/// the tree: a weapon never shows damage, ammunition never shows ergonomics,
+/// and a barter-only item gets no type-specific section at all. A missing fact
+/// produces no row; a zero *price* is the one real observation that gets an
+/// explicit label instead of being omitted.
 ///
-/// The layout caps its width and, from 1080 logical pixels, splits base/typed
-/// facts from categories and links into two columns. Narrow windows keep the
-/// single ordered column.
+/// The layout caps its width and, from 1080 logical pixels, splits
+/// base/price/typed facts from categories, links, relationships and history
+/// into two columns. Narrow windows keep the single ordered column.
 ///
-/// Images are a fixed neutral placeholder until task 5.6 adds the image cache.
-/// Acquisition/disposition (5.4), prices (5.5/5.7) and history are deliberately
-/// absent.
+/// Both the image cache and the price-history repository are injectable. When
+/// they are omitted the header keeps its neutral placeholder and the history
+/// section is omitted, so the screen still performs no I/O.
 class ItemDetailScreen extends StatefulWidget {
   const ItemDetailScreen({
     super.key,
     required this.repository,
     required this.itemId,
     this.onBack,
+    this.imageCache,
+    this.priceHistory,
+    this.offline = false,
   });
 
   final CatalogRepository repository;
@@ -38,14 +46,28 @@ class ItemDetailScreen extends StatefulWidget {
   /// current route, which is the normal behavior for a pushed detail page.
   final VoidCallback? onBack;
 
+  /// Optional disk-backed item image cache. Without it the header keeps its
+  /// neutral placeholder and performs no I/O.
+  final ItemImageCache? imageCache;
+
+  /// Optional on-demand price-history source. Without it the history section
+  /// is omitted entirely rather than rendering an empty chart.
+  final PriceHistoryRepository? priceHistory;
+
+  /// Whether the history fetch runs in offline mode (cache only).
+  final bool offline;
+
   @override
   State<ItemDetailScreen> createState() => _ItemDetailScreenState();
 }
 
 class _ItemDetailScreenState extends State<ItemDetailScreen> {
   ItemDetail? _detail;
+  ItemRelations? _relations;
+  PriceHistorySnapshot? _history;
   Object? _error;
   bool _loading = true;
+  bool _historyLoading = false;
   int _generation = 0;
 
   @override
@@ -58,7 +80,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   void didUpdateWidget(ItemDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.itemId != widget.itemId ||
-        oldWidget.repository != widget.repository) {
+        oldWidget.repository != widget.repository ||
+        oldWidget.priceHistory != widget.priceHistory ||
+        oldWidget.offline != widget.offline) {
       _load();
     }
   }
@@ -68,16 +92,42 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     setState(() {
       _loading = true;
       _detail = null;
+      _relations = null;
+      _history = null;
+      _historyLoading = widget.priceHistory != null;
       _error = null;
     });
     try {
       final detail = await widget.repository.itemDetail(widget.itemId);
+      final relations = detail == null
+          ? null
+          : await widget.repository.itemRelations(widget.itemId);
       if (!mounted || generation != _generation) {
         return;
       }
       setState(() {
         _detail = detail;
+        _relations = relations;
         _loading = false;
+      });
+
+      final history = widget.priceHistory;
+      if (detail == null || history == null) {
+        if (mounted && generation == _generation) {
+          setState(() => _historyLoading = false);
+        }
+        return;
+      }
+      final snapshot = await history.load(
+        widget.itemId,
+        offline: widget.offline,
+      );
+      if (!mounted || generation != _generation) {
+        return;
+      }
+      setState(() {
+        _history = snapshot;
+        _historyLoading = false;
       });
     } on Object catch (error) {
       if (!mounted || generation != _generation) {
@@ -85,6 +135,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       }
       setState(() {
         _loading = false;
+        _historyLoading = false;
         _error = error;
       });
     }
@@ -122,12 +173,24 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     if (detail == null) {
       return _NotFoundState(itemId: widget.itemId, onBack: _back);
     }
-    return _DetailBody(detail: detail);
+    return _DetailBody(
+      detail: detail,
+      relations: _relations,
+      history: _history,
+      historyLoading: _historyLoading,
+      imageCache: widget.imageCache,
+    );
   }
 }
 
 class _DetailBody extends StatelessWidget {
-  const _DetailBody({required this.detail});
+  const _DetailBody({
+    required this.detail,
+    required this.relations,
+    required this.history,
+    required this.historyLoading,
+    required this.imageCache,
+  });
 
   /// The widest the inspector grows, even on a 1920 monitor.
   static const double _maxContentWidth = 1180;
@@ -136,12 +199,20 @@ class _DetailBody extends StatelessWidget {
   static const double _twoColumnBreakpoint = 1080;
 
   final ItemDetail detail;
+  final ItemRelations? relations;
+  final PriceHistorySnapshot? history;
+  final bool historyLoading;
+  final ItemImageCache? imageCache;
 
   @override
   Widget build(BuildContext context) {
     final tokens = AppTokens.of(context);
     final typed = _buildTypedSection(detail.properties);
     final properties = _buildProperties(context, detail);
+    final price = _buildPriceSection(context, detail);
+    final historySection = _buildHistorySection(context);
+    final acquisition = _buildAcquisition(context, relations);
+    final disposition = _buildDisposition(context, relations);
     final categories = detail.categories.isEmpty
         ? null
         : _DetailSection(
@@ -204,8 +275,14 @@ class _DetailBody extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final twoColumn = constraints.maxWidth >= _twoColumnBreakpoint;
-              final left = <Widget>[?properties, ?typed, ?description];
-              final right = <Widget>[?categories, ?links];
+              final left = <Widget>[?properties, ?price, ?typed, ?description];
+              final right = <Widget>[
+                ?categories,
+                ?links,
+                ?acquisition,
+                ?disposition,
+                ?historySection,
+              ];
 
               final content = twoColumn && right.isNotEmpty
                   ? Row(
@@ -219,8 +296,12 @@ class _DetailBody extends StatelessWidget {
                   : _Stack(
                       children: [
                         ?properties,
+                        ?price,
                         ?categories,
                         ?links,
+                        ?acquisition,
+                        ?disposition,
+                        ?historySection,
                         ?typed,
                         ?description,
                       ],
@@ -229,7 +310,7 @@ class _DetailBody extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _Header(detail: detail),
+                  _Header(detail: detail, imageCache: imageCache),
                   SizedBox(height: tokens.spaceXl),
                   content,
                 ],
@@ -272,6 +353,269 @@ class _DetailBody extends StatelessWidget {
     );
   }
 
+  Widget? _buildPriceSection(BuildContext context, ItemDetail detail) {
+    final price = detail.price;
+    if (price.isEmpty && detail.basePrice == null) {
+      return null;
+    }
+    final tokens = AppTokens.of(context);
+    final rows = <Widget>[];
+    final fleaLabel = Text(
+      detail.fleaEligible
+          ? 'No flea price observed yet.'
+          : 'Not available on the flea market.',
+      key: const Key('item-detail-price-missing'),
+      style: tokens.bodyStyle.copyWith(color: tokens.muted),
+    );
+    final lastLow = price.fleaLastLow;
+    final average = price.fleaAvg24h;
+    if (lastLow == null && average == null) {
+      rows.add(_PropertyRow(label: 'Flea market', child: fleaLabel));
+    } else {
+      if (lastLow != null) {
+        if (lastLow == 0) {
+          rows.add(
+            _PropertyRow(
+              label: 'Flea · low',
+              child: Text(
+                'No flea offers (0 ₽)',
+                key: const Key('item-detail-price-zero'),
+                style: tokens.dataStyle.copyWith(color: tokens.muted),
+              ),
+            ),
+          );
+        } else {
+          rows.add(
+            _PropertyRow(
+              label: 'Flea · low',
+              child: Text(
+                formatRoubles(lastLow),
+                key: const Key('item-detail-price-flea'),
+                style: tokens.dataStyle.copyWith(color: tokens.value),
+              ),
+            ),
+          );
+        }
+      }
+      if (average != null && average > 0) {
+        rows.add(
+          _PropertyRow(
+            label: 'Flea · 24 h avg',
+            child: Text(
+              formatRoubles(average),
+              key: const Key('item-detail-price-avg'),
+              style: tokens.dataStyle.copyWith(color: tokens.text),
+            ),
+          ),
+        );
+      }
+      final change = price.change48hPercent;
+      if (change != null) {
+        rows.add(
+          _PropertyRow(
+            label: 'Flea · 48 h',
+            child: Text(
+              _formatPriceChange(change, price.change48hAbsolute),
+              key: const Key('item-detail-price-change'),
+              style: tokens.dataStyle.copyWith(
+                color: changeColor(tokens, change),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+    if (detail.basePrice != null) {
+      rows.add(
+        _PropertyRow(
+          label: 'Trader · base',
+          child: Text(
+            formatRoubles(detail.basePrice),
+            key: const Key('item-detail-price-base'),
+            style: tokens.dataStyle.copyWith(color: tokens.text),
+          ),
+        ),
+      );
+    }
+    final observedAt = price.observedAt;
+    if (observedAt != null) {
+      rows.add(
+        _PropertyRow(
+          label: 'Observed',
+          child: Text(
+            _formatTimestamp(observedAt),
+            key: const Key('item-detail-price-observed'),
+            style: tokens.dataStyle.copyWith(color: tokens.muted),
+          ),
+        ),
+      );
+    }
+    if (rows.isEmpty) {
+      return null;
+    }
+    return _DetailSection(
+      key: const Key('item-detail-section-prices'),
+      title: 'Prices',
+      children: rows,
+    );
+  }
+
+  Widget? _buildHistorySection(BuildContext context) {
+    if (!historyLoading && history == null) {
+      return null;
+    }
+    final tokens = AppTokens.of(context);
+    return _DetailSection(
+      key: const Key('item-detail-section-history'),
+      title: 'Price history',
+      children: [
+        if (historyLoading)
+          LinearProgressIndicator(
+            key: const Key('item-detail-history-loading'),
+            color: tokens.accent,
+            backgroundColor: tokens.surfaceRaised,
+            minHeight: 2,
+          )
+        else if (history != null)
+          PriceHistoryChart(snapshot: history!),
+      ],
+    );
+  }
+
+  Widget? _buildAcquisition(BuildContext context, ItemRelations? relations) {
+    if (relations == null) {
+      return null;
+    }
+    final rows = <Widget>[
+      for (final offer in relations.buyOffers)
+        _PropertyRow(
+          key: ValueKey('item-detail-buy-${offer.traderId}'),
+          label: offer.traderName,
+          child: _offerLine(context, offer),
+        ),
+      for (final barter in relations.barters)
+        _PropertyRow(
+          key: ValueKey('item-detail-barter-${barter.id}'),
+          label: barter.traderName,
+          child: _relationLine(
+            context,
+            '${_formatQuantities(barter.requiredItems)} → '
+            '${_formatQuantity(barter.offeredItem)}',
+          ),
+        ),
+      for (final craft in relations.crafts)
+        _PropertyRow(
+          key: ValueKey('item-detail-craft-${craft.id}'),
+          label: craft.stationName,
+          child: _relationLine(
+            context,
+            '${_formatQuantities(craft.requiredItems)} → '
+            '${_formatQuantity(craft.product)} · '
+            '${_formatDuration(craft.durationSeconds)}',
+          ),
+        ),
+      for (final quest in relations.quests)
+        _PropertyRow(
+          key: ValueKey(
+            'item-detail-quest-${quest.questId}-${quest.kind.name}',
+          ),
+          label: quest.questName,
+          child: _relationLine(
+            context,
+            quest.detail ?? 'Requires this item',
+            key: ValueKey('item-detail-quest-detail-${quest.questId}'),
+          ),
+        ),
+    ];
+    if (rows.isEmpty) {
+      return null;
+    }
+    return _DetailSection(
+      key: const Key('item-detail-section-acquisition'),
+      title: 'Acquisition',
+      children: rows,
+    );
+  }
+
+  Widget? _buildDisposition(BuildContext context, ItemRelations? relations) {
+    if (relations == null) {
+      return null;
+    }
+    final rows = <Widget>[
+      for (final offer in relations.sellOffers)
+        _PropertyRow(
+          key: ValueKey('item-detail-sell-${offer.traderId}'),
+          label: offer.traderName,
+          child: _offerLine(context, offer),
+        ),
+      for (final barter in relations.bartersUsing)
+        _PropertyRow(
+          key: ValueKey('item-detail-barter-input-${barter.id}'),
+          label: barter.traderName,
+          child: _relationLine(
+            context,
+            'Used for ${_formatQuantity(barter.offeredItem)}',
+          ),
+        ),
+      for (final craft in relations.craftsUsing)
+        _PropertyRow(
+          key: ValueKey('item-detail-craft-input-${craft.id}'),
+          label: craft.stationName,
+          child: _relationLine(
+            context,
+            'Used for ${_formatQuantity(craft.product)}',
+          ),
+        ),
+    ];
+    if (rows.isEmpty) {
+      return null;
+    }
+    return _DetailSection(
+      key: const Key('item-detail-section-disposition'),
+      title: 'Disposition',
+      children: rows,
+    );
+  }
+
+  Widget _offerLine(BuildContext context, TraderOffer offer) {
+    final tokens = AppTokens.of(context);
+    final meta = <String>[
+      if (offer.loyaltyLevel != null) 'LL ${offer.loyaltyLevel}',
+      if (offer.buyLimit != null) 'limit ${offer.buyLimit}',
+      if (offer.taskUnlockName != null) 'unlocked by ${offer.taskUnlockName}',
+    ];
+    return Row(
+      children: [
+        Text(
+          _formatCurrency(offer.price, offer.currency),
+          style: tokens.dataStyle.copyWith(color: tokens.value),
+        ),
+        if (meta.isNotEmpty) ...[
+          SizedBox(width: tokens.spaceSm),
+          Flexible(
+            child: Text(
+              meta.join(' · '),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: tokens.labelStyle.copyWith(color: tokens.dim),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _relationLine(BuildContext context, String text, {Key? key}) {
+    final tokens = AppTokens.of(context);
+    return Text(
+      text,
+      key: key,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: tokens.dataStyle.copyWith(color: tokens.text),
+    );
+  }
+
   Widget? _buildTypedSection(ItemProperties properties) {
     return switch (properties) {
       WeaponProperties() => _WeaponSection(properties: properties),
@@ -305,9 +649,10 @@ class _Stack extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.detail});
+  const _Header({required this.detail, this.imageCache});
 
   final ItemDetail detail;
+  final ItemImageCache? imageCache;
 
   @override
   Widget build(BuildContext context) {
@@ -315,16 +660,14 @@ class _Header extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          key: const Key('item-detail-icon-placeholder'),
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            color: tokens.surfaceRaised,
-            border: Border.all(color: tokens.border),
-            borderRadius: BorderRadius.circular(tokens.radiusSm),
-          ),
-          child: Icon(Icons.inventory_2_outlined, size: 52, color: tokens.dim),
+        ItemImage(
+          cache: imageCache,
+          url: detail.iconLink,
+          size: 120,
+          iconSize: 52,
+          borderRadius: BorderRadius.circular(tokens.radiusSm),
+          placeholderKey: const Key('item-detail-icon-placeholder'),
+          imageKey: const Key('item-detail-icon'),
         ),
         SizedBox(width: tokens.spaceXl),
         Expanded(
@@ -613,7 +956,7 @@ class _DetailSection extends StatelessWidget {
 /// One label/value row. A caller only adds a row when it has a value; [value]
 /// and [child] are therefore never an "N/A" fallback.
 class _PropertyRow extends StatelessWidget {
-  const _PropertyRow({required this.label, this.value, this.child});
+  const _PropertyRow({super.key, required this.label, this.value, this.child});
 
   final String label;
   final String? value;
@@ -771,6 +1114,64 @@ class _ErrorState extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatPriceChange(double percent, int? absolute) {
+  final direction = percent > 0 ? 'Rising' : (percent < 0 ? 'Falling' : 'Flat');
+  final parts = <String>[direction, formatChange(percent)];
+  if (absolute != null && absolute != 0) {
+    parts.add(_formatSignedRoubles(absolute));
+  }
+  return parts.join(' · ');
+}
+
+String _formatSignedRoubles(int value) {
+  final sign = value > 0 ? '+' : '';
+  return '$sign${formatRoubles(value)}';
+}
+
+String _formatTimestamp(DateTime value) {
+  final utc = value.toUtc();
+  String two(int number) => number.toString().padLeft(2, '0');
+  return '${utc.year}-${two(utc.month)}-${two(utc.day)} '
+      '${two(utc.hour)}:${two(utc.minute)} UTC';
+}
+
+String _formatCurrency(int amount, String currency) {
+  final symbol = switch (currency.toUpperCase()) {
+    'RUB' => '₽',
+    'USD' => '\$',
+    'EUR' => '€',
+    _ => currency,
+  };
+  final digits = amount.abs().toString();
+  final grouped = digits.replaceAllMapped(
+    RegExp(r'\B(?=(\d{3})+(?!\d))'),
+    (_) => ',',
+  );
+  return '${amount < 0 ? '-' : ''}$grouped $symbol';
+}
+
+String _formatQuantity(ItemQuantity quantity) =>
+    '${quantity.count} × ${quantity.name}';
+
+String _formatQuantities(List<ItemQuantity> quantities) =>
+    quantities.map(_formatQuantity).join(' + ');
+
+String _formatDuration(int seconds) {
+  if (seconds <= 0) {
+    return 'instant';
+  }
+  final hours = seconds ~/ 3600;
+  final minutes = (seconds % 3600) ~/ 60;
+  final remaining = seconds % 60;
+  if (hours > 0) {
+    return minutes > 0 ? '$hours h $minutes min' : '$hours h';
+  }
+  if (minutes > 0) {
+    return remaining > 0 ? '$minutes min $remaining s' : '$minutes min';
+  }
+  return '$remaining s';
 }
 
 /// Turns a bundle token into a display label (`noFlea` -> `No flea`,

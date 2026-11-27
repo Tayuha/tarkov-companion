@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 import 'package:tarkov_companion_features/tarkov_companion_features.dart';
+
+import 'dart:typed_data';
 
 import '../support/catalog_screen_fixture.dart';
 
@@ -50,6 +54,68 @@ void main() {
     await tester.tap(find.text(label).last);
     await tester.pumpAndSettle();
   }
+
+  testWidgets('a supplied image cache feeds the compact row image slot', (
+    tester,
+  ) async {
+    final directory = Directory.systemTemp.createTempSync('catalog-images-');
+    addTearDown(() {
+      if (directory.existsSync()) directory.deleteSync(recursive: true);
+    });
+    final cache = ItemImageCache(directory: directory, fetcher: _PngFetcher());
+    await tester.runAsync(() async {
+      await cache.load('https://assets.tarkov.dev/colt-icon.webp');
+    });
+
+    await tester.binding.setSurfaceSize(const Size(1000, 3000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: CatalogScreen(
+          repository: repository,
+          categories: fixtureCategories,
+          imageCache: cache,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('catalog-row-image-item-colt')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('category options load real bundle names when none are passed', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1440, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: CatalogScreen(
+          repository: repository,
+          onItemSelected: selectedIds.add,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('catalog-category-filter')));
+    await tester.pumpAndSettle();
+    // The labels come from the gameRecords seeded with the fixture, not from
+    // the screen's old hardcoded starter list.
+    expect(find.text('Weapons'), findsWidgets);
+    expect(find.text('Meds'), findsWidgets);
+
+    await tester.tap(find.text('Weapons').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Category: Weapons'), findsOneWidget);
+    expect(find.text('Showing 2 of 2 items'), findsOneWidget);
+  });
 
   testWidgets('initial load renders rows and the total count', (tester) async {
     await pumpCatalog(tester);
@@ -380,4 +446,18 @@ void main() {
       expect(surfaceFor('item-pmag'), tokens.background);
     });
   });
+}
+
+final class _PngFetcher implements ItemImageFetcher {
+  @override
+  Future<Uint8List> fetch(Uri uri) async => Uint8List.fromList(const [
+    0x89,
+    0x50,
+    0x4E,
+    0x47,
+    0x0D,
+    0x0A,
+    0x1A,
+    0x0A,
+  ]);
 }

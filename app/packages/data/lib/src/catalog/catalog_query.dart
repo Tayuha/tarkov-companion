@@ -255,6 +255,25 @@ final class CatalogQuery {
       'offset: $offset)';
 }
 
+/// One category a catalog filter can select.
+///
+/// The id and display name come from the bundle's item/handbook category
+/// records; the name falls back to the id when the record is absent.
+final class CatalogCategory {
+  const CatalogCategory({
+    required this.id,
+    required this.name,
+    required this.kind,
+  });
+
+  final String id;
+  final String name;
+  final CatalogCategoryKind kind;
+
+  @override
+  String toString() => 'CatalogCategory($id, $name)';
+}
+
 /// One catalog row, typed for the UI.
 ///
 /// This is deliberately not a drift row: it contains the joined `types` and

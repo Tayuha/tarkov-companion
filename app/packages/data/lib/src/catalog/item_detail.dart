@@ -25,6 +25,9 @@ final class ItemDetail {
     required this.conflictingItemIds,
     required this.conflictingSlotIds,
     required this.properties,
+    required this.price,
+    required this.basePrice,
+    required this.iconLink,
   });
 
   /// Decodes the canonical bundle `payload` and combines it with the indexed
@@ -93,6 +96,9 @@ final class ItemDetail {
         _strings(decoded['conflictingSlotIds']),
       ),
       properties: _parseProperties(properties, types),
+      price: _parsePrice(decoded['price']),
+      basePrice: _nonNegativeInt(decoded['basePrice']),
+      iconLink: _text(decoded['iconLink']),
     );
   }
 
@@ -133,6 +139,21 @@ final class ItemDetail {
   /// The typed property set for this item's kind.
   final ItemProperties properties;
 
+  /// The bundle's price snapshot, or [ItemPrice.none] when the record has no
+  /// `price` object.
+  final ItemPrice price;
+
+  /// Trader-independent base price in roubles, `basePrice`.
+  final int? basePrice;
+
+  /// Item icon URL (`iconLink`), or `null` when the bundle has none.
+  final String? iconLink;
+
+  /// Whether the item may appear on the flea market (`types` excludes
+  /// `noFlea`). Used by the price section to explain a missing flea price
+  /// instead of presenting it as zero.
+  bool get fleaEligible => !types.contains('noFlea');
+
   /// `width` × `height` in slots, or `null` when the bundle has no grid.
   String? get gridSize {
     final w = width;
@@ -142,6 +163,56 @@ final class ItemDetail {
     }
     return '$w × $h';
   }
+}
+
+/// The bundle `price` snapshot for an item.
+///
+/// Every field is nullable because the bundle can carry a partial observation:
+/// a trader-only item has no flea fields, and a zero [`fleaLastLow`] is a real
+/// observation (no active offers) rather than a missing one. The price section
+/// distinguishes those states instead of collapsing them into `null`.
+final class ItemPrice {
+  const ItemPrice({
+    required this.fleaLastLow,
+    required this.fleaAvg24h,
+    required this.change48hPercent,
+    required this.change48hAbsolute,
+    required this.observedAt,
+  });
+
+  /// No price object in the bundle.
+  static const none = ItemPrice(
+    fleaLastLow: null,
+    fleaAvg24h: null,
+    change48hPercent: null,
+    change48hAbsolute: null,
+    observedAt: null,
+  );
+
+  /// Latest flea-market low, `price.lastLow`.
+  final int? fleaLastLow;
+
+  /// Flea-market 24 h average, `price.avg24h`.
+  final int? fleaAvg24h;
+
+  /// 48 h flea price change as a percentage, `price.change48hPercent`.
+  final double? change48hPercent;
+
+  /// 48 h flea price change in roubles, `price.change48h`.
+  final int? change48hAbsolute;
+
+  /// When the snapshot was observed, `price.observedAt`.
+  final DateTime? observedAt;
+
+  /// Whether the bundle carried any flea price field.
+  bool get hasFleaObservation => fleaLastLow != null || fleaAvg24h != null;
+
+  /// Whether the latest low is a real zero (no active offers).
+  bool get isZero => fleaLastLow == 0;
+
+  /// No fields were present at all.
+  bool get isEmpty =>
+      fleaLastLow == null && fleaAvg24h == null && observedAt == null;
 }
 
 /// A category label for the detail header.
@@ -416,3 +487,30 @@ double? _positiveDouble(Object? value) {
 }
 
 num? _num(Object? value) => value is num ? value : null;
+
+ItemPrice _parsePrice(Object? value) {
+  final price = _map(value);
+  if (price.isEmpty) {
+    return ItemPrice.none;
+  }
+  return ItemPrice(
+    fleaLastLow: _nonNegativeInt(price['lastLow']),
+    fleaAvg24h: _nonNegativeInt(price['avg24h']),
+    change48hPercent: _num(price['change48hPercent'])?.toDouble(),
+    change48hAbsolute: _int(price['change48h']),
+    observedAt: _dateTime(price['observedAt']),
+  );
+}
+
+int? _nonNegativeInt(Object? value) {
+  final parsed = _int(value);
+  return parsed != null && parsed >= 0 ? parsed : null;
+}
+
+DateTime? _dateTime(Object? value) {
+  final text = _text(value);
+  if (text == null) {
+    return null;
+  }
+  return DateTime.tryParse(text)?.toUtc();
+}

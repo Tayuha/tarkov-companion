@@ -107,3 +107,23 @@ dart test packages/data --exclude-tags benchmark
 
 `-j 1` keeps the measurement free of other test isolates competing for CPU and
 memory, which would make the time and RSS numbers meaningless.
+
+## Catalog query and first-render budget (task 5.9)
+
+Task 5.9 adds two assertions against the same full items fixture (5,498 items):
+
+* `app/packages/data/test/catalog/catalog_benchmark_test.dart`, tagged
+  `benchmark`, ingests the published items asset, warms seven representative
+  queries (unfiltered, paged, FTS, category, flea-sorted, weight-sorted,
+  ammo+base-price) and measures 200 `CatalogRepository.query` calls. The
+  assertion is **p95 under 50 ms**, far above the ~9 ms observed locally:
+  `catalog query p95: 9.02 ms over 200 queries (5498 items)`
+  (Linux x86_64, 2026-11-27).
+* `app/packages/features/test/catalog/catalog_performance_test.dart` pumps the
+  real `CatalogScreen` against the same ingested fixture and times the first
+  page: `catalog first render: 591 ms` locally, against a **1.5 s** budget.
+
+The query test is tagged `benchmark`, so it joins the existing Windows
+`-t benchmark` job and is excluded from the fast `--exclude-tags benchmark`
+run. The first-render test is not tagged: `flutter test packages/features`
+runs it in both CI app jobs.

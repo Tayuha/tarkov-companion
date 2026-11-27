@@ -63,3 +63,30 @@ Future<void> ingestNormalizedItemsFixture(
     compressedFile: dataset.file,
   );
 }
+
+/// The committed normalized file for one dataset
+/// (`test/fixtures/normalized/<dataset>.jsonl`).
+Future<File> normalizedDatasetFixtureFile(DatasetKind kind) async {
+  final itemsFile = await normalizedItemsFixtureFile();
+  return File('${itemsFile.parent.path}/${kind.id}.jsonl');
+}
+
+/// Ingests one committed normalized fixture through the production ingestor,
+/// so relation and price tests read exactly the shape the pipeline publishes.
+Future<void> ingestNormalizedDataset(
+  AppDatabase database,
+  Directory temporary,
+  DatasetKind kind,
+) async {
+  final file = await normalizedDatasetFixtureFile(kind);
+  final lines = [
+    for (final line in await file.readAsLines())
+      if (line.trim().isNotEmpty) line,
+  ];
+  final dataset = writeSyntheticDataset(temporary, kind, lines);
+  await DatasetIngestor(database).ingest(
+    mode: GameMode.regular,
+    dataset: dataset.dataset,
+    compressedFile: dataset.file,
+  );
+}
