@@ -213,7 +213,55 @@ class _AppRootState extends State<AppRoot> {
       profileServices: session.profileServices,
       updates: session.updates,
       dataBundle: session.dataBundle,
+      upstreamCheck: _upstreamCheck(session),
     );
+  }
+
+  /// Deduplicates simultaneous upstream checks.
+  ///
+  /// The catalog and quests tabs are both built eagerly, and each attaches the
+  /// check when it mounts. Sharing one in-flight future keeps that to a single
+  /// manifest request, while a retry after completion starts a fresh check.
+  Future<UpstreamStatus>? _upstreamInFlight;
+
+  UpstreamCheck _upstreamCheck(AppSessionReady session) {
+    return () {
+      final running = _upstreamInFlight;
+      if (running != null) {
+        return running;
+      }
+      final future = _checkUpstream(session);
+      _upstreamInFlight = future;
+      return future.whenComplete(() {
+        if (identical(_upstreamInFlight, future)) {
+          _upstreamInFlight = null;
+        }
+      });
+    };
+  }
+
+  Future<UpstreamStatus> _checkUpstream(AppSessionReady session) async {
+    final checkedAt = DateTime.now().toUtc();
+    final dataUpdatedAt = session.dataBundle?.newestAppliedAt;
+    try {
+      final preparation = await session.sync.prepare(GameMode.regular);
+      if (preparation.datasetCount > 0) {
+        return UpstreamStatus.updateAvailable(
+          checkedAt: checkedAt,
+          dataUpdatedAt: dataUpdatedAt,
+        );
+      }
+      return UpstreamStatus.current(
+        checkedAt: checkedAt,
+        dataUpdatedAt: dataUpdatedAt,
+      );
+    } on Object catch (error) {
+      return UpstreamStatus.fromError(
+        error,
+        checkedAt: checkedAt,
+        dataUpdatedAt: dataUpdatedAt,
+      );
+    }
   }
 }
 

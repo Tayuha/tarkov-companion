@@ -43,6 +43,7 @@ class HomeShell extends StatefulWidget {
     this.profileServices,
     this.updates,
     this.dataBundle,
+    this.upstreamCheck,
     this.appVersion = '0.1.0',
     this.onQuestSelected,
   });
@@ -69,6 +70,13 @@ class HomeShell extends StatefulWidget {
 
   /// Locally applied data summary shown on the About screen.
   final DataBundleStatus? dataBundle;
+
+  /// Set when the shell can check the upstream without blocking local data.
+  ///
+  /// Production adapts `SyncService.prepare`; tests and sessions without a
+  /// network seam leave it null, which keeps the catalog and quests offline
+  /// strip dormant.
+  final UpstreamCheck? upstreamCheck;
 
   /// Version written into exported progress files and shown on About.
   final String appVersion;
@@ -135,7 +143,11 @@ class _HomeShellState extends State<HomeShell> {
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ItemDetailScreen(repository: catalog, itemId: itemId),
+        builder: (_) => ItemDetailScreen(
+          repository: catalog,
+          itemId: itemId,
+          upstreamCheck: widget.upstreamCheck,
+        ),
       ),
     );
   }
@@ -293,7 +305,11 @@ class _HomeShellState extends State<HomeShell> {
         message: 'The item catalog is not available in this session.',
       );
     }
-    return CatalogScreen(repository: catalog, onItemSelected: _openItem);
+    return CatalogScreen(
+      repository: catalog,
+      onItemSelected: _openItem,
+      upstreamCheck: widget.upstreamCheck,
+    );
   }
 
   Widget _buildQuestsTab() {
@@ -307,6 +323,7 @@ class _HomeShellState extends State<HomeShell> {
       repository: quests,
       profileId: _activeProfileId,
       onQuestSelected: widget.onQuestSelected ?? _openQuest,
+      upstreamCheck: widget.upstreamCheck,
     );
   }
 
@@ -330,6 +347,7 @@ class _HomeShellState extends State<HomeShell> {
           catalog: catalog,
           questId: questId,
           profileId: _activeProfileId,
+          upstreamCheck: widget.upstreamCheck,
         ),
       ),
     );

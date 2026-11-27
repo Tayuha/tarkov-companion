@@ -91,6 +91,7 @@ void main() {
     ValueChanged<String>? onQuestSelected,
     UpdateCheckControl? updates,
     DataBundleStatus? dataBundle,
+    UpstreamCheck? upstreamCheck,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -106,6 +107,7 @@ void main() {
           onQuestSelected: onQuestSelected,
           updates: updates,
           dataBundle: dataBundle,
+          upstreamCheck: upstreamCheck,
         ),
       ),
     );
@@ -262,6 +264,23 @@ void main() {
       tester.widget<Text>(find.byKey(AboutKeys.bundleVersion)).data,
       'manifest 1 · schema 1',
     );
+  });
+
+  testWidgets('an offline upstream surfaces the status strip over cached rows', (
+    tester,
+  ) async {
+    await pumpShell(
+      tester,
+      upstreamCheck: () async => UpstreamStatus.offline(
+        message: 'no connection',
+        checkedAt: DateTime.utc(2026, 11, 27),
+      ),
+    );
+
+    expect(find.text('OFFLINE'), findsWidgets);
+    expect(find.byKey(const Key('app-status-retry')), findsWidgets);
+    // Cached rows stay visible instead of being replaced by the error state.
+    expect(find.text('Colt M4A1 5.56x45 assault rifle'), findsWidgets);
   });
 
   testWidgets('a session without updates still exposes About', (tester) async {
