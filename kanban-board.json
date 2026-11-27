@@ -930,16 +930,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 4,
+      "categoryID": "inprogress",
+      "position": 25,
       "tagIDs": [
         "tag_implementation",
         "tag_infra"
       ],
-      "notes": "Add `.gitignore`, `.editorconfig`, `.gitattributes`, and `dart format`/`prettier` configuration, verified by a clean checkout producing no formatting diff after running both formatters",
+      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
     },
     {
       "id": "task_impl_4_9",
@@ -1031,16 +1032,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 5,
+      "categoryID": "inprogress",
+      "position": 0,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement acquisition and disposition sections (trader buy/sell, barter, craft, quest requirement links), verified by widget tests asserting each section renders from fixture relationships",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_5_5",
@@ -1051,16 +1053,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 6,
+      "categoryID": "inprogress",
+      "position": 1,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement price presentation with source, observation time, 48-hour direction, and explicit missing-data states, verified by widget tests for complete, missing-flea, and zero-price fixtures",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_5_6",
@@ -1071,16 +1074,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 7,
+      "categoryID": "inprogress",
+      "position": 2,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement the disk-backed image cache with lazy loading, placeholder fallback, and a size budget, verified by tests for cache hit offline, failed fetch, and eviction at the budget",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_5_7",
@@ -1091,16 +1095,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 8,
+      "categoryID": "inprogress",
+      "position": 3,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement on-demand price history fetch, caching with TTL, and the chart view including the offline-without-cache state, verified by tests for fetch, cache hit, TTL expiry, and offline miss",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_5_8",
@@ -1111,16 +1116,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 9,
+      "categoryID": "inprogress",
+      "position": 19,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement item deep links by game identifier with resolved and removed-item states, verified by tests opening a known id and a deleted id against a fixture dataset",
+      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
     },
     {
       "id": "task_impl_5_9",
@@ -1131,16 +1137,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 10,
+      "categoryID": "inprogress",
+      "position": 4,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Add a catalog performance test asserting p95 query latency under 50 ms and initial render under 1.5 s with the full fixture set, verified by the test running in CI",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_6_1",
@@ -1293,16 +1300,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 11,
+      "categoryID": "inprogress",
+      "position": 6,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement separation of progress that references quests missing from the active dataset, verified by a test loading a profile that references a removed quest and asserting it is listed as unavailable and excluded from dependency math",
+      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
     },
     {
       "id": "task_impl_6_9",
@@ -1313,16 +1321,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 12,
+      "categoryID": "inprogress",
+      "position": 7,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement the available-quests view with selectable ordering and an explanatory empty state, verified by widget tests for a populated list and for a profile with nothing available",
+      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
     },
     {
       "id": "task_impl_6_10",
@@ -1333,16 +1342,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 13,
+      "categoryID": "inprogress",
+      "position": 8,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement game-mode scoping so the tracker reads only the active mode's quest dataset, verified by a test asserting a PvE-only quest is absent under the regular profile",
+      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
     },
     {
       "id": "task_impl_6_11",
@@ -1353,16 +1363,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 14,
+      "categoryID": "inprogress",
+      "position": 9,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Document quest state semantics and override behavior in `docs/quest-tracking.md`, verified by the documented state table matching the implementation tests",
+      "notes": "Running in parallel workstream ses_de4812ae3ffeTWUWjr9cO5ID3o.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae3ffeTWUWjr9cO5ID3o"
     },
     {
       "id": "task_impl_7_1",
@@ -1394,16 +1405,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 15,
+      "categoryID": "inprogress",
+      "position": 10,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement editable profile facts (player level, and faction if retained) with immediate re-derivation, verified by a test that a level change unlocks a quest without restart",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_3",
@@ -1414,16 +1426,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 16,
+      "categoryID": "inprogress",
+      "position": 11,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement profile reset and deletion with confirmation and post-delete activation of another profile, verified by integration tests including deleting the last profile",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_4",
@@ -1434,17 +1447,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 17,
+      "categoryID": "inprogress",
+      "position": 12,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement the export document writer with canonical JSON and checksum, verified by a golden-file test and a checksum stability test across key ordering",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_5",
@@ -1455,16 +1469,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 18,
+      "categoryID": "inprogress",
+      "position": 13,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement export through the platform file picker for the active profile and all profiles, verified by an integration test writing to a temporary directory and re-reading the file",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_6",
@@ -1475,17 +1490,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 19,
+      "categoryID": "inprogress",
+      "position": 14,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement import validation (format, version, checksum, value ranges) rejecting without writes, verified by tests for truncated JSON, wrong format, newer version, and bad checksum",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_7",
@@ -1496,16 +1512,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 20,
+      "categoryID": "inprogress",
+      "position": 15,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Implement the import preview with explicit replace/merge selection and non-destructive default, verified by widget tests for preview counts, cancel, replace, and merge conflict resolution",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_8",
@@ -1516,17 +1533,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 21,
+      "categoryID": "inprogress",
+      "position": 16,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Implement transactional import application and rollback on failure, verified by a test injecting a write failure and asserting the profile is unchanged",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_9",
@@ -1537,16 +1555,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 22,
+      "categoryID": "inprogress",
+      "position": 17,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Add a cross-format portability test importing a fixture export produced by the documented format, verified by the test running on both Windows and Linux CI runners",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_7_10",
@@ -1557,16 +1576,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 23,
+      "categoryID": "inprogress",
+      "position": 18,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Document the progress file format and recovery steps in `docs/progress-format.md`, verified by a hand-edited fixture importing successfully and an invalid one failing with the documented message",
+      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
     },
     {
       "id": "task_impl_8_1",
@@ -1661,17 +1681,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 27,
+      "categoryID": "inprogress",
+      "position": 20,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Implement window geometry persistence with display clamping and a minimum size, verified by tests for restored geometry and an off-screen saved position",
+      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
     },
     {
       "id": "task_impl_8_6",
@@ -1682,17 +1703,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 28,
+      "categoryID": "inprogress",
+      "position": 21,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Linux-first (2026-11-26): implement single-instance focusing on Linux; Windows/mobile equivalents deferred. Original task text adjusted.",
+      "notes": "Running in parallel workstream ses_de4812addffdf9kc6cb9R7I2v3.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812addffdf9kc6cb9R7I2v3"
     },
     {
       "id": "task_impl_8_7",
@@ -1745,17 +1767,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "review",
-      "position": 0,
+      "categoryID": "inprogress",
+      "position": 22,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Packaging merged. Final AppImage built from the merged tree (includes first-run, catalog, quests, item detail): dist/TarkovCompanion-0.1.0-x86_64.AppImage, 11 MB, sha c6720321..., checksum OK. Smoke run launches the Flutter app and stays up. BLOCKER for the manual gate: the app fetches the manifest from the public release URL, but the GitHub repository is private, so anonymous sync gets HTTP 404 (\"No bundle is published\"). The error state and Retry render correctly. Need either a public repository or a local/dev manifest override before sync/browse can be approved.",
+      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795711067037,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
     },
     {
       "id": "task_impl_8_10",
@@ -1766,17 +1789,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 31,
+      "categoryID": "inprogress",
+      "position": 23,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Publish Linux checksums and release notes with signing status; Windows/mobile artifacts follow after approval.",
+      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795708308458,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
     },
     {
       "id": "task_impl_9_1",
@@ -1913,17 +1937,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 38,
+      "categoryID": "inprogress",
+      "position": 24,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_infra"
       ],
-      "notes": "Add issue and pull-request templates plus a roadmap issue, verified by opening a test issue that renders both templates",
+      "notes": "Running in parallel workstream ses_de4812adcffemt7Q9Lc6k4U1w4.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795706841847,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812adcffemt7Q9Lc6k4U1w4"
     },
     {
       "id": "task_impl_5_10",
@@ -1934,17 +1959,18 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "backlog",
-      "position": 39,
+      "categoryID": "inprogress",
+      "position": 5,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Discovered during T5.2: the catalog filter bar ships a starter category set because the query layer does not expose bundle category labels. Read itemCategory/handbookCategory records from gameRecords (or a dedicated query), return id/name pairs, and feed the filter bar. Tests: category query + widget using loaded options.",
+      "notes": "Running in parallel workstream ses_de4812ae4ffe0GTnKXThE9BPgV.",
       "createdAt": 1795709662442,
-      "updatedAt": 1795709662442,
-      "archived": false
+      "updatedAt": 1795757641487,
+      "archived": false,
+      "sessionID": "ses_de4812ae4ffe0GTnKXThE9BPgV"
     },
     {
       "id": "task_impl_6_12",
