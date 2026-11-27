@@ -105,7 +105,7 @@
 
 - [x] 8.12 Implement the phosphor design system in Flutter: `AppTokens` ThemeExtension, dark `ThemeData`, typography/spacing, and primitives (panel, button, chip, status badge, stat tile, progress bar), verified by golden and contrast tests
 - [x] 8.13 Migrate the Items screen to the design-system primitives and phosphor theme, verified by widget/golden tests at the 1440 and 1920 layouts
-- [ ] 8.14 Migrate the Quests list and detail to the design-system primitives, verified by widget/golden tests
+- [x] 8.14 Migrate the Quests list and detail to the design-system primitives, verified by widget/golden tests
 
 ## 9. Integration and release readiness
 

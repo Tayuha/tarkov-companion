@@ -2039,18 +2039,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 0,
+      "categoryID": "done",
+      "position": 48,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_design"
       ],
-      "notes": "In progress in worktree t814-quests-migration. Tokenises quest list/table (responsive 1440/1920, 1600px cap), detail panels with progress bars and two-column wide layout, status badges, regenerated goldens. Concept-only chain graph/map panel stay deferred.",
+      "notes": "Completed 2026-11-26 in worktree t814-quests-migration, merged as e5d1dd4 and polished in cfaf894. Quest list on tokens with 1100/1600 breakpoints and 1600px cap; detail with progress bars, two-column >=1080, omission rule kept; 100 feature tests, 4 quest goldens. App bar now 44px surface breadcrumb; goldens load MaterialIcons. Deferred: chain graph, map panel, trader strip, Items split inspector, true 24h field.",
       "createdAt": 1795755040019,
-      "updatedAt": 1795756542892,
-      "archived": false,
-      "sessionID": "ses_de491c9ebffeNZ3k1vGjyP4VTN"
+      "updatedAt": 1795757391652,
+      "archived": false
     }
   ],
   "tagsByProject": {
