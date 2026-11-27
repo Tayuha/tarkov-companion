@@ -103,6 +103,36 @@ The primitive is `AppStatusStrip` and the check types are `UpstreamStatus` /
 `UpstreamCheck`, both exported from `tarkov_companion_features`.
 
 
+## Keyboard and focus
+
+The catalog is fully usable without a pointer. Focus order follows the visual
+order and every row is exactly one tab stop, not one per cell:
+
+| Order | Stop | Enter / Space |
+|---|---|---|
+| 1 | Search field | Applies the query (Enter) |
+| 2 | Sort field | Opens the sort menu |
+| 3 | Sort direction (only when a sort field is chosen) | Reverses the order |
+| 4 | Category filter | Opens the category menu |
+| 5 | Type filter | Opens the type menu |
+| 6 | Flea eligible chip | Toggles the filter |
+| 7 | Reset (only while filters are active) | Clears every filter |
+| 8 | Offline/status retry (only while a strip is shown) | Re-runs the upstream check |
+| 9 | One table or card row per item | Opens the item detail |
+| 10 | Load more (only while more rows match) | Appends the next page |
+
+* `Tab` and `Shift+Tab` move through that order and wrap at the ends of the
+  screen. The focused row is scrolled into view, even inside the virtualised
+  list.
+* Rows and filter controls expose the same `AppFocusRing` treatment: a 2 px
+  accent outline painted as an overlay, so focus never shifts layout. Search
+  inputs use the matching two-pixel accent `focusedBorder`.
+* `/` focuses the search field and selects existing text. `Escape` clears a
+  non-empty search and returns focus to the screen, so the next `Tab` starts
+  from the top again.
+* The list is vertical only; there is no horizontal scrollable for Tab to stop
+  on.
+
 ## Responsive layout
 
 The screen measures the width available after the app shell and inside a
@@ -143,3 +173,10 @@ alternating row surfaces.
 `catalog_offline_test.dart` adds the network-state coverage: populated cache
 with a failing upstream, retry re-running the check, an in-flight retry that
 keeps rows visible, and the empty-plus-failing-upstream offline state.
+
+`catalog_keyboard_test.dart` drives focus with synthetic `Tab`, `Shift+Tab`,
+`/`, `Escape`, Enter and Space events only:
+traversal order through search, sort, filters, one stop per row and pagination;
+Shift+Tab wrap; scroll reveal of a focused row; Enter/Space row activation;
+keyboard activation of a filter chip; keyboard activation of the offline retry;
+the `/` and `Escape` shortcuts; and the tokenised ring decoration.

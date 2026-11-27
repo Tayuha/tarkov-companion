@@ -29,6 +29,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.info,
     required this.value,
     required this.onAccent,
+    required this.focusRing,
+    required this.focusRingWidth,
     required this.spaceXs,
     required this.spaceSm,
     required this.spaceMd,
@@ -69,6 +71,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
         info: const Color(0xFF7DDCC4),
         value: const Color(0xFFC9D99A),
         onAccent: const Color(0xFF04140A),
+        focusRing: const Color(0xFF7DF7A8),
+        focusRingWidth: 2,
         spaceXs: 4,
         spaceSm: 8,
         spaceMd: 12,
@@ -146,6 +150,17 @@ class AppTokens extends ThemeExtension<AppTokens> {
 
   /// Text drawn on top of [accent].
   final Color onAccent;
+
+  /// The keyboard focus ring drawn around the focused control.
+  ///
+  /// It matches [accent] so focus reads as the same decision colour as
+  /// selection, and [focusRingWidth] makes it distinguishable from a resting
+  /// one-pixel border.
+  final Color focusRing;
+
+  /// Stroke width of [focusRing]; painted as an overlay so focus never changes
+  /// a control's layout.
+  final double focusRingWidth;
 
   final double spaceXs;
   final double spaceSm;
@@ -257,6 +272,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? info,
     Color? value,
     Color? onAccent,
+    Color? focusRing,
+    double? focusRingWidth,
     double? spaceXs,
     double? spaceSm,
     double? spaceMd,
@@ -294,6 +311,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
       info: info ?? this.info,
       value: value ?? this.value,
       onAccent: onAccent ?? this.onAccent,
+      focusRing: focusRing ?? this.focusRing,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
       spaceXs: spaceXs ?? this.spaceXs,
       spaceSm: spaceSm ?? this.spaceSm,
       spaceMd: spaceMd ?? this.spaceMd,
@@ -340,6 +359,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
       info: blend(info, other.info),
       value: blend(value, other.value),
       onAccent: blend(onAccent, other.onAccent),
+      focusRing: blend(focusRing, other.focusRing),
+      focusRingWidth: scale(focusRingWidth, other.focusRingWidth),
       spaceXs: scale(spaceXs, other.spaceXs),
       spaceSm: scale(spaceSm, other.spaceSm),
       spaceMd: scale(spaceMd, other.spaceMd),

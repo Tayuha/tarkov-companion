@@ -128,6 +128,46 @@ locked; the list keeps the more specific failed word and colour. The progress
 readout is `satisfied required objectives / required objectives`; optional
 objectives are tracked but never enter the denominator.
 
+## Keyboard and focus
+
+The quest list is fully usable without a pointer. Focus order follows the visual
+order and every row is exactly one tab stop, not one per cell.
+
+**Catalog view**
+
+| Order | Stop | Enter / Space |
+|---|---|---|
+| 1 | Catalog / Available segment (two chips, profile only) | Switches the view |
+| 2 | Search field | Applies the query (Enter) |
+| 3 | Trader filter | Opens the trader menu |
+| 4 | Map filter | Opens the map menu |
+| 5 | Level filter | Opens the level menu |
+| 6 | All states + four state chips | Selects that state |
+| 7 | Reset (only while filters are active) | Clears every filter |
+| 8 | Offline/status retry (only while a strip is shown) | Re-runs the upstream check |
+| 9 | One table or card row per quest | Opens the quest detail |
+| 10 | Load more (catalog only, while more rows match) | Appends the next page |
+
+**Available view**
+
+The segment stays first, then the four ordering chips (**Level**, **Trader**,
+**Map**, **Name**), then one stop per available row. The search field, filters
+and pagination are not present because that view derives its whole list from
+the profile.
+
+* `Tab` and `Shift+Tab` move through the active view's order and wrap at the
+  ends of the screen. The focused row is scrolled into view, even inside the
+  virtualised list.
+* Rows, chips, buttons, dropdowns and the retry action use `AppFocusRing`: a
+  2 px accent outline painted as an overlay, so focus never shifts layout.
+  Search inputs use the matching two-pixel accent `focusedBorder`.
+* `/` focuses the catalog search field and selects existing text. `Escape`
+  clears a non-empty search and returns focus to the screen, so the next `Tab`
+  starts from the top again. Both shortcuts are inactive in the available view
+  where no search field exists.
+* The list is vertical only; there is no horizontal scrollable for Tab to stop
+  on.
+
 ## Responsive layout
 
 | Content width | Layout |
@@ -200,3 +240,10 @@ panel, and list goldens at 1440 and 1920. No test performs network access.
 populated cache plus offline, retry re-running the check, the available segment
 through an outage, the empty-catalog offline state, and the available segment's
 offline empty explanation.
+
+`quest_keyboard_test.dart` drives focus with synthetic `Tab`, `Shift+Tab`, `/`,
+`Escape` and Enter events only: catalog traversal through segment, search,
+filters, state chips, one stop per row and pagination; Shift+Tab wrap; the
+segment switching to the available view and handing focus to the ordering
+chips; Enter opening the focused quest; keyboard activation of the offline
+retry; the `/` and `Escape` shortcuts; and the tokenised ring decoration.

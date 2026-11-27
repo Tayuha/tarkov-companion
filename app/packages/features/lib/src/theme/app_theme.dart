@@ -22,6 +22,10 @@ ThemeData buildAppTheme() {
     textTheme: textTheme,
     primaryTextTheme: textTheme,
     iconTheme: IconThemeData(color: tokens.muted, size: tokens.h2Size),
+    // InkWell draws this over a focused control. It is deliberately quiet: the
+    // 2 px AppFocusRing is the primary cue, and this fill only softens the
+    // transition for controls whose InkWell is focused by the shell.
+    focusColor: tokens.focusRing.withValues(alpha: 0.12),
     // Detail routes repeat the entity name in the body header, so the bar is a
     // compact breadcrumb: surface fill, hairline rule, mono label type.
     appBarTheme: AppBarThemeData(
@@ -158,9 +162,13 @@ TextTheme _textTheme(AppTokens tokens) {
 
 InputDecorationThemeData _inputDecorationTheme(AppTokens tokens) {
   final radius = BorderRadius.circular(tokens.radiusSm);
-  BorderSide side(Color color) => BorderSide(color: color);
-  OutlineInputBorder outline(Color color) =>
-      OutlineInputBorder(borderRadius: radius, borderSide: side(color));
+  BorderSide side(Color color, {double width = 1}) =>
+      BorderSide(color: color, width: width);
+  OutlineInputBorder outline(Color color, {double width = 1}) =>
+      OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: side(color, width: width),
+      );
 
   return InputDecorationThemeData(
     filled: true,
@@ -179,10 +187,10 @@ InputDecorationThemeData _inputDecorationTheme(AppTokens tokens) {
     suffixIconColor: tokens.muted,
     border: outline(tokens.border),
     enabledBorder: outline(tokens.border),
-    focusedBorder: outline(tokens.accent),
+    focusedBorder: outline(tokens.focusRing, width: tokens.focusRingWidth),
     disabledBorder: outline(tokens.borderSoft),
     errorBorder: outline(tokens.danger),
-    focusedErrorBorder: outline(tokens.danger),
+    focusedErrorBorder: outline(tokens.danger, width: tokens.focusRingWidth),
   );
 }
 
