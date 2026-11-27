@@ -22,6 +22,7 @@ in the `value` column, so the stored type is explicit: `"profile-id"`, `true`,
 | `settings.autoUpdateEnabled` | `true` | `true` / `false` | Whether background update checks may run. When `false`, no automatic data or app-update request is made until the user checks manually. |
 | `settings.allowMeteredUpdates` | `false` | `true` / `false` | Whether automatic downloads may proceed when the OS reports a metered connection. |
 | `settings.dataFreshnessHours` | `24` | integer `1`–`168` | Age in hours after which prices are labelled stale and the dataset is considered old. |
+| `settings.windowGeometry` | `null` | JSON object or `null` | Desktop window rectangle (`x`, `y`, `width`, `height`) restored on launch. See [`window.md`](window.md). |
 
 The defaults are also the values of `const AppSettings()`; a database with no
 rows behaves exactly like a fresh install.
@@ -35,7 +36,7 @@ rows behaves exactly like a fresh install.
   callback (wire it to the application logger) and keeps the app usable.
 - **Unknown key** — ignored by `read()`, and deliberately left in the table so
   a downgrade does not destroy a newer version's data. The table is still owned
-  by this repository: `write()` deletes every key outside the four above, so
+  by this repository: `write()` deletes every key outside the five above, so
   obsolete keys from an older version disappear on the next write. `reset()`
   deletes every row.
 
@@ -43,7 +44,7 @@ rows behaves exactly like a fresh install.
 
 `write(AppSettings)` validates the freshness range before touching the
 database and throws `ArgumentError` for a value outside `1`–`168`; a rejected
-write leaves the previous rows untouched. A valid write upserts all four keys
+write leaves the previous rows untouched. A valid write upserts all five keys
 and deletes obsolete keys in **one transaction**. The convenience setters
 (`setActiveProfileId`, `setAutoUpdateEnabled`, `setAllowMeteredUpdates`,
 `setDataFreshnessHours`) are read-modify-write helpers over `write`.
