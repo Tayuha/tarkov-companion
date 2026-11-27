@@ -1400,17 +1400,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 10,
+      "categoryID": "done",
+      "position": 59,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_3",
@@ -1421,17 +1420,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 11,
+      "categoryID": "done",
+      "position": 60,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_4",
@@ -1442,18 +1440,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 12,
+      "categoryID": "done",
+      "position": 61,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_5",
@@ -1464,17 +1461,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 13,
+      "categoryID": "done",
+      "position": 62,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_6",
@@ -1485,18 +1481,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 14,
+      "categoryID": "done",
+      "position": 63,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_7",
@@ -1507,17 +1502,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 15,
+      "categoryID": "done",
+      "position": 64,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_8",
@@ -1528,18 +1522,17 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 16,
+      "categoryID": "done",
+      "position": 65,
       "tagIDs": [
         "tag_implementation",
         "tag_app",
         "tag_data"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_9",
@@ -1550,17 +1543,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 17,
+      "categoryID": "done",
+      "position": 66,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_7_10",
@@ -1571,17 +1563,16 @@
       "serverID": "sidecar",
       "branch": "main",
       "baseBranch": "main",
-      "categoryID": "inprogress",
-      "position": 18,
+      "categoryID": "done",
+      "position": 67,
       "tagIDs": [
         "tag_implementation",
         "tag_app"
       ],
-      "notes": "Running in parallel workstream ses_de4812addffedZTKBNRTXV7qtZ.",
+      "notes": "Merged as f314d68. Level editing/reset/delete, canonical export + checksum, import validation, preview with non-destructive merge and replace confirmation, transactional rollback, CRLF portability, docs/progress-format.md. Profiles tab exists but app_root wiring lands with the entry workstream.",
       "createdAt": 1795706841847,
-      "updatedAt": 1795757641487,
-      "archived": false,
-      "sessionID": "ses_de4812addffedZTKBNRTXV7qtZ"
+      "updatedAt": 1795758746257,
+      "archived": false
     },
     {
       "id": "task_impl_8_1",

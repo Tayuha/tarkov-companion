@@ -78,15 +78,15 @@
 ## 7. Profiles and portability
 
 - [x] 7.1 Implement per-mode profile creation, activation, and switching with a single active profile invariant, verified by tests for first launch, explicit creation, and switching
-- [ ] 7.2 Implement editable profile facts (player level, and faction if retained) with immediate re-derivation, verified by a test that a level change unlocks a quest without restart
-- [ ] 7.3 Implement profile reset and deletion with confirmation and post-delete activation of another profile, verified by integration tests including deleting the last profile
-- [ ] 7.4 Implement the export document writer with canonical JSON and checksum, verified by a golden-file test and a checksum stability test across key ordering
-- [ ] 7.5 Implement export through the platform file picker for the active profile and all profiles, verified by an integration test writing to a temporary directory and re-reading the file
-- [ ] 7.6 Implement import validation (format, version, checksum, value ranges) rejecting without writes, verified by tests for truncated JSON, wrong format, newer version, and bad checksum
-- [ ] 7.7 Implement the import preview with explicit replace/merge selection and non-destructive default, verified by widget tests for preview counts, cancel, replace, and merge conflict resolution
-- [ ] 7.8 Implement transactional import application and rollback on failure, verified by a test injecting a write failure and asserting the profile is unchanged
-- [ ] 7.9 Add a cross-format portability test importing a fixture export produced by the documented format, verified by the test running on both Windows and Linux CI runners
-- [ ] 7.10 Document the progress file format and recovery steps in `docs/progress-format.md`, verified by a hand-edited fixture importing successfully and an invalid one failing with the documented message
+- [x] 7.2 Implement editable profile facts (player level, and faction if retained) with immediate re-derivation, verified by a test that a level change unlocks a quest without restart
+- [x] 7.3 Implement profile reset and deletion with confirmation and post-delete activation of another profile, verified by integration tests including deleting the last profile
+- [x] 7.4 Implement the export document writer with canonical JSON and checksum, verified by a golden-file test and a checksum stability test across key ordering
+- [x] 7.5 Implement export through the platform file picker for the active profile and all profiles, verified by an integration test writing to a temporary directory and re-reading the file
+- [x] 7.6 Implement import validation (format, version, checksum, value ranges) rejecting without writes, verified by tests for truncated JSON, wrong format, newer version, and bad checksum
+- [x] 7.7 Implement the import preview with explicit replace/merge selection and non-destructive default, verified by widget tests for preview counts, cancel, replace, and merge conflict resolution
+- [x] 7.8 Implement transactional import application and rollback on failure, verified by a test injecting a write failure and asserting the profile is unchanged
+- [x] 7.9 Add a cross-format portability test importing a fixture export produced by the documented format, verified by the test running on both Windows and Linux CI runners
+- [x] 7.10 Document the progress file format and recovery steps in `docs/progress-format.md`, verified by a hand-edited fixture importing successfully and an invalid one failing with the documented message
 
 ## 8. Desktop shell
 
