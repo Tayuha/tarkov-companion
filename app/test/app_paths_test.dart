@@ -52,4 +52,25 @@ void main() {
       throwsA(isA<StateError>()),
     );
   });
+
+  test('the instance runtime directory prefers XDG_RUNTIME_DIR', () {
+    final paths = AppPaths.resolve(
+      environment: {
+        'XDG_DATA_HOME': '${separator}xdg-data',
+        'XDG_RUNTIME_DIR': '${separator}run${separator}user${separator}1000',
+      },
+    );
+
+    expect(
+      paths.runtimeDirectoryFrom({
+        'XDG_RUNTIME_DIR': '${separator}run${separator}user${separator}1000',
+      }).path,
+      '${separator}run${separator}user${separator}1000'
+      '${separator}tarkov_companion',
+    );
+    expect(
+      paths.runtimeDirectoryFrom(const {}).path,
+      '${separator}xdg-data${separator}tarkov_companion${separator}run',
+    );
+  });
 }

@@ -41,6 +41,16 @@ standard `Navigator`. Escape is wired once in `TarkovCompanionApp`; when the roo
 route cannot be popped the action is disabled, so the default Flutter dismissal
 handling still closes menus and text toolbars.
 
+## Deep links
+
+`AppRoot` accepts a `DeepLinkInbox`; a launch argument
+(`--item-id=<id>`) and a second process both queue an item id there. Once the
+session is ready, the shell pushes `ItemDetailScreen` over `HomeShell`, so the
+catalog stays mounted underneath and the removed-item state returns to it with
+the normal back action. The launch and second-instance contracts are documented
+in [`deep-links.md`](deep-links.md); window geometry and single-instance
+behavior are in [`window.md`](window.md).
+
 ## State preservation
 
 Both tabs are children of one `IndexedStack` and stay mounted when hidden.

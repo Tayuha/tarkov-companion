@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:tarkov_companion_data/tarkov_companion_data.dart';
 
 import 'app_paths.dart';
@@ -23,6 +25,7 @@ final class AppSessionReady extends AppSession {
     this.quests,
     this.activeProfileId,
     this.profileServices,
+    this.settings,
     required super.close,
   });
 
@@ -50,6 +53,12 @@ final class AppSessionReady extends AppSession {
   /// The shell shows the tab only when this is non-null, so a session built in
   /// a test without SQLite keeps the original two-tab layout.
   final ProfileServices? profileServices;
+
+  /// Typed access to local app preferences, when a real database is open.
+  ///
+  /// The desktop shell uses this for persisted window geometry; tests may
+  /// omit it.
+  final SettingsRepository? settings;
 }
 
 /// The database could not be opened and is available read-only.
@@ -107,6 +116,10 @@ Future<AppSession> openAppSession({
   final database = (opened as DatabaseOpened).database;
   final stateRepository = DatasetStateRepository(database);
   final client = httpClient ?? AllowlistedHttpClient();
+  final settings = SettingsRepository(
+    database,
+    onWarning: (message) => unawaited(logger.warn(message)),
+  );
 
   try {
     final applied = await stateRepository.appliedForMode(GameMode.regular);
@@ -150,6 +163,7 @@ Future<AppSession> openAppSession({
       quests: QuestRepository(database),
       activeProfileId: activeProfile.id,
       profileServices: profileServices,
+      settings: settings,
       close: () async {
         client.close();
         await opened.close();

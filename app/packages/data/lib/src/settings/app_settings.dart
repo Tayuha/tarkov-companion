@@ -1,9 +1,10 @@
 /// Immutable, typed application preferences.
 ///
-/// The fields mirror the four values documented in `docs/settings.md` and are
-/// persisted by [SettingsRepository] in the `appSettings` table. Defaults here
-/// are the documented defaults: a fresh database with no rows behaves exactly
-/// like `const AppSettings()`.
+/// The fields mirror the displayed preferences documented in
+/// `docs/settings.md` plus the desktop window geometry saved by the app shell,
+/// and are persisted by [SettingsRepository] in the `appSettings` table.
+/// Defaults here are the documented defaults: a fresh database with no rows
+/// behaves exactly like `const AppSettings()`.
 ///
 /// This type performs no profile validation and no I/O; it only describes the
 /// preference values and the range of `dataFreshnessHours`.
@@ -13,6 +14,7 @@ final class AppSettings {
     this.autoUpdateEnabled = defaultAutoUpdateEnabled,
     this.allowMeteredUpdates = defaultAllowMeteredUpdates,
     this.dataFreshnessHours = defaultDataFreshnessHours,
+    this.windowGeometryJson,
   });
 
   /// No profile is active until the user creates or activates one.
@@ -26,6 +28,9 @@ final class AppSettings {
 
   /// Prices and datasets older than this are labelled stale.
   static const int defaultDataFreshnessHours = 24;
+
+  /// No saved window geometry until the desktop shell records one.
+  static const String? defaultWindowGeometryJson = null;
 
   /// Smallest accepted freshness threshold.
   static const int minDataFreshnessHours = 1;
@@ -49,6 +54,13 @@ final class AppSettings {
   /// Age, in hours, after which prices and dataset data are stale.
   final int dataFreshnessHours;
 
+  /// The desktop window geometry document saved by the app shell, or `null`.
+  ///
+  /// The settings layer treats this as an opaque string so the schema stays
+  /// independent of the platform channel. The app shell writes and validates
+  /// JSON; an unreadable value falls back to `null` on the next read.
+  final String? windowGeometryJson;
+
   /// Whether every field is inside its documented range.
   ///
   /// Only [dataFreshnessHours] can be out of range; booleans and a nullable
@@ -65,6 +77,7 @@ final class AppSettings {
     bool? autoUpdateEnabled,
     bool? allowMeteredUpdates,
     int? dataFreshnessHours,
+    Object? windowGeometryJson = _unset,
   }) {
     return AppSettings(
       activeProfileId: identical(activeProfileId, _unset)
@@ -73,6 +86,9 @@ final class AppSettings {
       autoUpdateEnabled: autoUpdateEnabled ?? this.autoUpdateEnabled,
       allowMeteredUpdates: allowMeteredUpdates ?? this.allowMeteredUpdates,
       dataFreshnessHours: dataFreshnessHours ?? this.dataFreshnessHours,
+      windowGeometryJson: identical(windowGeometryJson, _unset)
+          ? this.windowGeometryJson
+          : windowGeometryJson as String?,
     );
   }
 
@@ -82,7 +98,8 @@ final class AppSettings {
       other.activeProfileId == activeProfileId &&
       other.autoUpdateEnabled == autoUpdateEnabled &&
       other.allowMeteredUpdates == allowMeteredUpdates &&
-      other.dataFreshnessHours == dataFreshnessHours;
+      other.dataFreshnessHours == dataFreshnessHours &&
+      other.windowGeometryJson == windowGeometryJson;
 
   @override
   int get hashCode => Object.hash(
@@ -90,6 +107,7 @@ final class AppSettings {
     autoUpdateEnabled,
     allowMeteredUpdates,
     dataFreshnessHours,
+    windowGeometryJson,
   );
 
   @override
@@ -97,7 +115,8 @@ final class AppSettings {
       'AppSettings(activeProfileId: $activeProfileId, '
       'autoUpdateEnabled: $autoUpdateEnabled, '
       'allowMeteredUpdates: $allowMeteredUpdates, '
-      'dataFreshnessHours: $dataFreshnessHours)';
+      'dataFreshnessHours: $dataFreshnessHours, '
+      'windowGeometryJson: $windowGeometryJson)';
 }
 
 /// Sentinel that distinguishes an omitted `copyWith` argument from `null`.
